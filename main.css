@@ -6,3 +6,14 @@
 svg{
 	border: 2px dotted red;
 }
+
+.red {
+  fill: red; /* not background-color! */
+}
+
+.fancy {
+  fill: none;
+  stroke: black; /* similar to border-color */
+  stroke-width: 3pt; /* similar to border-width */
+  stroke-dasharray: 3,5,10;
+}
