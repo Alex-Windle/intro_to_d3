@@ -18,11 +18,11 @@ svg{
   stroke-dasharray: 3,5,10;
 }
 
-.chart{
+.manual_chart{
 	border: 1px solid gray;
 }
 
-.chart div{
+.manual_chart div{
 	background-color: steelblue;
 	color: white;
 	font-weight: bold;
