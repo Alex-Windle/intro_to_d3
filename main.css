@@ -7,13 +7,24 @@ svg{
 	border: 2px dotted red;
 }
 
-.red {
+.red{
   fill: red; /* not background-color! */
 }
 
-.fancy {
+.fancy{
   fill: none;
   stroke: black; /* similar to border-color */
   stroke-width: 3pt; /* similar to border-width */
   stroke-dasharray: 3,5,10;
+}
+
+.chart{
+	border: 1px solid gray;
+}
+
+.chart div{
+	background-color: steelblue;
+	color: white;
+	font-weight: bold;
+	text-align: right;
 }
