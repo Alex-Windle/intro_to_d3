@@ -14,20 +14,25 @@
     <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
   </head>
   <body>
-    <div class="chart"></div>
+    <!-- <div class="chart"></div> -->
 	<script>
-		var data = [4, 8, 15, 16, 23, 42];
+		//Generate new text element
+		d3.select("body")
+			.append("p")
+			.text("hello world")
+
+		// var data = [4, 8, 15, 16, 23, 42];
 
 		//select the chart container
-		d3.select(".chart")
+		// d3.select(".chart")
 			//initiate the data join by defining the selection to which we will join data
-		  .selectAll("div")
+		  // .selectAll("div")
 		  	//join the data to the selection
-		    .data(data)
+		    // .data(data)
 		  //the enter selection represents new data for which there was no existing element before
-		  .enter().append("div")
-		    .style("width", function(d) { return d * 10 + "px"; })
-		    .text(function(d) { return d; });
+		  // .enter().append("div")
+		    // .style("width", function(d) { return d * 10 + "px"; })
+		    // .text(function(d) { return d; });
 	</script>
   </body>
 </html>
