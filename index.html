@@ -13,8 +13,12 @@
             .axis path,
             .axis line {
                 fill: none;
-                stroke: #000;
+                stroke: #000; 
                 shape-rendering: crispEdges;
+            }
+            .confidence_indicator {
+                stroke: black;
+                stroke-width: 1;
             }
         </style>
     </head>
@@ -171,12 +175,12 @@
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; });
             bar.append("line")
+                .attr("class", "confidence_indicator")
                 .data(confidenceIndicators)
                 .attr("x1", function () { return x.bandwidth() / 6; })
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
-                .attr("y2", function (d) { return y(d.hci); })
-                .style("stroke", "black");
+                .attr("y2", function (d) { return y(d.hci); });
          
             //axes
             var xAxis = chart.append("g")
