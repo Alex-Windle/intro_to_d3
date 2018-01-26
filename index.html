@@ -1347,19 +1347,32 @@
                 "wn": 3358303
             }
         ]; 
-            //extract datasets
+            //extract data
             var dataValues = [];
-            var categoryCodes = []; 
-            var categoryTitles = []; //titles from lookupObj
+            var categoryCodes = [];
+            var categoryTitles = []; 
             var confidenceIndicators = []; 
+            var legend = [];
             
-            function getCategoryTitleRsFromResponse (obj) {//takes json data object
-                var rs = obj.rs; //get title code 
-                var responseObject = lookUpObject.Response; 
-                categoryTitles.push(responseObject[rs].name);
+            function getCategoryTitleRsFromLku (obj) {
+                var rs = obj.rs; 
+                var lku = lookUpObject.Response; 
+                categoryTitles.push(lku[rs].name);
+                return;
             }; 
 
-            console.log("titles: ", categoryTitles);
+            function getLegendKeyS1FromLku (obj) {
+                var strat = obj.s1; 
+                var lku = lookUpObject.Stratification; 
+                var legendTitle = lku[strat].name;
+                if (legend.indexOf(legendTitle) > -1) { 
+                    return;
+                } else {
+                    legend.push(legendTitle);
+                    return;
+                }
+            }
+            console.log("legend: ", legend);
 
             jsonData.forEach(function (obj) {
                 var value = obj.dv; 
@@ -1371,11 +1384,13 @@
                 dataValues.push(value); 
                 categoryCodes.push(category);
                 confidenceIndicators.push(confidenceIndicator);
-                getCategoryTitleRsFromResponse (obj); 
+                getCategoryTitleRsFromLku (obj); 
+                getLegendKeyS1FromLku (obj); 
+                return;
             });  
 
-            console.log("Data values: ", dataValues);
-            console.log("Confidence indicators (low-high): ", confidenceIndicators);
+            // console.log("Data values: ", dataValues);
+            // console.log("Confidence indicators (low-high): ", confidenceIndicators);
 
             //vertical chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
@@ -1385,7 +1400,7 @@
 
             //scale
             var x = d3.scaleBand()
-                .domain(categoryTitles) //.domain(categoryCodes)
+                .domain(categoryTitles) 
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
@@ -1397,11 +1412,10 @@
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom); 
             var bar = chart.selectAll("g") //grouping includes bar & text          
-                .data(categoryTitles) //.data(categoryCodes)
+                .data(categoryTitles) 
                 .enter()
-                .append("g")
-                //position bars left to right, swap x and y coordinates for vertical 
-                .attr("transform", function (d) {
+                .append("g") 
+                .attr("transform", function (d) { //position bars
                     var spaceLeft = x.bandwidth() + x(d);
                     return "translate(" + spaceLeft + ", " + margin.top + ")";  
                 }); 
