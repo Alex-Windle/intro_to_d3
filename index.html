@@ -23,6 +23,18 @@
             .legend {
                 font: 15px sans-serif;
             }
+            div.tooltip {
+                position: absolute;
+                text-align: center;
+                width: 60px;
+                height: 28px;
+                padding: 2px;
+                font: 12px sans-serif;
+                background: white;
+                border: .5px solid #2e2e2e;
+                border-radius: 6px;
+                pointer-events: none;
+            }
         </style>
     </head>
     <body>
@@ -1355,18 +1367,26 @@
             var categoryCodes = [];
             var categoryTitles = []; 
             var confidenceIndicators = []; 
+            var hoverCodes = []; 
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
             
-            function getCategoryTitleRsFromLku (obj) {
+            function getCategoryTitle_Rs_FromLku (obj) {
                 var rs = obj.rs; 
                 var lku = lookUpObject.Response; 
                 categoryTitles.push(lku[rs].name);
                 return;
             }; 
 
-            function getLegendKeyS1FromLku (obj) {
+            function getHover_Wn_FromLku (obj) {
+                var wn = obj.wn; 
+                //what does this map to in the look up? 
+                hoverCodes.push(wn);
+                return;
+            }; 
+
+            function getLegendKey_S1_FromLku (obj) {
                 var strat = obj.s1; 
                 var lku = lookUpObject.Stratification; 
                 var legendTitle = lku[strat].name;
@@ -1376,7 +1396,7 @@
                     legendKeys.push(legendTitle);
                     return;
                 }
-            }
+            }; 
 
             jsonData.forEach(function (obj) {
                 var value = obj.dv; 
@@ -1388,19 +1408,22 @@
                 dataValues.push(value); 
                 categoryCodes.push(category);
                 confidenceIndicators.push(confidenceIndicator);
-                getCategoryTitleRsFromLku (obj); 
-                getLegendKeyS1FromLku (obj); 
+                getCategoryTitle_Rs_FromLku (obj); 
+                getHover_Wn_FromLku(obj); 
+                getLegendKey_S1_FromLku (obj); 
                 return;
             });  
-
-            // console.log("Data values: ", dataValues);
-            // console.log("Confidence indicators (low-high): ", confidenceIndicators);
 
             //vertical chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
             var spaceFromTop = height + margin.top; 
+             
+            //tool tip
+            var div = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0.9);
 
             //scale
             var x = d3.scaleBand()
@@ -1428,7 +1451,21 @@
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                .attr("data-legend", "Overall");
+                .data(hoverCodes)
+                .on("mouseover", function (d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    div.html(String(d)) //translate code to lku
+                        .style("padding-top", "15px")
+                        .style("left", (d3.event.pageX - 15) + "px")
+                        .style("top", (d3.event.pageY - 35) + "px");
+                })
+                .on("mouseout", function (d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                }); 
             bar.append("line")
                 .attr("class", "confidence_indicator")
                 .data(confidenceIndicators)
@@ -1455,18 +1492,16 @@
             //legend 
             var legend = chart.append("g")
                 .attr("class", "legend")
-            
-                legend.append("rect")
-                    .attr("x", width / 2 - legendColorKeyWidth)
-                    .attr("y", height + margin.bottom)
-                    .attr("width", legendColorKeyWidth)
-                    .attr("height", legendColorKeyHeight); //where is the color coming from?
-                
-                legend.append("text")
-                    .data(legendKeys)
-                    .attr("x", width / 2 + 10)
-                    .attr("y", height + margin.bottom + 13)
-                    .text(function (d) { return d; });
+            legend.append("rect")
+                .attr("x", width / 2 - legendColorKeyWidth)
+                .attr("y", height + margin.bottom)
+                .attr("width", legendColorKeyWidth)
+                .attr("height", legendColorKeyHeight); //where is the color coming from?
+            legend.append("text")
+                .data(legendKeys)
+                .attr("x", width / 2 + 10) //make spacing dynamic/repeatable 
+                .attr("y", height + margin.bottom + 13) // "
+                .text(function (d) { return d; });
         </script>
     </body>
 </html>
