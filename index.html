@@ -5,7 +5,6 @@
         <style>
             .chart rect {
                 fill: steelblue;
-                opacity: 1;
             }
             .axis text {
                 font: 15px sans-serif;
@@ -26,14 +25,15 @@
             div.tooltip {
                 position: absolute;
                 text-align: center;
-                width: 60px;
-                height: 28px;
-                padding: 2px;
-                font: 12px sans-serif;
-                background: white;
-                border: .5px solid #2e2e2e;
-                border-radius: 6px;
+                width: 80px;
+                height: 20px;
+                padding: 15px;
+                font: 14px sans-serif;
+                background:yellow;
+                border: none;
+                border-radius: 4px;
                 pointer-events: none;
+                box-shadow: 3 3 3px rgba(0, 0, 0. 0.4);
             }
         </style>
     </head>
@@ -1423,7 +1423,7 @@
             //tool tip
             var div = d3.select("body").append("div")
                 .attr("class", "tooltip")
-                .style("opacity", 0.9);
+                .style("opacity", 0);
 
             //scale
             var x = d3.scaleBand()
@@ -1457,9 +1457,9 @@
                         .duration(200)
                         .style("opacity", .9);
                     div.html(String(d)) //translate code to lku
-                        .style("padding-top", "15px")
-                        .style("left", (d3.event.pageX - 15) + "px")
-                        .style("top", (d3.event.pageY - 35) + "px");
+                        // .style("padding-top", "10px")
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 55) + "px");
                 })
                 .on("mouseout", function (d) {
                     div.transition()
