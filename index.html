@@ -20,6 +20,9 @@
                 stroke: black;
                 stroke-width: 1;
             }
+            .legend {
+                font: 15px sans-serif;
+            }
         </style>
     </head>
     <body>
@@ -1352,7 +1355,9 @@
             var categoryCodes = [];
             var categoryTitles = []; 
             var confidenceIndicators = []; 
-            var legend = [];
+            var legendKeys = [];
+            var legendColorKeyWidth = 20;
+            var legendColorKeyHeight = 20;
             
             function getCategoryTitleRsFromLku (obj) {
                 var rs = obj.rs; 
@@ -1365,14 +1370,13 @@
                 var strat = obj.s1; 
                 var lku = lookUpObject.Stratification; 
                 var legendTitle = lku[strat].name;
-                if (legend.indexOf(legendTitle) > -1) { 
+                if (legendKeys.indexOf(legendTitle) > -1) { 
                     return;
                 } else {
-                    legend.push(legendTitle);
+                    legendKeys.push(legendTitle);
                     return;
                 }
             }
-            console.log("legend: ", legend);
 
             jsonData.forEach(function (obj) {
                 var value = obj.dv; 
@@ -1423,7 +1427,8 @@
                 .data(dataValues)
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
-                .attr("width", function (d, i) { return x.bandwidth() / 3; });
+                .attr("width", function (d, i) { return x.bandwidth() / 3; })
+                .attr("data-legend", "Overall");
             bar.append("line")
                 .attr("class", "confidence_indicator")
                 .data(confidenceIndicators)
@@ -1431,7 +1436,7 @@
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
                 .attr("y2", function (d) { return y(d.hci); });
-         
+                
             //axes
             var xAxis = chart.append("g")
                 .attr("class", "axis")             
@@ -1446,6 +1451,22 @@
                 .attr("class", "axis")
                 .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
                 .call(d3.axisLeft(y));
+            
+            //legend 
+            var legend = chart.append("g")
+                .attr("class", "legend")
+            
+                legend.append("rect")
+                    .attr("x", width / 2 - legendColorKeyWidth)
+                    .attr("y", height + margin.bottom)
+                    .attr("width", legendColorKeyWidth)
+                    .attr("height", legendColorKeyHeight); //where is the color coming from?
+                
+                legend.append("text")
+                    .data(legendKeys)
+                    .attr("x", width / 2 + 10)
+                    .attr("y", height + margin.bottom + 13)
+                    .text(function (d) { return d; });
         </script>
     </body>
 </html>
