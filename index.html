@@ -12,8 +12,8 @@
             .axis path,
             .axis line {
                 fill: none;
-                stroke: #000; 
-                shape-rendering: crispEdges;
+                /* remove y-axis ticks and main x-axis */
+                stroke: none; 
             }
             .grid line {
                 stroke: darkgray;
@@ -1514,7 +1514,8 @@
             var yAxis = chart.append("g")
                 .attr("class", "axis")
                 .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-                .call(d3.axisLeft(y));
+                .call(d3.axisLeft(y))
+                .select(".domain").remove(); //remove y-axis line
             
             //legend 
             var legend = chart.append("g")
