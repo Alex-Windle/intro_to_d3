@@ -27,7 +27,7 @@
             .grid path {
                 stroke-width: 0;
             }
-            .confidence_indicator {
+            .confidence_indicator, .linecap {
                 stroke: black;
                 stroke-width: 1;
                 shape-rendering: crispEdges;                
@@ -1428,7 +1428,7 @@
             });  
 
             //chart
-            var margin = {top: 30, right: 0, bottom: 220, left: 80};
+            var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
             var spaceFromTop = height + margin.top; 
@@ -1498,22 +1498,31 @@
                         .duration(500)
                         .style("opacity", 0);
                 }); 
-            bar.append("line")
+            var line = bar.append("line")
                 .attr("class", "confidence_indicator")
                 .data(confidenceIndicators)
                 .attr("x1", function () { return x.bandwidth() / 6; })
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
                 .attr("y2", function (d) { return y(d.hci); });
-            
+            var linecap = line.append("g")
+                .append("line")
+                .attr("class", "linecap")
+                .attr("x1", 10)
+                .attr("y1", 500)
+                .attr("x2", 300)
+                .attr("y2", 500)
+                .style("stroke", "black")
+                .style("stroke-width", "2");
+
             //axes labels
-            var titleYAxisMarginLeft = margin.left/2;
-            var yAxisMidpoint = (height + margin.top)/2 + margin.top;             
+            var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+            var paddingLeft = 14;         
             var yAxisTitle = chart.append("text")
                 .attr("class", "label")
                 .attr("id", "y_axis_label")
                 .text("Title (data value unit)") //hard-coded. TODO: get data for this.
-                .attr("transform", "translate(" + titleYAxisMarginLeft + ", " + yAxisMidpoint + ")rotate(-90)")
+                .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
                 .attr("text-anchor", "middle");         
             
             //axes
