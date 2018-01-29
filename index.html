@@ -15,9 +15,18 @@
                 stroke: #000; 
                 shape-rendering: crispEdges;
             }
+            .grid line {
+                stroke: darkgray;
+                stroke-opacity: 0.7;
+                /* shape-rendering: crispEdges; */
+            }
+            .grid path {
+                stroke-width: 0;
+            }
             .confidence_indicator {
                 stroke: black;
                 stroke-width: 1;
+                shape-rendering: crispEdges;                
             }
             .legend {
                 font: 15px sans-serif;
@@ -1433,11 +1442,18 @@
             var y = d3.scaleLinear()
                 .domain([0, d3.max(dataValues)])
                 .range([height, 0]);
-            
+
+            //gridlines in y axis 
+            function make_y_gridlines() {
+                return d3.axisLeft(y)
+            }
+
             //chart
             var chart = d3.select(".chart")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom); 
+
+            //bars
             var bar = chart.selectAll("g") //grouping includes bar & text          
                 .data(categoryTitles) 
                 .enter()
@@ -1473,7 +1489,17 @@
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
                 .attr("y2", function (d) { return y(d.hci); });
-                
+            
+            // add the Y gridlines
+            chart.append("g")			
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    // .ticks()
+                    .tickFormat("")
+                )
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
             //axes
             var xAxis = chart.append("g")
                 .attr("class", "axis")             
