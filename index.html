@@ -1460,8 +1460,8 @@
             chart.append("g")			
                 .attr("class", "grid")
                 .call(make_y_gridlines()
-                    .tickSize(-width)
-                    .tickFormat("")
+                    .tickSize(-width) //full graph width
+                    .tickFormat("") //no label
                 )
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
             
