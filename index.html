@@ -1440,7 +1440,8 @@
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
-                .domain([0, d3.max(dataValues)])
+                //additional values acts as buffer. ex) if the max value is 70, the top of the chart shows a max of 90.
+                .domain([0, d3.max(dataValues) + 20]) 
                 .range([height, 0]);
 
             //gridlines in y axis 
