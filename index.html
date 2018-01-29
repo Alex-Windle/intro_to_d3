@@ -1423,7 +1423,7 @@
                 return;
             });  
 
-            //vertical chart
+            //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
@@ -1453,9 +1453,20 @@
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom); 
 
+             //create bar grouping
+            var bar = chart.selectAll("g"); //grouping includes bar & text  
+
+            // add the Y gridlines
+            chart.append("g")			
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+            
             //bars
-            var bar = chart.selectAll("g") //grouping includes bar & text          
-                .data(categoryTitles) 
+            bar = bar.data(categoryTitles) 
                 .enter()
                 .append("g") 
                 .attr("transform", function (d) { //position bars
@@ -1489,16 +1500,6 @@
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
                 .attr("y2", function (d) { return y(d.hci); });
-            
-            // add the Y gridlines
-            chart.append("g")			
-                .attr("class", "grid")
-                .call(make_y_gridlines()
-                    .tickSize(-width)
-                    // .ticks()
-                    .tickFormat("")
-                )
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             //axes
             var xAxis = chart.append("g")
