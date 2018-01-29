@@ -3,6 +3,9 @@
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script> 
         <style>
+            body {
+                /* font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif; */
+            }
             .chart rect {
                 fill: steelblue;
             }
@@ -10,7 +13,7 @@
                 font: 18px sans-serif; 
                 font-weight: bold;
             }
-            .axis text {
+            .axis text {               
                 font: 15px sans-serif;
             }
             .axis path,
@@ -1380,7 +1383,7 @@
             var categoryCodes = [];
             var categoryTitles = []; 
             var confidenceIndicators = []; 
-            var hoverCodes = []; 
+            var tooltipData = []; 
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
@@ -1392,12 +1395,19 @@
                 return;
             }; 
 
-            function getHover_Wn_FromLku (obj) {
-                var wn = obj.wn; 
-                //what does this map to in the look up? 
-                hoverCodes.push(wn);
-                return;
-            }; 
+            // function createTooltipDisplay (obj) { 
+            //     var tooltipDatum = {}; 
+            //     var title = function() {
+            //         console.log("all titles: ", categoryTitles);
+            //         return obj.rs; 
+            //     }();
+            //     tooltipDatum.title = "title: " + title; 
+            //     tooltipDatum.ci = "ci"; 
+            //     tooltipDatum.wn = "wn"; 
+            //     tooltipData.push(tooltipDatum);
+            //     return;
+            // }; 
+            // console.log("tool tip display: ", tooltipData);
 
             function getLegendKey_S1_FromLku (obj) {
                 var strat = obj.s1; 
@@ -1422,7 +1432,7 @@
                 categoryCodes.push(category);
                 confidenceIndicators.push(confidenceIndicator);
                 getCategoryTitle_Rs_FromLku (obj); 
-                getHover_Wn_FromLku(obj); 
+                // createTooltipDisplay(obj); 
                 getLegendKey_S1_FromLku (obj); 
                 return;
             });  
@@ -1483,7 +1493,7 @@
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                .data(hoverCodes)
+                .data(tooltipData)
                 .on("mouseover", function (d) {
                     div.transition()
                         .duration(200)
