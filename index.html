@@ -6,6 +6,10 @@
             .chart rect {
                 fill: steelblue;
             }
+            .label {
+                font: 18px sans-serif; 
+                font-weight: bold;
+            }
             .axis text {
                 font: 15px sans-serif;
             }
@@ -1424,7 +1428,7 @@
             });  
 
             //chart
-            var margin = {top: 30, right: 0, bottom: 220, left: 50};
+            var margin = {top: 30, right: 0, bottom: 220, left: 80};
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
             var spaceFromTop = height + margin.top; 
@@ -1501,7 +1505,17 @@
                 .attr("y1", function (d) { return y(d.lci); }) //start line
                 .attr("x2", function () { return x.bandwidth() / 6; }) //end line
                 .attr("y2", function (d) { return y(d.hci); });
-
+            
+            //axes labels
+            var titleYAxisMarginLeft = margin.left/2;
+            var yAxisMidpoint = (height + margin.top)/2 + margin.top;             
+            var yAxisTitle = chart.append("text")
+                .attr("class", "label")
+                .attr("id", "y_axis_label")
+                .text("Title (data value unit)") //hard-coded. TODO: get data for this.
+                .attr("transform", "translate(" + titleYAxisMarginLeft + ", " + yAxisMidpoint + ")rotate(-90)")
+                .attr("text-anchor", "middle");         
+            
             //axes
             var xAxis = chart.append("g")
                 .attr("class", "axis")             
@@ -1517,7 +1531,7 @@
                 .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
                 .call(d3.axisLeft(y))
                 .select(".domain").remove(); //remove y-axis line
-            
+
             //legend 
             var legend = chart.append("g")
                 .attr("class", "legend")
