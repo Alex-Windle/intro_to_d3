@@ -1444,24 +1444,6 @@
                 return;
             }); //Compatible in Chrome 
 
-            // for (i = 0; i < jsonData.length; i++) {
-            //     console.log("item", jsonData[i]);
-            //     var obj = jsonData[i]; 
-            //     var value = obj.dv; 
-            //     var category = obj.rs;
-            //     var confidenceIndicator = {
-            //         lci: obj.lci, 
-            //         hci: obj.hci
-            //     }; 
-            //     dataValues.push(value); 
-            //     categoryCodes.push(category);
-            //     confidenceIndicators.push(confidenceIndicator);
-            //     getCategoryTitle_Rs_FromLku (obj); 
-            //     get_Wn_FromLku(obj);  
-            //     getLegendKey_S1_FromLku (obj); 
-            //     make_tooltip_display(obj);
-            // } //Compatible in IE11, Chrome
-
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
@@ -1494,7 +1476,7 @@
             var chart = d3.select(".chart")
                 // FIX: Chart re-size in IE11 and Chrome. 
                 //when "height" is off, Chrome works. When it's on, IE works.
-                // .attr("height", "700") 
+                .attr("height", "700") 
                 .attr("viewBox", function () {
                     return "0 0 700 700";
                 }) //min-x, min-y, width, height
@@ -1537,7 +1519,7 @@
                     //     CI (${d.lci} - ${d.hci})
                     //     <br />WN = ${d.wn}
                     // `) // Compatible in Chrome
-                    div.html("Hello world") // Make compatible in IE11, Chrome
+                    div.html("Lorem ipsum") // Make compatible in IE11, Chrome                   
                         .style("left", (d3.event.pageX - 70) + "px")
                         .style("top", (d3.event.pageY - 90) + "px");
                 })
