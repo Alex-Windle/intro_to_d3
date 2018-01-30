@@ -1380,18 +1380,26 @@
         ]; 
             //extract data
             var categoryCodes = [];
-            var categoryTitles = []; //hover
-            var confidenceIndicators = []; //hover
-            var dataValues = [];            
-            var wn = []; //hover TODO...populate this array.
+            var categoryTitles = []; //hov
+            var confidenceIndicators = []; //hov
+            var dataValues = []; //hov           
+            var wns = []; //hov
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
-            
+            var tooltipDisplay = []; //array of objects that represent each piece of data
+
             function getCategoryTitle_Rs_FromLku (obj) {
                 var rs = obj.rs; 
                 var lku = lookUpObject.Response; 
                 categoryTitles.push(lku[rs].name);
+                return;
+            }; 
+
+            function get_Wn_FromLku (obj) {
+                var wn = obj.wn; 
+                //what does this map to in the look up? 
+                wns.push(wn);
                 return;
             }; 
 
@@ -1407,6 +1415,19 @@
                 }
             }; 
 
+            function make_tooltip_display (obj) {   
+                var rs = obj.rs; 
+                var lku = lookUpObject.Response;  
+                tooltipDisplay.push({
+                    "title": lku[rs].name,
+                    "dv": obj.dv,
+                    "lci": obj.lci, 
+                    "hci": obj.hci,
+                    "wn": obj.wn
+                });
+                return;
+            }
+
             jsonData.forEach(function (obj) {
                 var value = obj.dv; 
                 var category = obj.rs;
@@ -1418,8 +1439,9 @@
                 categoryCodes.push(category);
                 confidenceIndicators.push(confidenceIndicator);
                 getCategoryTitle_Rs_FromLku (obj); 
-                // createTooltipDisplay(obj); 
+                get_Wn_FromLku(obj);  
                 getLegendKey_S1_FromLku (obj); 
+                make_tooltip_display(obj);
                 return;
             });  
 
@@ -1480,13 +1502,13 @@
                     var spaceLeft = x.bandwidth() + x(d);
                     return "translate(" + spaceLeft + ", " + margin.top + ")";  
                 }); 
+                console.log('data: ', tooltipDisplay);
             bar.append("rect")
                 .data(dataValues)
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                // .data(tooltipData)
-                .data(categoryCodes)
+                .data(tooltipDisplay)
                 .on("mouseover", function (d) {
                     div.transition()
                         .duration(200)
@@ -1563,7 +1585,7 @@
             legend.append("text")
                 .data(legendKeys)
                 .attr("x", width / 2 + 10) //make spacing dynamic/repeatable 
-                .attr("y", height + margin.bottom + 13) // "
+                .attr("y", height + margin.bottom + 13)
                 .text(function (d) { return d; });
         </script>
     </body>
