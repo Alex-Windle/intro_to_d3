@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <html>
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script> 
@@ -20,8 +21,7 @@
             .axis path,
             .axis line {
                 fill: none;
-                /* remove y-axis ticks and main x-axis */
-                stroke: none; 
+                stroke: none; /* remove y-axis ticks and main x-axis */
             }
             .grid line {
                 stroke: darkgray;
@@ -1387,7 +1387,7 @@
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
-            var tooltipDisplay = []; //array of data to distribute to tooltip
+            var tooltipDisplay = []; //data displays in tooltip
 
             function getCategoryTitle_Rs_FromLku (obj) {
                 var rs = obj.rs; 
@@ -1398,7 +1398,6 @@
 
             function get_Wn_FromLku (obj) {
                 var wn = obj.wn; 
-                //what does this map to in the look up? 
                 wns.push(wn);
                 return;
             }; 
@@ -1407,12 +1406,12 @@
                 var strat = obj.s1; 
                 var lku = lookUpObject.Stratification; 
                 var legendTitle = lku[strat].name;
-                if (legendKeys.indexOf(legendTitle) > -1) { 
-                    return;
-                } else {
-                    legendKeys.push(legendTitle);
-                    return;
-                }
+                // if (legendKeys.indexOf(legendTitle) > -1) { 
+                //     return;
+                // } else {
+                //     legendKeys.push(legendTitle);
+                //     return;
+                // }
             }; 
 
             function make_tooltip_display (obj) {   
@@ -1428,7 +1427,28 @@
                 return;
             }
 
-            jsonData.forEach(function (obj) {
+            // jsonData.forEach(function (obj) {
+            //     var value = obj.dv; 
+            //     var category = obj.rs;
+            //     var confidenceIndicator = {
+            //         lci: obj.lci, 
+            //         hci: obj.hci
+            //     }; 
+            //     dataValues.push(value); 
+            //     categoryCodes.push(category);
+            //     confidenceIndicators.push(confidenceIndicator);
+            //     getCategoryTitle_Rs_FromLku (obj); 
+            //     get_Wn_FromLku(obj);  
+            //     getLegendKey_S1_FromLku (obj); 
+            //     make_tooltip_display(obj);
+            //     return;
+            // });  
+
+            // var array = [1,2,3,4,5];
+
+            for (i = 0; i < jsonData.length; i++) {
+                console.log("item", jsonData[i]);
+                var obj = jsonData[i]; 
                 var value = obj.dv; 
                 var category = obj.rs;
                 var confidenceIndicator = {
@@ -1442,8 +1462,7 @@
                 get_Wn_FromLku(obj);  
                 getLegendKey_S1_FromLku (obj); 
                 make_tooltip_display(obj);
-                return;
-            });  
+            }
 
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
@@ -1464,8 +1483,8 @@
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
-                //additional values acts as buffer. ex) if the max value is 70, the top of the chart shows a max of 90.
-                .domain([0, d3.max(dataValues) + 3]) 
+                //provides a max-value buffer
+                .domain([0, d3.max(dataValues) + 3]) //REFACTOR - REMOVE HARDCODED VAL
                 .range([height, 0]);
 
             //gridlines in y axis 
@@ -1475,8 +1494,8 @@
 
             //chart
             var chart = d3.select(".chart")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
+                // .attr("width", width + margin.left + margin.right)
+                // .attr("height", height + margin.top + margin.bottom)
                 .attr("viewBox", function () {
                     return "0 0 700 700";
                 }) //min-x, min-y, width, height
@@ -1490,7 +1509,7 @@
                 .attr("class", "grid")
                 .call(make_y_gridlines()
                     .tickSize(-width) //full graph width
-                    .tickFormat("") //no label
+                    .tickFormat("") //remove label
                 )
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
             
@@ -1513,12 +1532,13 @@
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(`
-                        <h3>${d.title}</h3> 
-                        <h3>${d.dv}</h3>
-                        CI (${d.lci} - ${d.hci})
-                        <br />WN = ${d.wn}
-                    `)
+                    // div.html(`
+                    //     <h3>${d.title}</h3> 
+                    //     <h3>${d.dv}</h3>
+                    //     CI (${d.lci} - ${d.hci})
+                    //     <br />WN = ${d.wn}
+                    // `) //FIX
+                    div.html("Hello world") //NOT IE COMPATIBLE
                         .style("left", (d3.event.pageX - 70) + "px")
                         .style("top", (d3.event.pageY - 90) + "px");
                 })
@@ -1558,7 +1578,7 @@
             var yAxisTitle = chart.append("text")
                 .attr("class", "label")
                 .attr("id", "y_axis_label")
-                .text("Title (data value unit)") //hard-coded. TO DO: get data for this.
+                .text("Title (data value unit)") //REFACTOR - GET UNIT VALUES
                 .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
                 .attr("text-anchor", "middle");         
             
@@ -1588,7 +1608,7 @@
                 .attr("height", legendColorKeyHeight); //where is the color coming from?
             legend.append("text")
                 .data(legendKeys)
-                .attr("x", width / 2 + 10) //make spacing dynamic/repeatable 
+                .attr("x", width / 2 + 10) //REFACTOR - MAKE SPACING DYNAMIC, REPEATABLE
                 .attr("y", height + margin.bottom + 13)
                 .text(function (d) { return d; });
         </script>
