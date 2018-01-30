@@ -3,8 +3,9 @@
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script> 
         <style>
-            body {
-                /* font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif; */
+            h3 {
+                margin: 0;
+                padding: 0;
             }
             .chart rect {
                 fill: steelblue;
@@ -40,16 +41,15 @@
             }
             div.tooltip {
                 position: absolute;
-                text-align: center;
-                width: 80px;
-                height: 20px;
-                padding: 15px;
-                font: 14px sans-serif;
-                background:yellow;
-                border: none;
-                border-radius: 4px;
+                text-align: left;
+                width: 140px;
+                padding: 7px 7px 7px 11px;
+                font: 12px sans-serif;
+                line-height: 1.5em;
+                background:white;
+                border: 1px solid black;
+                border-radius: 5px;
                 pointer-events: none;
-                box-shadow: 3 3 3px rgba(0, 0, 0. 0.4);
             }
         </style>
     </head>
@@ -1380,14 +1380,14 @@
         ]; 
             //extract data
             var categoryCodes = [];
-            var categoryTitles = []; //hov
-            var confidenceIndicators = []; //hov
-            var dataValues = []; //hov           
-            var wns = []; //hov
+            var categoryTitles = [];
+            var confidenceIndicators = [];
+            var dataValues = [];           
+            var wns = []; 
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
-            var tooltipDisplay = []; //array of objects that represent each piece of data
+            var tooltipDisplay = []; //array of data to distribute to tooltip
 
             function getCategoryTitle_Rs_FromLku (obj) {
                 var rs = obj.rs; 
@@ -1419,11 +1419,11 @@
                 var rs = obj.rs; 
                 var lku = lookUpObject.Response;  
                 tooltipDisplay.push({
-                    "title": lku[rs].name,
-                    "dv": obj.dv,
-                    "lci": obj.lci, 
-                    "hci": obj.hci,
-                    "wn": obj.wn
+                    title: lku[rs].name,
+                    dv: obj.dv,
+                    lci: obj.lci, 
+                    hci: obj.hci,
+                    wn: obj.wn
                 });
                 return;
             }
@@ -1509,14 +1509,18 @@
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
                 .data(tooltipDisplay)
-                .on("mouseover", function (d) {
+                .on("mouseover", function (d, i) {
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(String(d)) //translate code to lku
-                        // .style("padding-top", "10px")
-                        .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 55) + "px");
+                    div.html(`
+                        <h3>${d.title}</h3> 
+                        <h3>${d.dv}</h3>
+                        CI (${d.lci} - ${d.hci})
+                        <br />WN = ${d.wn}
+                    `)
+                        .style("left", (d3.event.pageX - 70) + "px")
+                        .style("top", (d3.event.pageY - 90) + "px");
                 })
                 .on("mouseout", function (d) {
                     div.transition()
