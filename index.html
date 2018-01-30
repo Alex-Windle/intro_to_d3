@@ -11,7 +11,7 @@
             .chart rect {
                 fill: steelblue;
             }
-            .label {
+            .label { 
                 font: 18px sans-serif; 
                 font-weight: bold;
             }
@@ -1406,12 +1406,12 @@
                 var strat = obj.s1; 
                 var lku = lookUpObject.Stratification; 
                 var legendTitle = lku[strat].name;
-                // if (legendKeys.indexOf(legendTitle) > -1) { 
-                //     return;
-                // } else {
-                //     legendKeys.push(legendTitle);
-                //     return;
-                // }
+                if (legendKeys.indexOf(legendTitle) > -1) { 
+                    return;
+                } else {
+                    legendKeys.push(legendTitle);
+                    return;
+                }
             }; 
 
             function make_tooltip_display (obj) {   
@@ -1427,28 +1427,7 @@
                 return;
             }
 
-            // jsonData.forEach(function (obj) {
-            //     var value = obj.dv; 
-            //     var category = obj.rs;
-            //     var confidenceIndicator = {
-            //         lci: obj.lci, 
-            //         hci: obj.hci
-            //     }; 
-            //     dataValues.push(value); 
-            //     categoryCodes.push(category);
-            //     confidenceIndicators.push(confidenceIndicator);
-            //     getCategoryTitle_Rs_FromLku (obj); 
-            //     get_Wn_FromLku(obj);  
-            //     getLegendKey_S1_FromLku (obj); 
-            //     make_tooltip_display(obj);
-            //     return;
-            // });  
-
-            // var array = [1,2,3,4,5];
-
-            for (i = 0; i < jsonData.length; i++) {
-                console.log("item", jsonData[i]);
-                var obj = jsonData[i]; 
+            jsonData.forEach(function (obj) {
                 var value = obj.dv; 
                 var category = obj.rs;
                 var confidenceIndicator = {
@@ -1462,7 +1441,26 @@
                 get_Wn_FromLku(obj);  
                 getLegendKey_S1_FromLku (obj); 
                 make_tooltip_display(obj);
-            }
+                return;
+            }); //Compatible in Chrome 
+
+            // for (i = 0; i < jsonData.length; i++) {
+            //     console.log("item", jsonData[i]);
+            //     var obj = jsonData[i]; 
+            //     var value = obj.dv; 
+            //     var category = obj.rs;
+            //     var confidenceIndicator = {
+            //         lci: obj.lci, 
+            //         hci: obj.hci
+            //     }; 
+            //     dataValues.push(value); 
+            //     categoryCodes.push(category);
+            //     confidenceIndicators.push(confidenceIndicator);
+            //     getCategoryTitle_Rs_FromLku (obj); 
+            //     get_Wn_FromLku(obj);  
+            //     getLegendKey_S1_FromLku (obj); 
+            //     make_tooltip_display(obj);
+            // } //Compatible in IE11, Chrome
 
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
@@ -1494,8 +1492,9 @@
 
             //chart
             var chart = d3.select(".chart")
-                // .attr("width", width + margin.left + margin.right)
-                // .attr("height", height + margin.top + margin.bottom)
+                // FIX: Chart re-size in IE11 and Chrome. 
+                //when "height" is off, Chrome works. When it's on, IE works.
+                // .attr("height", "700") 
                 .attr("viewBox", function () {
                     return "0 0 700 700";
                 }) //min-x, min-y, width, height
@@ -1537,8 +1536,8 @@
                     //     <h3>${d.dv}</h3>
                     //     CI (${d.lci} - ${d.hci})
                     //     <br />WN = ${d.wn}
-                    // `) //FIX
-                    div.html("Hello world") //NOT IE COMPATIBLE
+                    // `) // Compatible in Chrome
+                    div.html("Hello world") // Make compatible in IE11, Chrome
                         .style("left", (d3.event.pageX - 70) + "px")
                         .style("top", (d3.event.pageY - 90) + "px");
                 })
