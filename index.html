@@ -1379,11 +1379,11 @@
             }
         ]; 
             //extract data
-            var dataValues = [];
             var categoryCodes = [];
-            var categoryTitles = []; 
-            var confidenceIndicators = []; 
-            var tooltipData = []; 
+            var categoryTitles = []; //hover
+            var confidenceIndicators = []; //hover
+            var dataValues = [];            
+            var wn = []; //hover TODO...populate this array.
             var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
@@ -1394,20 +1394,6 @@
                 categoryTitles.push(lku[rs].name);
                 return;
             }; 
-
-            // function createTooltipDisplay (obj) { 
-            //     var tooltipDatum = {}; 
-            //     var title = function() {
-            //         console.log("all titles: ", categoryTitles);
-            //         return obj.rs; 
-            //     }();
-            //     tooltipDatum.title = "title: " + title; 
-            //     tooltipDatum.ci = "ci"; 
-            //     tooltipDatum.wn = "wn"; 
-            //     tooltipData.push(tooltipDatum);
-            //     return;
-            // }; 
-            // console.log("tool tip display: ", tooltipData);
 
             function getLegendKey_S1_FromLku (obj) {
                 var strat = obj.s1; 
@@ -1442,7 +1428,9 @@
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
             var spaceFromTop = height + margin.top; 
-             
+            var totalWidth = width + margin.left + margin.right; 
+            var totalHeight = height + margin.top + margin.bottom;
+
             //tool tip
             var div = d3.select("body").append("div")
                 .attr("class", "tooltip")
@@ -1464,9 +1452,13 @@
             }
 
             //chart
-            var chart = d3.select(".chart")
+            var chart = d3.select(".chart") //svg
                 .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom); 
+                .attr("height", height + margin.top + margin.bottom)//;
+                .attr("viewBox", function () {
+                    return "0 0 700 700";
+                }) //min-x, min-y, width, height
+                .attr("preserveAspectRatio", "xMinYMin meet"); 
 
              //create bar grouping
             var bar = chart.selectAll("g"); //grouping includes bar & text  
@@ -1493,7 +1485,8 @@
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                .data(tooltipData)
+                // .data(tooltipData)
+                .data(categoryCodes)
                 .on("mouseover", function (d) {
                     div.transition()
                         .duration(200)
