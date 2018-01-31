@@ -1,98 +1,89 @@
-[
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6HEAR",
-        "dvt": "AGEADJPREV",
-        "dv": 4.5,
-        "lci": 4,
-        "hci": 5,
-        "wn": 1335697
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6VIS",
-        "dvt": "AGEADJPREV",
-        "dv": 4.2,
-        "lci": 3.7,
-        "hci": 4.7,
-        "wn": 1236853
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6SEL",
-        "dvt": "AGEADJPREV",
-        "dv": 3.3,
-        "lci": 2.9,
-        "hci": 3.8,
-        "wn": 993955
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6IND",
-        "dvt": "AGEADJPREV",
-        "dv": 5.8,
-        "lci": 5.2,
-        "hci": 6.4,
-        "wn": 1682258
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6DIS1",
-        "dvt": "AGEADJPREV",
-        "dv": 22.3,
-        "lci": 21.3,
-        "hci": 23.3,
-        "wn": 6479729
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6DIS2",
-        "dvt": "AGEADJPREV",
-        "dv": 77.7,
-        "lci": 76.7,
-        "hci": 78.7,
-        "wn": 21821005
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6COG",
-        "dvt": "AGEADJPREV",
-        "dv": 9.5,
-        "lci": 8.8,
-        "hci": 10.2,
-        "wn": 2718561
-    },
-    {
-        "qi": "STATTYPE",
-        "yr": "YR1",
-        "sc1": "CAT1",
-        "s1": "BO1",
-        "rs": "Q6MOB",
-        "dvt": "AGEADJPREV",
-        "dv": 11.2,
-        "lci": 10.5,
-        "hci": 12,
-        "wn": 3358303
-    }
-]; 
+[{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6HEAR",
+    "dvt": "AGEADJPREV",
+    "dv": 4.5,
+    "lci": 4,
+    "hci": 5,
+    "wn": 1335697
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6VIS",
+    "dvt": "AGEADJPREV",
+    "dv": 4.2,
+    "lci": 3.7,
+    "hci": 4.7,
+    "wn": 1236853
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6SEL",
+    "dvt": "AGEADJPREV",
+    "dv": 3.3,
+    "lci": 2.9,
+    "hci": 3.8,
+    "wn": 993955
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6IND",
+    "dvt": "AGEADJPREV",
+    "dv": 5.8,
+    "lci": 5.2,
+    "hci": 6.4,
+    "wn": 1682258
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6DIS1",
+    "dvt": "AGEADJPREV",
+    "dv": 22.3,
+    "lci": 21.3,
+    "hci": 23.3,
+    "wn": 6479729
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6DIS2",
+    "dvt": "AGEADJPREV",
+    "dv": 77.7,
+    "lci": 76.7,
+    "hci": 78.7,
+    "wn": 21821005
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6COG",
+    "dvt": "AGEADJPREV",
+    "dv": 9.5,
+    "lci": 8.8,
+    "hci": 10.2,
+    "wn": 2718561
+},{
+    "qi": "STATTYPE",
+    "yr": "YR1",
+    "sc1": "CAT1",
+    "s1": "BO1",
+    "rs": "Q6MOB",
+    "dvt": "AGEADJPREV",
+    "dv": 11.2,
+    "lci": 10.5,
+    "hci": 12,
+    "wn": 3358303
+}]
