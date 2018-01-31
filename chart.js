@@ -1,4 +1,8 @@
-function makeChart (chartConfigObject, data_1, lookup) {
+function makeChart (chartConfigObject, jsonData, lookup) {
+            console.log("chart: ", chartConfigObject); 
+            console.log("json: ", jsonData); 
+            console.log("lookup: ", lookup); 
+            
             //extract data
             var categoryCodes = [];
             var categoryTitles = [];
@@ -48,22 +52,22 @@ function makeChart (chartConfigObject, data_1, lookup) {
                 return;
             }
 
-            jsonData.forEach(function (obj) {
-                var value = obj.dv; 
-                var category = obj.rs;
-                var confidenceIndicator = {
-                    lci: obj.lci, 
-                    hci: obj.hci
-                }; 
-                dataValues.push(value); 
-                categoryCodes.push(category);
-                confidenceIndicators.push(confidenceIndicator);
-                getCategoryTitle_Rs_FromLku (obj); 
-                get_Wn_FromLku(obj);  
-                getLegendKey_S1_FromLku (obj); 
-                make_tooltip_display(obj);
-                return;
-            });
+            // jsonData.forEach(function (obj) {
+            //     var value = obj.dv; 
+            //     var category = obj.rs;
+            //     var confidenceIndicator = {
+            //         lci: obj.lci, 
+            //         hci: obj.hci
+            //     }; 
+            //     dataValues.push(value); 
+            //     categoryCodes.push(category);
+            //     confidenceIndicators.push(confidenceIndicator);
+            //     getCategoryTitle_Rs_FromLku (obj); 
+            //     get_Wn_FromLku(obj);  
+            //     getLegendKey_S1_FromLku (obj); 
+            //     make_tooltip_display(obj);
+            //     return;
+            // });
 
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
