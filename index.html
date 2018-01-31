@@ -1477,6 +1477,7 @@
             var spaceFromTop = height + margin.top; 
             var totalWidth = width + margin.left + margin.right; 
             var totalHeight = height + margin.top + margin.bottom;
+            var CHART_TOP_BUFFER_VALUE = 10; //this value must be approved by the team. Test 5-10.
 
             //tool tip
             var div = d3.select("body").append("div")
@@ -1490,7 +1491,7 @@
                 .padding(0.1);
             var y = d3.scaleLinear()
                 //provides a max-value buffer
-                .domain([0, d3.max(dataValues) + 3]) //REFACTOR - REMOVE HARDCODED VAL
+                .domain([0, d3.max(dataValues) + CHART_TOP_BUFFER_VALUE])
                 .range([height, 0]);
 
             //gridlines in y axis 
