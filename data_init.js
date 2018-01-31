@@ -1,19 +1,16 @@
-//load data (TODO)
-var data_1 = new Promise(function (resolve, reject) {
-    d3.json("./resp_1.json", function (data) {
-        resolve(data);
-        return;
-    })
-});
+// load data
+let data_1 = new Promise(function(resolve, reject){
+	d3.json("./resp_1.json", function(data) {
+		resolve(data)
+	})
+})
 
-var mypromise = new Promise(function (resolve, reject) {
-    //asynchonous code runs here
-    //call resolve() to indicate task completed
-    //call reject() to indicate task failed
-}); 
-
-//load lookup.json (TODO, then TEST!!!)
-var lookup = {"test": 1, "data":"lookup", "type":"json"};
+//load lookup
+var lookup = new Promise(function(resolve, reject){
+	d3.json("./lookup.json", function(data) {
+		resolve(data)
+	})
+})
 
 //configuration object
 var chartConfigObject = {  
@@ -41,4 +38,8 @@ var chartConfigObject = {
     "confidenceIntervalLabel":"95% CI" //pass to chart
 }
 
-makeChart(chartConfigObject, data_1, lookup); //call chart function 
+Promise.all([data_1, lookup]).then(function (data) {
+    var jsonData = data[0]; 
+    var lookup = data[1]; 
+    makeChart(chartConfigObject, jsonData, lookup); //call chart function 
+});
