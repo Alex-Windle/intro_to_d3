@@ -1,3 +1,9 @@
+//load data
+var data_1 = {"name": "alex", "lastname": "windle"};
+
+//load lookup.json
+var lookup = {"test": 1, "data":"lookup", "type":"json"};
+
 //configuration object
 var chartConfigObject = {  
     "xAxisColumn":"rs", //code (translate to semantic English w/ lookup)
@@ -24,4 +30,4 @@ var chartConfigObject = {
     "confidenceIntervalLabel":"95% CI" //pass to chart
 }
 
-makeChart(chartConfigObject); //call chart function 
+makeChart(chartConfigObject, data_1, lookup); //call chart function 
