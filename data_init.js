@@ -1,7 +1,18 @@
-//load data
-var data_1 = {"name": "alex", "lastname": "windle"};
+//load data (TODO)
+var data_1 = new Promise(function (resolve, reject) {
+    d3.json("./resp_1.json", function (data) {
+        resolve(data);
+        return;
+    })
+});
 
-//load lookup.json
+var mypromise = new Promise(function (resolve, reject) {
+    //asynchonous code runs here
+    //call resolve() to indicate task completed
+    //call reject() to indicate task failed
+}); 
+
+//load lookup.json (TODO, then TEST!!!)
 var lookup = {"test": 1, "data":"lookup", "type":"json"};
 
 //configuration object
