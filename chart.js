@@ -1386,7 +1386,7 @@ function makeChart (chartConfigObject) {
                 getLegendKey_S1_FromLku (obj); 
                 make_tooltip_display(obj);
                 return;
-            }); //Compatible in Chrome 
+            });
 
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
@@ -1408,7 +1408,7 @@ function makeChart (chartConfigObject) {
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
-                //provides a max-value buffer
+                //set value scaling with buffer
                 .domain([0, d3.max(dataValues) + CHART_TOP_BUFFER_VALUE])
                 .range([height, 0]);
 
@@ -1418,24 +1418,22 @@ function makeChart (chartConfigObject) {
             }
 
             //chart
-            var chart = d3.select(".chart")
-                // FIX: Chart re-size in IE11 and Chrome. 
-                //when "height" is off, Chrome works. When it's on, IE works.
-                .attr("height", "700") 
+            var chart = d3.select(".chart") 
+                // .attr("height", "700") //refactor for compatibility with ie
                 .attr("viewBox", function () {
                     return "0 0 700 700";
-                }) //min-x, min-y, width, height
+                })
                 .attr("preserveAspectRatio", "xMinYMin meet"); 
 
              //create bar grouping
-            var bar = chart.selectAll("g"); //grouping includes bar & text  
+            var bar = chart.selectAll("g"); 
 
             // add the Y gridlines
             chart.append("g")			
                 .attr("class", "grid")
                 .call(make_y_gridlines()
                     .tickSize(-width) //full graph width
-                    .tickFormat("") //remove label
+                    .tickFormat("")
                 )
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
             
@@ -1443,11 +1441,10 @@ function makeChart (chartConfigObject) {
             bar = bar.data(categoryTitles) 
                 .enter()
                 .append("g") 
-                .attr("transform", function (d) { //position bars
+                .attr("transform", function (d) { 
                     var spaceLeft = x.bandwidth() + x(d);
                     return "translate(" + spaceLeft + ", " + margin.top + ")";  
                 }); 
-                console.log('data: ', tooltipDisplay);
             bar.append("rect")
                 .data(dataValues)
                 .attr("y", function (d) { return y(d); }) //y coordinate
@@ -1463,8 +1460,7 @@ function makeChart (chartConfigObject) {
                         <h3>${d.dv}</h3>
                         CI (${d.lci} - ${d.hci})
                         <br />WN = ${d.wn}
-                    `) // Compatible in Chrome
-                    // div.html("Lorem ipsum") // Make compatible in IE11, Chrome                   
+                    `)                  
                         .style("left", (d3.event.pageX - 70) + "px")
                         .style("top", (d3.event.pageY - 90) + "px");
                 })
@@ -1473,14 +1469,16 @@ function makeChart (chartConfigObject) {
                         .duration(500)
                         .style("opacity", 0);
                 }); 
+
             //confidence indicator line
             var line = bar.append("line")
                 .attr("class", "confidence_indicator")
                 .data(confidenceIndicators)
                 .attr("x1", function () { return x.bandwidth() / 6; })
-                .attr("y1", function (d) { return y(d.lci); }) //start line
-                .attr("x2", function () { return x.bandwidth() / 6; }) //end line
+                .attr("y1", function (d) { return y(d.lci); }) 
+                .attr("x2", function () { return x.bandwidth() / 6; }) 
                 .attr("y2", function (d) { return y(d.hci); });
+
             //confidence indicator linecaps
             var linecapHalfWidth = 5; 
             var linecap_top = bar.append("line")
@@ -1504,7 +1502,7 @@ function makeChart (chartConfigObject) {
             var yAxisTitle = chart.append("text")
                 .attr("class", "label")
                 .attr("id", "y_axis_label")
-                .text("Title (data value unit)") //REFACTOR - GET UNIT VALUES
+                .text("Title (data value unit)")//refactor
                 .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
                 .attr("text-anchor", "middle");         
             
@@ -1534,7 +1532,7 @@ function makeChart (chartConfigObject) {
                 .attr("height", legendColorKeyHeight); //where is the color coming from?
             legend.append("text")
                 .data(legendKeys)
-                .attr("x", width / 2 + 10) //REFACTOR - MAKE SPACING DYNAMIC, REPEATABLE
+                .attr("x", width / 2 + 10) //refactor
                 .attr("y", height + margin.bottom + 13)
                 .text(function (d) { return d; });
 } 
