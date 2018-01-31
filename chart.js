@@ -2,6 +2,25 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             console.log("chart: ", chartConfigObject); 
             console.log("json: ", jsonData); 
             console.log("lookup: ", lookup); 
+
+            //set chart variables
+            let barDataValues = []; 
+            let xAxisCategory;  //create!!! x-axis categories
+            let xAxisCategoryLookup; //get from xAxisType
+
+            // let yAxisValues;    //y-axis values
+            // let yAxisTitle;     //y-axis title
+            // let totalBars;      //total number of bars to display
+            // let barColors;      //bar color options
+            // let legendTitle;    //legend title
+            // let confidenceIntervalLabel; //where to display this? 
+            // let decimalPlaces;  //sets decimals to display
+            // let displayTrendChart; //true or false
+            
+            //chart variable codes
+            let xAxisColumn = chartConfigObject.xAxisColumn; 
+            console.log("xAxisColumn", xAxisColumn);
+            let xAxisCategoryDataCodes = []; 
             
             //extract data
             var categoryCodes = [];
@@ -14,61 +33,73 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var legendColorKeyHeight = 20;
             var tooltipDisplay = []; //data displays in tooltip
 
-            function getCategoryTitle_Rs_FromLku (obj) {
-                var rs = obj.rs; 
-                var lku = lookUpObject.Response; 
-                categoryTitles.push(lku[rs].name);
-                return;
-            }; 
-
-            function get_Wn_FromLku (obj) {
-                var wn = obj.wn; 
-                wns.push(wn);
-                return;
-            }; 
-
-            function getLegendKey_S1_FromLku (obj) {
-                var strat = obj.s1; 
-                var lku = lookUpObject.Stratification; 
-                var legendTitle = lku[strat].name;
-                if (legendKeys.indexOf(legendTitle) > -1) { 
-                    return;
-                } else {
-                    legendKeys.push(legendTitle);
-                    return;
-                }
-            }; 
-
-            function make_tooltip_display (obj) {   
-                var rs = obj.rs; 
-                var lku = lookUpObject.Response;  
-                tooltipDisplay.push({
-                    title: lku[rs].name,
-                    dv: obj.dv,
-                    lci: obj.lci, 
-                    hci: obj.hci,
-                    wn: obj.wn
-                });
-                return;
-            }
-
-            // jsonData.forEach(function (obj) {
-            //     var value = obj.dv; 
-            //     var category = obj.rs;
-            //     var confidenceIndicator = {
-            //         lci: obj.lci, 
-            //         hci: obj.hci
-            //     }; 
-            //     dataValues.push(value); 
-            //     categoryCodes.push(category);
-            //     confidenceIndicators.push(confidenceIndicator);
-            //     getCategoryTitle_Rs_FromLku (obj); 
-            //     get_Wn_FromLku(obj);  
-            //     getLegendKey_S1_FromLku (obj); 
-            //     make_tooltip_display(obj);
+            // function getCategoryTitle_Rs_FromLku (obj) {
+            //     var rs = obj.rs; 
+            //     var lku = lookUpObject.Response; 
+            //     categoryTitles.push(lku[rs].name);
             //     return;
-            // });
+            // }; 
 
+            // function get_Wn_FromLku (obj) {
+            //     var wn = obj.wn; 
+            //     wns.push(wn);
+            //     return;
+            // }; 
+
+            // function getLegendKey_S1_FromLku (obj) {
+            //     var strat = obj.s1; 
+            //     var lku = lookUpObject.Stratification; 
+            //     var legendTitle = lku[strat].name;
+            //     if (legendKeys.indexOf(legendTitle) > -1) { 
+            //         return;
+            //     } else {
+            //         legendKeys.push(legendTitle);
+            //         return;
+            //     }
+            // }; 
+
+            // function make_tooltip_display (obj) {   
+            //     var rs = obj.rs; 
+            //     var lku = lookUpObject.Response;  
+            //     tooltipDisplay.push({
+            //         title: lku[rs].name,
+            //         dv: obj.dv,
+            //         lci: obj.lci, 
+            //         hci: obj.hci,
+            //         wn: obj.wn
+            //     });
+            //     return;
+            // }
+
+            jsonData.forEach(function (obj, i) {
+                console.log("data: ", i, obj);
+
+                //get data values
+                let barDataValue = obj.dv; 
+                barDataValues.push(barDataValue);
+
+                //get x-axis category data codes. these need to be translated to semantic english.
+                xAxisCategoryDataCodes.push(obj[xAxisColumn]);
+                
+                // var value = obj.dv; 
+                // var category = obj.rs;
+                // var confidenceIndicator = {
+                //     lci: obj.lci, 
+                //     hci: obj.hci
+                // }; 
+                // dataValues.push(value); 
+                // categoryCodes.push(category);
+                // confidenceIndicators.push(confidenceIndicator);
+                // getCategoryTitle_Rs_FromLku (obj); 
+                // get_Wn_FromLku(obj);  
+                // getLegendKey_S1_FromLku (obj); 
+                // make_tooltip_display(obj);
+                return;
+            });
+
+            // console.log("barDataValues", barDataValues);
+            console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
+            
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
