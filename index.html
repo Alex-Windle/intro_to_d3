@@ -1444,6 +1444,32 @@
                 return;
             }); //Compatible in Chrome 
 
+            //configuration
+            var chartConfigObject = {  
+                "xAxisColumn":"rs", //code (translate to semantic English w/ lookup)
+                "xAxisType":"Response", //lookup 
+                "legendColumn":"s1", //code (translate to semantic English w/ lookup)
+                "legendType":"Stratification", //lookup 
+                "legendTitleStr":"", //if empty, do what? 
+                "displayTrendChart":false, //line chart?
+                "colorsArrStr":[  //pass to chart
+                    "#377eb8",
+                    "#e41a1c",
+                    "#4daf4a",
+                    "#984ea3",
+                    "#ff7f00",
+                    "#a65628",
+                    "#f781bf",
+                    "#CAB2D6",
+                    "#FF7F00",
+                    "#FDBF6F",
+                    "#FFFF99"
+                ],
+                "yAxisTitle":"Age-adjusted Prevalence (%)", //pass to chart
+                "decimalPlaces":1,
+                "confidenceIntervalLabel":"95% CI" //pass to chart
+            }
+
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
@@ -1513,13 +1539,13 @@
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    // div.html(`
-                    //     <h3>${d.title}</h3> 
-                    //     <h3>${d.dv}</h3>
-                    //     CI (${d.lci} - ${d.hci})
-                    //     <br />WN = ${d.wn}
-                    // `) // Compatible in Chrome
-                    div.html("Lorem ipsum") // Make compatible in IE11, Chrome                   
+                    div.html(`
+                        <h3>${d.title}</h3> 
+                        <h3>${d.dv}</h3>
+                        CI (${d.lci} - ${d.hci})
+                        <br />WN = ${d.wn}
+                    `) // Compatible in Chrome
+                    // div.html("Lorem ipsum") // Make compatible in IE11, Chrome                   
                         .style("left", (d3.event.pageX - 70) + "px")
                         .style("top", (d3.event.pageY - 90) + "px");
                 })
