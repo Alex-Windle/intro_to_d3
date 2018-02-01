@@ -202,30 +202,30 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 // }); 
 
             //confidence indicator line
-            // var line = bar.append("line")
-            //     .attr("class", "confidence_indicator")
-            //     .data(confidenceIndicators)
-            //     .attr("x1", function () { return x.bandwidth() / 6; })
-            //     .attr("y1", function (d) { return y(d.lci); }) 
-            //     .attr("x2", function () { return x.bandwidth() / 6; }) 
-            //     .attr("y2", function (d) { return y(d.hci); });
+            var line = bar.append("line")
+                .attr("class", "confidence_indicator")
+                .data(confidenceIndicators)
+                .attr("x1", function () { return x.bandwidth() / 6; })
+                .attr("y1", function (d) { return y(d.lci); }) 
+                .attr("x2", function () { return x.bandwidth() / 6; }) 
+                .attr("y2", function (d) { return y(d.hci); });
 
             //confidence indicator linecaps
-            // var linecapHalfWidth = 5; 
-            // var linecap_top = bar.append("line")
-            //     .attr("class", "linecap_top")
-            //     .data(confidenceIndicators)
-            //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-            //     .attr("y1", function (d) { return y(d.hci); })
-            //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-            //     .attr("y2", function (d) { return y(d.hci); });
-            // var linecap_bottom = bar.append("line")
-            //     .attr("class", "linecap_top")
-            //     .data(confidenceIndicators)
-            //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-            //     .attr("y1", function (d) { return y(d.lci); })
-            //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-            //     .attr("y2", function (d) { return y(d.lci); });
+            var linecapHalfWidth = 5; 
+            var linecap_top = bar.append("line")
+                .attr("class", "linecap_top")
+                .data(confidenceIndicators)
+                .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+                .attr("y1", function (d) { return y(d.hci); })
+                .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+                .attr("y2", function (d) { return y(d.hci); });
+            var linecap_bottom = bar.append("line")
+                .attr("class", "linecap_top")
+                .data(confidenceIndicators)
+                .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+                .attr("y1", function (d) { return y(d.lci); })
+                .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+                .attr("y2", function (d) { return y(d.lci); });
 
             //axes labels
             // var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
