@@ -18,23 +18,22 @@
             .axis text {               
                 font: 15px sans-serif;
             }
+            /* remove y-axis ticks and main x-axis */
             .axis path,
             .axis line {
                 fill: none;
-                stroke: none; /* remove y-axis ticks and main x-axis */
+                stroke: none; 
             }
             .grid line {
                 stroke: darkgray;
                 stroke-opacity: 0.7;
-                /* shape-rendering: crispEdges; */
             }
             .grid path {
                 stroke-width: 0;
             }
             .confidence_indicator, .linecap_top, .linecap_bottom {
                 stroke: black;
-                stroke-width: 1;
-                shape-rendering: crispEdges;                
+                stroke-width: 0.5;
             }
             .legend {
                 font: 15px sans-serif;
