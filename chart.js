@@ -69,7 +69,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let title = lookup[xAxisType][column].name; 
         let wn = String(obj.wn); 
         if (wn.length > 3 && wn.length < 7) {
+            wn = wn.split("").reverse().join("");
             wn = wn.substring(0,3) + "," + wn.substring(3);
+            wn = wn.split("").reverse().join("");
         }
             else if (wn.length > 6 && wn.length < 10) {
             wn = wn.split("").reverse().join("");
@@ -151,7 +153,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .attr("height", function (d) { return height - y(d); }) //height
         .attr("width", function (d, i) { return x.bandwidth() / 3; })
         .style("fill", barColors[0]) //hard-coded first color in array
-        
         .data(tooltipDisplay)
         .on("mouseover", function (d, i) {
             div.transition()
@@ -180,7 +181,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .attr("y1", function (d) { return y(d.lci); }) 
         .attr("x2", function () { return x.bandwidth() / 6; }) 
         .attr("y2", function (d) { return y(d.hci); });
-
     //confidence indicator linecaps
     var linecapHalfWidth = 5; 
     var linecap_top = bar.append("line")
