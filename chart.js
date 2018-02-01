@@ -122,7 +122,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var spaceFromTop = height + margin.top; 
             var totalWidth = width + margin.left + margin.right; 
             var totalHeight = height + margin.top + margin.bottom;
-            var CHART_TOP_BUFFER_VALUE = 10; //verify this value with team
+            var CHART_TOP_BUFFER_VALUE = 15; //verify this value with team
 
             //tool tip
             // var div = d3.select("body").append("div")
@@ -228,42 +228,43 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("y2", function (d) { return y(d.lci); });
 
             //axes labels
-            // var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-            // var paddingLeft = 14;         
-            // var yAxisLabel = chart.append("text")
-            //     .attr("class", "label")
-            //     .attr("id", "y_axis_label")
-            //     .text("Title (data value unit)")//refactor
-            //     .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-            //     .attr("text-anchor", "middle");         
+            var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+            var paddingLeft = 14;         
+            var yAxisLabel = chart.append("text")
+                .attr("class", "label")
+                .attr("id", "y_axis_label")
+                .text(yAxisTitle)
+                .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+                .attr("text-anchor", "middle");         
             
             //axes
-            // var xAxis = chart.append("g")
-            //     .attr("class", "axis")             
-            //     .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-            //     .call(d3.axisBottom(x))
-            //     .selectAll("text")
-            //     .style("text-anchor", "end")
-            //     .attr("dx", "-.8em")
-            //     .attr("dy", ".15em")
-            //     .attr("transform", "rotate(-45)");
-            // var yAxis = chart.append("g")
-            //     .attr("class", "axis")
-            //     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-            //     .call(d3.axisLeft(y))
-            //     .select(".domain").remove(); //remove y-axis line
+            var xAxis = chart.append("g")
+                .attr("class", "axis")             
+                .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)");
+            var yAxis = chart.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+                .call(d3.axisLeft(y))
+                .select(".domain").remove(); //remove y-axis line
 
             //legend 
-            // var legend = chart.append("g")
-            //     .attr("class", "legend")
-            // legend.append("rect")
-            //     .attr("x", width / 2 - legendColorKeyWidth)
-            //     .attr("y", height + margin.bottom)
-            //     .attr("width", legendColorKeyWidth)
-            //     .attr("height", legendColorKeyHeight); //where is the color coming from?
-            // legend.append("text")
-            //     .data(legendCategoryNames)
-            //     .attr("x", width / 2 + 10) //refactor
-            //     .attr("y", height + margin.bottom + 13)
-            //     .text(function (d) { return d; });
+            var legend = chart.append("g")
+                .attr("class", "legend")
+            legend.append("rect")
+                .attr("x", width / 2 - legendColorKeyWidth)
+                .attr("y", height + margin.bottom)
+                .attr("width", legendColorKeyWidth)
+                .attr("height", legendColorKeyHeight)
+                .style("fill", barColors[0]); //hard-coded first color in array
+            legend.append("text")
+                .data(legendCategoryNames)
+                .attr("x", width / 2 + 10) //refactor
+                .attr("y", height + margin.bottom + 13)
+                .text(function (d) { return d; });
 } 
