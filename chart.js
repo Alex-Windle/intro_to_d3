@@ -11,12 +11,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
             let decimalPlaces = chartConfigObject.decimalPlaces;  //sets decimals to display
             let displayTrendChart = chartConfigObject.displayTrendChart; //true or false
-            console.log("totalBars" , totalBars);
-            console.log("barDataValues" , barDataValues);
-            console.log("decimalPlaces" , decimalPlaces);
-            console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
-            console.log("displayTrendChart" , displayTrendChart);
-            console.log("legendTitle" , legendTitle);
+            // console.log("totalBars" , totalBars);
+            // console.log("barDataValues" , barDataValues);
+            // console.log("decimalPlaces" , decimalPlaces);
+            // console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
+            // console.log("displayTrendChart" , displayTrendChart);
+            // console.log("legendTitle" , legendTitle);
             
             //process chart data variables
             let xAxisColumn = chartConfigObject.xAxisColumn; //get type
@@ -25,10 +25,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             let legendColumn = chartConfigObject.legendColumn; 
             let legendType = chartConfigObject.legendType; 
             let legendCategoryDataCodes = []; 
-            console.log("xAxisColumn", xAxisColumn);
-            console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
-            console.log("legendColumn", legendColumn);
-            console.log("legendType", legendType);
+            // console.log("xAxisColumn", xAxisColumn);
+            // console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
+            // console.log("legendColumn", legendColumn);
+            // console.log("legendType", legendType);
 
             //TODO
             var wns = []; 
@@ -111,9 +111,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     } 
                 }
             });
-            console.log("xAxisCategoryNames", xAxisCategoryNames);
-            console.log("confidenceIndicators", confidenceIndicators);
-            console.log("legendCategoryNames", legendCategoryNames);
+            // console.log("xAxisCategoryNames", xAxisCategoryNames);
+            // console.log("confidenceIndicators", confidenceIndicators);
+            // console.log("legendCategoryNames", legendCategoryNames);
 
             //svg chart variables
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
@@ -147,12 +147,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //chart
             var chart = d3.select(".chart") 
                 // .attr("height", "700") //refactor for compatibility with ie
-                // .attr("viewBox", function () {
-                //     return "0 0 700 700";
-                // })
-                // .attr("preserveAspectRatio", "xMinYMin meet"); 
-                .attr("height", 700)
-                .attr("width", 700)
+                .attr("viewBox", function () {
+                    return "0 0 700 700";
+                })
+                .attr("preserveAspectRatio", "xMinYMin meet")
                 .style("border", "0.5px dotted black");
 
             //create bar grouping
