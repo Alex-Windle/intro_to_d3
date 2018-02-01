@@ -140,9 +140,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .range([height, 0]);
             
             //gridlines in y axis 
-            // function make_y_gridlines() {
-            //     return d3.axisLeft(y)
-            // }
+            function make_y_gridlines() {
+                return d3.axisLeft(y)
+            }
 
             //chart
             var chart = d3.select(".chart") 
@@ -154,20 +154,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .style("border", "0.5px dotted black");
 
             //create bar grouping
-            // var bar = chart.selectAll("g"); 
+            var bar = chart.selectAll("g"); 
 
             // add the Y gridlines
-            // chart.append("g")			
-            //     .attr("class", "grid")
-            //     .call(make_y_gridlines()
-            //         .tickSize(-width) //full graph width
-            //         .tickFormat("")
-            //     )
-            //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+            chart.append("g")			
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width) //full graph width
+                    .tickFormat("")
+                )
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
  
             //bars
-            var bar = chart.selectAll("g")
-                .data(xAxisCategoryNames)
+            bar = bar.data(xAxisCategoryNames)
                 .enter()
                 .append("g") 
                 .attr("transform", function (d) { 
