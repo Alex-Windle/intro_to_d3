@@ -1,29 +1,24 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
-            console.log("chart: ", chartConfigObject); 
-            console.log("json: ", jsonData); 
-            console.log("lookup: ", lookup); 
-
-            //set chart variables
-            let totalBars = jsonData.length;      //total number of bars to display
+            //set chart data variables
+            let totalBars = jsonData.length; //total number of bars to display
             let barColors = chartConfigObject.colorsArrStr;
             let barDataValues = []; 
             let xAxisCategoryNames = []; 
             let confidenceIndicators = []; 
             let yAxisTitle = chartConfigObject.yAxisTitle; 
-            
             let legendTitle = chartConfigObject.legendTitleStr;
-            let legendCategoryNames = []; //empty
-            let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; //where to display this? 
+            let legendCategoryNames = [];
+            let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
             let decimalPlaces = chartConfigObject.decimalPlaces;  //sets decimals to display
             let displayTrendChart = chartConfigObject.displayTrendChart; //true or false
-            
             console.log("totalBars" , totalBars);
+            console.log("barDataValues" , barDataValues);
             console.log("decimalPlaces" , decimalPlaces);
             console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
             console.log("displayTrendChart" , displayTrendChart);
             console.log("legendTitle" , legendTitle);
             
-            //process chart variables
+            //process chart data variables
             let xAxisColumn = chartConfigObject.xAxisColumn; //get type
             let xAxisType = chartConfigObject.xAxisType; //get type
             let xAxisCategoryDataCodes = []; //data codes (map to titles)
@@ -34,15 +29,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
             console.log("legendColumn", legendColumn);
             console.log("legendType", legendType);
-            
 
-            //extract data
-            var categoryCodes = [];
-            var categoryTitles = [];
-            // var confidenceIndicators = [];
-            var dataValues = [];           
+            //TODO
             var wns = []; 
-            var legendKeys = [];
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
             var tooltipDisplay = []; //data displays in tooltip
@@ -78,13 +67,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //     return;
             // }
 
-            //blocking. execute this function FIRST, then the ones below that 
-            //DEPEND on the information output from this function.
             jsonData.forEach(function (obj, i) {
-                console.log("data: ", i, obj);
-
                 //get data values
-                let barDataValue = obj.dv; 
+                let barDataValue = obj.dv.toFixed(decimalPlaces);
                 barDataValues.push(barDataValue);
 
                 //save data codes. then, map titles. 
@@ -126,19 +111,18 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     } 
                 }
             });
-
             console.log("xAxisCategoryNames", xAxisCategoryNames);
             console.log("confidenceIndicators", confidenceIndicators);
             console.log("legendCategoryNames", legendCategoryNames);
 
-            //chart
+            //svg chart variables
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
             var height = 700 - margin.top - margin.bottom;
             var spaceFromTop = height + margin.top; 
             var totalWidth = width + margin.left + margin.right; 
             var totalHeight = height + margin.top + margin.bottom;
-            var CHART_TOP_BUFFER_VALUE = 10; //this value must be approved by the team. Test 5-10.
+            var CHART_TOP_BUFFER_VALUE = 10; //verify this value with team
 
             //tool tip
             var div = d3.select("body").append("div")
