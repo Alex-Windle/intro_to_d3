@@ -4,29 +4,37 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             console.log("lookup: ", lookup); 
 
             //set chart variables
+            let totalBars = jsonData.length;      //total number of bars to display
+            let barColors = chartConfigObject.colorsArrStr;
             let barDataValues = []; 
-            let xAxisCategoryNames = []; //empty
+            let xAxisCategoryNames = []; 
             let confidenceIndicators = []; 
-            // let yAxisValues;    //y-axis values
-            let yAxisTitle = chartConfigObject.yAxisTitle;     //y-axis title
-            // let totalBars;      //total number of bars to display
-            // let barColors;      //bar color options
-            // let legendTitle;    //legend title
+            let yAxisTitle = chartConfigObject.yAxisTitle; 
+            
+            let legendTitle = chartConfigObject.legendTitleStr;
+            let legendCategoryNames = []; //empty
             let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; //where to display this? 
             let decimalPlaces = chartConfigObject.decimalPlaces;  //sets decimals to display
             let displayTrendChart = chartConfigObject.displayTrendChart; //true or false
             
+            console.log("totalBars" , totalBars);
             console.log("decimalPlaces" , decimalPlaces);
             console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
             console.log("displayTrendChart" , displayTrendChart);
+            console.log("legendTitle" , legendTitle);
             
             //process chart variables
             let xAxisColumn = chartConfigObject.xAxisColumn; //get type
             let xAxisType = chartConfigObject.xAxisType; //get type
-            let xAxisCategoryDataCodes = []; //data codes. translate to titles.
-            
+            let xAxisCategoryDataCodes = []; //data codes (map to titles)
+            let legendColumn = chartConfigObject.legendColumn; 
+            let legendType = chartConfigObject.legendType; 
+            let legendCategoryDataCodes = []; 
             console.log("xAxisColumn", xAxisColumn);
             console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
+            console.log("legendColumn", legendColumn);
+            console.log("legendType", legendType);
+            
 
             //extract data
             var categoryCodes = [];
@@ -38,13 +46,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var legendColorKeyWidth = 20;
             var legendColorKeyHeight = 20;
             var tooltipDisplay = []; //data displays in tooltip
-
-            // function getCategoryTitle_Rs_FromLku (obj) {
-            //     var rs = obj.rs; 
-            //     var lku = lookUpObject.Response; 
-            //     categoryTitles.push(lku[rs].name);
-            //     return;
-            // }; 
 
             // function get_Wn_FromLku (obj) {
             //     var wn = obj.wn; 
@@ -88,6 +89,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
                 //save data codes. then, map titles. 
                 xAxisCategoryDataCodes.push(obj[xAxisColumn]);
+                legendCategoryDataCodes.push(obj[legendColumn]);
 
                 let confidenceIndicator = {
                     lci: obj.lci,
@@ -95,16 +97,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 };
                 confidenceIndicators.push(confidenceIndicator);
                 
-                // var value = obj.dv; 
-                // var category = obj.rs;
-                // var confidenceIndicator = {
-                //     lci: obj.lci, 
-                //     hci: obj.hci
-                // }; 
-                // dataValues.push(value); 
-                // categoryCodes.push(category);
-                // confidenceIndicators.push(confidenceIndicator);
-                // getCategoryTitle_Rs_FromLku (obj); 
                 // get_Wn_FromLku(obj);  
                 // getLegendKey_S1_FromLku (obj); 
                 // make_tooltip_display(obj);
@@ -116,13 +108,28 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 let lku = lookup[xAxisType]; 
                 for (key in lku) {
                     if (code === key) {
-                        const title = lku[code].name;
-                        xAxisCategoryNames.push(title);
+                        const name = lku[code].name;
+                        xAxisCategoryNames.push(name);
                     } 
                 }
             });
 
-            console.log("All my TITLES: ", xAxisCategoryNames);
+            legendCategoryDataCodes.forEach(function (code) {
+                let lku = lookup[legendType]; 
+                for (key in lku) {
+                    if (code === key) {
+                        const name = lku[code].name;
+                        //check array for existing str
+                        if (legendCategoryNames.indexOf(name) < 0) {
+                            legendCategoryNames.push(name);
+                        }
+                    } 
+                }
+            });
+
+            console.log("xAxisCategoryNames", xAxisCategoryNames);
+            console.log("confidenceIndicators", confidenceIndicators);
+            console.log("legendCategoryNames", legendCategoryNames);
 
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
