@@ -131,12 +131,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
             //scale
             var x = d3.scaleBand()
-                .domain(categoryTitles) 
+                .domain(xAxisCategoryNames) 
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
                 //set value scaling with buffer
-                .domain([0, d3.max(dataValues) + CHART_TOP_BUFFER_VALUE])
+                .domain([0, d3.max(barDataValues) + CHART_TOP_BUFFER_VALUE])
                 .range([height, 0]);
 
             //gridlines in y axis 
@@ -165,7 +165,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
             
             //bars
-            bar = bar.data(categoryTitles) 
+            bar = bar.data(xAxisCategoryNames) 
                 .enter()
                 .append("g") 
                 .attr("transform", function (d) { 
@@ -173,7 +173,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     return "translate(" + spaceLeft + ", " + margin.top + ")";  
                 }); 
             bar.append("rect")
-                .data(dataValues)
+                .data(barDataValues)
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
@@ -258,7 +258,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("width", legendColorKeyWidth)
                 .attr("height", legendColorKeyHeight); //where is the color coming from?
             legend.append("text")
-                .data(legendKeys)
+                .data(legendCategoryNames)
                 .attr("x", width / 2 + 10) //refactor
                 .attr("y", height + margin.bottom + 13)
                 .text(function (d) { return d; });
