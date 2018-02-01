@@ -5,27 +5,33 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
             //set chart variables
             let barDataValues = []; 
-            let xAxisCategory;  //create!!! x-axis categories
-            let xAxisCategoryLookup; //get from xAxisType
-
+            let xAxisCategoryNames = []; //empty
+            let confidenceIndicators = []; 
             // let yAxisValues;    //y-axis values
-            // let yAxisTitle;     //y-axis title
+            let yAxisTitle = chartConfigObject.yAxisTitle;     //y-axis title
             // let totalBars;      //total number of bars to display
             // let barColors;      //bar color options
             // let legendTitle;    //legend title
-            // let confidenceIntervalLabel; //where to display this? 
-            // let decimalPlaces;  //sets decimals to display
-            // let displayTrendChart; //true or false
+            let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; //where to display this? 
+            let decimalPlaces = chartConfigObject.decimalPlaces;  //sets decimals to display
+            let displayTrendChart = chartConfigObject.displayTrendChart; //true or false
             
-            //chart variable codes
-            let xAxisColumn = chartConfigObject.xAxisColumn; 
+            console.log("decimalPlaces" , decimalPlaces);
+            console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
+            console.log("displayTrendChart" , displayTrendChart);
+            
+            //process chart variables
+            let xAxisColumn = chartConfigObject.xAxisColumn; //get type
+            let xAxisType = chartConfigObject.xAxisType; //get type
+            let xAxisCategoryDataCodes = []; //data codes. translate to titles.
+            
             console.log("xAxisColumn", xAxisColumn);
-            let xAxisCategoryDataCodes = []; 
-            
+            console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
+
             //extract data
             var categoryCodes = [];
             var categoryTitles = [];
-            var confidenceIndicators = [];
+            // var confidenceIndicators = [];
             var dataValues = [];           
             var wns = []; 
             var legendKeys = [];
@@ -71,6 +77,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //     return;
             // }
 
+            //blocking. execute this function FIRST, then the ones below that 
+            //DEPEND on the information output from this function.
             jsonData.forEach(function (obj, i) {
                 console.log("data: ", i, obj);
 
@@ -78,8 +86,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 let barDataValue = obj.dv; 
                 barDataValues.push(barDataValue);
 
-                //get x-axis category data codes. these need to be translated to semantic english.
+                //save data codes. then, map titles. 
                 xAxisCategoryDataCodes.push(obj[xAxisColumn]);
+
+                let confidenceIndicator = {
+                    lci: obj.lci,
+                    hci: obj.hci
+                };
+                confidenceIndicators.push(confidenceIndicator);
                 
                 // var value = obj.dv; 
                 // var category = obj.rs;
@@ -97,9 +111,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 return;
             });
 
-            // console.log("barDataValues", barDataValues);
-            console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
-            
+            //map codes to category names
+            xAxisCategoryDataCodes.forEach(function (code) {
+                let lku = lookup[xAxisType]; 
+                for (key in lku) {
+                    if (code === key) {
+                        const title = lku[code].name;
+                        xAxisCategoryNames.push(title);
+                    } 
+                }
+            });
+
+            console.log("All my TITLES: ", xAxisCategoryNames);
+
             //chart
             var margin = {top: 30, right: 0, bottom: 220, left: 50};
             var width = 700 - margin.left - margin.right;
@@ -211,7 +235,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //axes labels
             var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
             var paddingLeft = 14;         
-            var yAxisTitle = chart.append("text")
+            var yAxisLabel = chart.append("text")
                 .attr("class", "label")
                 .attr("id", "y_axis_label")
                 .text("Title (data value unit)")//refactor
