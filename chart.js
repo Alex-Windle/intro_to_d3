@@ -69,7 +69,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
             jsonData.forEach(function (obj, i) {
                 //get data values
-                let barDataValue = obj.dv.toFixed(decimalPlaces);
+                let barDataValue = Number(obj.dv.toFixed(decimalPlaces));
                 barDataValues.push(barDataValue);
 
                 //save data codes. then, map titles. 
@@ -125,24 +125,26 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var CHART_TOP_BUFFER_VALUE = 10; //verify this value with team
 
             //tool tip
-            var div = d3.select("body").append("div")
-                .attr("class", "tooltip")
-                .style("opacity", 0);
+            // var div = d3.select("body").append("div")
+            //     .attr("class", "tooltip")
+            //     .style("opacity", 0);
 
             //scale
             var x = d3.scaleBand()
-                .domain(xAxisCategoryNames) 
+                .domain(totalBars) 
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
                 //set value scaling with buffer
                 .domain([0, d3.max(barDataValues) + CHART_TOP_BUFFER_VALUE])
                 .range([height, 0]);
-
+            
+            console.log("x domain ===> ", totalBars);
+            
             //gridlines in y axis 
-            function make_y_gridlines() {
-                return d3.axisLeft(y)
-            }
+            // function make_y_gridlines() {
+            //     return d3.axisLeft(y)
+            // }
 
             //chart
             var chart = d3.select(".chart") 
@@ -152,114 +154,114 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 })
                 .attr("preserveAspectRatio", "xMinYMin meet"); 
 
-             //create bar grouping
-            var bar = chart.selectAll("g"); 
+            //create bar grouping
+            // var bar = chart.selectAll("g"); 
 
             // add the Y gridlines
-            chart.append("g")			
-                .attr("class", "grid")
-                .call(make_y_gridlines()
-                    .tickSize(-width) //full graph width
-                    .tickFormat("")
-                )
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
-            
+            // chart.append("g")			
+            //     .attr("class", "grid")
+            //     .call(make_y_gridlines()
+            //         .tickSize(-width) //full graph width
+            //         .tickFormat("")
+            //     )
+            //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+ 
             //bars
-            bar = bar.data(xAxisCategoryNames) 
-                .enter()
-                .append("g") 
-                .attr("transform", function (d) { 
-                    var spaceLeft = x.bandwidth() + x(d);
-                    return "translate(" + spaceLeft + ", " + margin.top + ")";  
-                }); 
-            bar.append("rect")
-                .data(barDataValues)
-                .attr("y", function (d) { return y(d); }) //y coordinate
-                .attr("height", function (d) { return height - y(d); }) //height
-                .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                .data(tooltipDisplay)
-                .on("mouseover", function (d, i) {
-                    div.transition()
-                        .duration(200)
-                        .style("opacity", .9);
-                    div.html(`
-                        <h3>${d.title}</h3> 
-                        <h3>${d.dv}</h3>
-                        CI (${d.lci} - ${d.hci})
-                        <br />WN = ${d.wn}
-                    `)                  
-                        .style("left", (d3.event.pageX - 70) + "px")
-                        .style("top", (d3.event.pageY - 90) + "px");
-                })
-                .on("mouseout", function (d) {
-                    div.transition()
-                        .duration(500)
-                        .style("opacity", 0);
-                }); 
+            // bar = bar.data(totalBars) 
+            //     .enter()
+            //     .append("g") 
+            //     .attr("transform", function (d) { 
+            //         var spaceLeft = x.bandwidth() + x(d);
+            //         return "translate(" + spaceLeft + ", " + margin.top + ")";  
+            //     }); 
+            // bar.append("rect")
+            //     .data(barDataValues)
+            //     .attr("y", function (d) { return y(d); }) //y coordinate
+            //     .attr("height", function (d) { return height - y(d); }) //height
+            //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
+                // .data(tooltipDisplay)
+                // .on("mouseover", function (d, i) {
+                //     div.transition()
+                //         .duration(200)
+                //         .style("opacity", .9);
+                //     div.html(`
+                //         <h3>${d.title}</h3> 
+                //         <h3>${d.dv}</h3>
+                //         CI (${d.lci} - ${d.hci})
+                //         <br />WN = ${d.wn}
+                //     `)                  
+                //         .style("left", (d3.event.pageX - 70) + "px")
+                //         .style("top", (d3.event.pageY - 90) + "px");
+                // })
+                // .on("mouseout", function (d) {
+                //     div.transition()
+                //         .duration(500)
+                //         .style("opacity", 0);
+                // }); 
 
             //confidence indicator line
-            var line = bar.append("line")
-                .attr("class", "confidence_indicator")
-                .data(confidenceIndicators)
-                .attr("x1", function () { return x.bandwidth() / 6; })
-                .attr("y1", function (d) { return y(d.lci); }) 
-                .attr("x2", function () { return x.bandwidth() / 6; }) 
-                .attr("y2", function (d) { return y(d.hci); });
+            // var line = bar.append("line")
+            //     .attr("class", "confidence_indicator")
+            //     .data(confidenceIndicators)
+            //     .attr("x1", function () { return x.bandwidth() / 6; })
+            //     .attr("y1", function (d) { return y(d.lci); }) 
+            //     .attr("x2", function () { return x.bandwidth() / 6; }) 
+            //     .attr("y2", function (d) { return y(d.hci); });
 
             //confidence indicator linecaps
-            var linecapHalfWidth = 5; 
-            var linecap_top = bar.append("line")
-                .attr("class", "linecap_top")
-                .data(confidenceIndicators)
-                .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-                .attr("y1", function (d) { return y(d.hci); })
-                .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-                .attr("y2", function (d) { return y(d.hci); });
-            var linecap_bottom = bar.append("line")
-                .attr("class", "linecap_top")
-                .data(confidenceIndicators)
-                .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-                .attr("y1", function (d) { return y(d.lci); })
-                .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-                .attr("y2", function (d) { return y(d.lci); });
+            // var linecapHalfWidth = 5; 
+            // var linecap_top = bar.append("line")
+            //     .attr("class", "linecap_top")
+            //     .data(confidenceIndicators)
+            //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+            //     .attr("y1", function (d) { return y(d.hci); })
+            //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+            //     .attr("y2", function (d) { return y(d.hci); });
+            // var linecap_bottom = bar.append("line")
+            //     .attr("class", "linecap_top")
+            //     .data(confidenceIndicators)
+            //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+            //     .attr("y1", function (d) { return y(d.lci); })
+            //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+            //     .attr("y2", function (d) { return y(d.lci); });
 
             //axes labels
-            var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-            var paddingLeft = 14;         
-            var yAxisLabel = chart.append("text")
-                .attr("class", "label")
-                .attr("id", "y_axis_label")
-                .text("Title (data value unit)")//refactor
-                .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-                .attr("text-anchor", "middle");         
+            // var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+            // var paddingLeft = 14;         
+            // var yAxisLabel = chart.append("text")
+            //     .attr("class", "label")
+            //     .attr("id", "y_axis_label")
+            //     .text("Title (data value unit)")//refactor
+            //     .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+            //     .attr("text-anchor", "middle");         
             
             //axes
-            var xAxis = chart.append("g")
-                .attr("class", "axis")             
-                .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-                .call(d3.axisBottom(x))
-                .selectAll("text")
-                .style("text-anchor", "end")
-                .attr("dx", "-.8em")
-                .attr("dy", ".15em")
-                .attr("transform", "rotate(-45)");
-            var yAxis = chart.append("g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-                .call(d3.axisLeft(y))
-                .select(".domain").remove(); //remove y-axis line
+            // var xAxis = chart.append("g")
+            //     .attr("class", "axis")             
+            //     .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
+            //     .call(d3.axisBottom(x))
+            //     .selectAll("text")
+            //     .style("text-anchor", "end")
+            //     .attr("dx", "-.8em")
+            //     .attr("dy", ".15em")
+            //     .attr("transform", "rotate(-45)");
+            // var yAxis = chart.append("g")
+            //     .attr("class", "axis")
+            //     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+            //     .call(d3.axisLeft(y))
+            //     .select(".domain").remove(); //remove y-axis line
 
             //legend 
-            var legend = chart.append("g")
-                .attr("class", "legend")
-            legend.append("rect")
-                .attr("x", width / 2 - legendColorKeyWidth)
-                .attr("y", height + margin.bottom)
-                .attr("width", legendColorKeyWidth)
-                .attr("height", legendColorKeyHeight); //where is the color coming from?
-            legend.append("text")
-                .data(legendCategoryNames)
-                .attr("x", width / 2 + 10) //refactor
-                .attr("y", height + margin.bottom + 13)
-                .text(function (d) { return d; });
+            // var legend = chart.append("g")
+            //     .attr("class", "legend")
+            // legend.append("rect")
+            //     .attr("x", width / 2 - legendColorKeyWidth)
+            //     .attr("y", height + margin.bottom)
+            //     .attr("width", legendColorKeyWidth)
+            //     .attr("height", legendColorKeyHeight); //where is the color coming from?
+            // legend.append("text")
+            //     .data(legendCategoryNames)
+            //     .attr("x", width / 2 + 10) //refactor
+            //     .attr("y", height + margin.bottom + 13)
+            //     .text(function (d) { return d; });
 } 
