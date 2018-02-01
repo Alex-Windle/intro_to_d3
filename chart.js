@@ -131,7 +131,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
             //scale
             var x = d3.scaleBand()
-                .domain(totalBars) 
+                .domain(xAxisCategoryNames) 
                 .rangeRound([0, width]) //total width 
                 .padding(0.1);
             var y = d3.scaleLinear()
@@ -149,10 +149,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //chart
             var chart = d3.select(".chart") 
                 // .attr("height", "700") //refactor for compatibility with ie
-                .attr("viewBox", function () {
-                    return "0 0 700 700";
-                })
-                .attr("preserveAspectRatio", "xMinYMin meet"); 
+                // .attr("viewBox", function () {
+                //     return "0 0 700 700";
+                // })
+                // .attr("preserveAspectRatio", "xMinYMin meet"); 
+                .attr("height", 700)
+                .attr("width", 700)
+                .style("border", "2px dotted black");
 
             //create bar grouping
             // var bar = chart.selectAll("g"); 
@@ -167,18 +170,23 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
  
             //bars
-            // bar = bar.data(totalBars) 
-            //     .enter()
-            //     .append("g") 
-            //     .attr("transform", function (d) { 
-            //         var spaceLeft = x.bandwidth() + x(d);
-            //         return "translate(" + spaceLeft + ", " + margin.top + ")";  
-            //     }); 
+            var bar = chart.selectAll("g")
+                .data(xAxisCategoryNames)
+                .enter()
+                .append("g") 
+                .attr("transform", function (d) { 
+                    var bandwidth = x.bandwidth(); 
+                    console.log("bandwidth", bandwidth);
+                    var spaceLeft = x.bandwidth() + x(d);
+                    return "translate(" + spaceLeft + ", " + margin.top + ")";  
+                }); 
             // bar.append("rect")
-            //     .data(barDataValues)
+            //     .data(xAxisCategoryNames)
             //     .attr("y", function (d) { return y(d); }) //y coordinate
             //     .attr("height", function (d) { return height - y(d); }) //height
             //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
+            //     .style("border", "2px dotted black");
+                
                 // .data(tooltipDisplay)
                 // .on("mouseover", function (d, i) {
                 //     div.transition()
