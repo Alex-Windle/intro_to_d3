@@ -181,7 +181,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .data(barDataValues)
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
-                .attr("width", function (d, i) { return x.bandwidth() / 3; });
+                .attr("width", function (d, i) { return x.bandwidth() / 3; })
+                .style("fill", barColors[0]); //hard-coded first color in array
                 
                 // .data(tooltipDisplay)
                 // .on("mouseover", function (d, i) {
