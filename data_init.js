@@ -14,13 +14,13 @@ var lookup = new Promise(function(resolve, reject){
 
 //configuration object
 var chartConfigObject = {  
-    "xAxisColumn":"rs", //code (translate to semantic English w/ lookup)
-    "xAxisType":"Response", //lookup 
-    "legendColumn":"s1", //code (translate to semantic English w/ lookup)
-    "legendType":"Stratification", //lookup 
-    "legendTitleStr":"", //if empty, do what? 
-    "displayTrendChart":false, //line chart?
-    "colorsArrStr":[  //pass to chart
+    "xAxisColumn":"rs", 
+    "xAxisType":"Response", 
+    "legendColumn":"s1", 
+    "legendType":"Stratification", 
+    "legendTitleStr":"", 
+    "displayTrendChart":false, 
+    "colorsArrStr":[  
         "#377eb8",
         "#e41a1c",
         "#4daf4a",
@@ -33,13 +33,13 @@ var chartConfigObject = {
         "#FDBF6F",
         "#FFFF99"
     ],
-    "yAxisTitle":"Age-adjusted Prevalence (%)", //pass to chart
+    "yAxisTitle":"Age-adjusted Prevalence (%)", 
     "decimalPlaces":1,
-    "confidenceIntervalLabel":"95% CI" //pass to chart
+    "confidenceIntervalLabel":"95% CI" 
 }
 
 Promise.all([data_1, lookup]).then(function (data) {
     var jsonData = data[0]; 
     var lookup = data[1]; 
-    makeChart(chartConfigObject, jsonData, lookup); //call chart function 
+    makeChart(chartConfigObject, jsonData, lookup); 
 });
