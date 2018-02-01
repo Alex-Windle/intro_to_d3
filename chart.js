@@ -139,8 +139,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .domain([0, d3.max(barDataValues) + CHART_TOP_BUFFER_VALUE])
                 .range([height, 0]);
             
-            console.log("x domain ===> ", totalBars);
-            
             //gridlines in y axis 
             // function make_y_gridlines() {
             //     return d3.axisLeft(y)
@@ -155,7 +153,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 // .attr("preserveAspectRatio", "xMinYMin meet"); 
                 .attr("height", 700)
                 .attr("width", 700)
-                .style("border", "2px dotted black");
+                .style("border", "0.5px dotted black");
 
             //create bar grouping
             // var bar = chart.selectAll("g"); 
@@ -176,16 +174,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .append("g") 
                 .attr("transform", function (d) { 
                     var bandwidth = x.bandwidth(); 
-                    console.log("bandwidth", bandwidth);
                     var spaceLeft = x.bandwidth() + x(d);
                     return "translate(" + spaceLeft + ", " + margin.top + ")";  
                 }); 
-            // bar.append("rect")
-            //     .data(xAxisCategoryNames)
-            //     .attr("y", function (d) { return y(d); }) //y coordinate
-            //     .attr("height", function (d) { return height - y(d); }) //height
-            //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
-            //     .style("border", "2px dotted black");
+            bar.append("rect")
+                .data(barDataValues)
+                .attr("y", function (d) { return y(d); }) //y coordinate
+                .attr("height", function (d) { return height - y(d); }) //height
+                .attr("width", function (d, i) { return x.bandwidth() / 3; });
                 
                 // .data(tooltipDisplay)
                 // .on("mouseover", function (d, i) {
