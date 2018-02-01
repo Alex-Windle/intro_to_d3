@@ -10,6 +10,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             let legendCategoryNames = [];
             let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
             let decimalPlaces = chartConfigObject.decimalPlaces;  //sets decimals to display
+            let tooltipDisplay = []; 
             let displayTrendChart = chartConfigObject.displayTrendChart; //true or false
             // console.log("totalBars" , totalBars);
             // console.log("barDataValues" , barDataValues);
@@ -17,6 +18,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             // console.log("confidenceIntervalLabel" , confidenceIntervalLabel);
             // console.log("displayTrendChart" , displayTrendChart);
             // console.log("legendTitle" , legendTitle);
+            console.log("tooltipDisplay" , tooltipDisplay);
             
             //process chart data variables
             let xAxisColumn = chartConfigObject.xAxisColumn; //get type
@@ -29,12 +31,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             // console.log("xAxisCategoryDataCodes", xAxisCategoryDataCodes);
             // console.log("legendColumn", legendColumn);
             // console.log("legendType", legendType);
-
-            //TODO
-            var wns = []; 
-            var legendColorKeyWidth = 20;
-            var legendColorKeyHeight = 20;
-            var tooltipDisplay = []; //data displays in tooltip
 
             // function get_Wn_FromLku (obj) {
             //     var wn = obj.wn; 
@@ -54,18 +50,28 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //     }
             // }; 
 
-            // function make_tooltip_display (obj) {   
-            //     var rs = obj.rs; 
-            //     var lku = lookUpObject.Response;  
-            //     tooltipDisplay.push({
-            //         title: lku[rs].name,
-            //         dv: obj.dv,
-            //         lci: obj.lci, 
-            //         hci: obj.hci,
-            //         wn: obj.wn
-            //     });
-            //     return;
-            // }
+            function make_tooltip_display (obj) {   
+                let column = obj[xAxisColumn];
+                let title = lookup[xAxisType][column].name; 
+                let wn = String(obj.wn); 
+                // console.log(wn);
+                if (wn.length > 3 && wn.length < 7) {
+                    wn = wn.substring(0,3) + "," + wn.substring(3);
+                    // console.log(wn);
+                }
+                 else if (wn.length > 6 && wn.length < 10) {
+                    wn = wn.split("").reverse().join("");
+                    wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
+                    wn = wn.split("").reverse().join("");
+                }
+                tooltipDisplay.push({
+                    title: title,
+                    dv: obj.dv,
+                    lci: obj.lci, 
+                    hci: obj.hci,
+                    wn: wn
+                });
+            }
 
             jsonData.forEach(function (obj, i) {
                 //get data values
@@ -84,7 +90,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 
                 // get_Wn_FromLku(obj);  
                 // getLegendKey_S1_FromLku (obj); 
-                // make_tooltip_display(obj);
+                make_tooltip_display(obj);
                 return;
             });
 
@@ -123,11 +129,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var totalWidth = width + margin.left + margin.right; 
             var totalHeight = height + margin.top + margin.bottom;
             var CHART_TOP_BUFFER_VALUE = 15; //verify this value with team
+            var legendColorKeyWidth = 20;
+            var legendColorKeyHeight = 20;
 
             //tool tip
-            // var div = d3.select("body").append("div")
-            //     .attr("class", "tooltip")
-            //     .style("opacity", 0);
+            var div = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
 
             //scale
             var x = d3.scaleBand()
@@ -150,8 +158,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("viewBox", function () {
                     return "0 0 700 700";
                 })
-                .attr("preserveAspectRatio", "xMinYMin meet")
-                .style("border", "0.5px dotted black");
+                .attr("preserveAspectRatio", "xMinYMin meet");
 
             //create bar grouping
             var bar = chart.selectAll("g"); 
@@ -179,27 +186,27 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("y", function (d) { return y(d); }) //y coordinate
                 .attr("height", function (d) { return height - y(d); }) //height
                 .attr("width", function (d, i) { return x.bandwidth() / 3; })
-                .style("fill", barColors[0]); //hard-coded first color in array
+                .style("fill", barColors[0]) //hard-coded first color in array
                 
-                // .data(tooltipDisplay)
-                // .on("mouseover", function (d, i) {
-                //     div.transition()
-                //         .duration(200)
-                //         .style("opacity", .9);
-                //     div.html(`
-                //         <h3>${d.title}</h3> 
-                //         <h3>${d.dv}</h3>
-                //         CI (${d.lci} - ${d.hci})
-                //         <br />WN = ${d.wn}
-                //     `)                  
-                //         .style("left", (d3.event.pageX - 70) + "px")
-                //         .style("top", (d3.event.pageY - 90) + "px");
-                // })
-                // .on("mouseout", function (d) {
-                //     div.transition()
-                //         .duration(500)
-                //         .style("opacity", 0);
-                // }); 
+                .data(tooltipDisplay)
+                .on("mouseover", function (d, i) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    div.html(`
+                        <h3>${d.title}</h3> 
+                        <h3>${d.dv}</h3>
+                        CI (${d.lci} - ${d.hci})
+                        <br />WN = ${d.wn}
+                    `)                  
+                        .style("left", (d3.event.pageX - 70) + "px")
+                        .style("top", (d3.event.pageY - 90) + "px");
+                })
+                .on("mouseout", function (d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                }); 
 
             //confidence indicator line
             var line = bar.append("line")
