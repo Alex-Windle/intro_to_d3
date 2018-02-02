@@ -1,13 +1,19 @@
 // load data
-let data_1 = new Promise(function(resolve, reject){
-	d3.json("./resp_1.json", function(data) {
+let data_1 = new Promise(function (resolve, reject) {
+	d3.json("./resp_1.json", function (data) {
 		resolve(data)
 	})
 })
 
+let data_3 = new Promise(function (resolve, reject ){
+    d3.json("./resp_3.json", function (data) {
+        resolve(data)
+    })
+})
+
 //load lookup
-var lookup = new Promise(function(resolve, reject){
-	d3.json("./lookup.json", function(data) {
+var lookup = new Promise(function (resolve, reject) {
+	d3.json("./lookup.json", function (data) {
 		resolve(data)
 	})
 })
@@ -90,8 +96,10 @@ var chartConfigObject = {
     "confidenceIntervalLabel":"95% CI"
  }
 
-Promise.all([data_1, lookup]).then(function (data) {
-    var jsonData = data[0]; 
-    var lookup = data[1]; 
+Promise.all([data_1, data_3, lookup]).then(function (data) {
+    //for testing purposes, only turn on 1 data variable at a time
+    // var jsonData = data[0]; 
+    var jsonData = data[1]; 
+    var lookup = data[2]; 
     makeChart(chartConfigObject, jsonData, lookup); 
 });
