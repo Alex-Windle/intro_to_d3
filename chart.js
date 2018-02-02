@@ -120,6 +120,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .domain(xAxisCategoryNames) 
         .rangeRound([0, width]) //total width 
         .padding(0.1);
+
     var y = d3.scaleLinear()
         //set value scaling with buffer
         .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -300,40 +301,47 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
 
+        //scale 
+        var xResponseGrouping = d3.scaleBand()
+            .domain(xAxisCategoryNames) 
+            .rangeRound([0, width]) //total width 
+            .padding(0);
+        var xResponseGroupingWidth = xResponseGrouping.bandwidth(); 
+        console.log("xResponseGroupingWidth: ", xResponseGroupingWidth);
+
         // calculate # of response areas and # of bars within each
         responseGrouping = responseGrouping.data(xAxisCategoryNames) // makes 1 grouping per response
             .enter()
             .append("g")
             .attr("class", "response_grouping")
             .attr("transform", function (d) { 
-                var bandwidth = x.bandwidth(); 
-                var spaceLeft = x.bandwidth() + x(d);
+                var bandwidth = xResponseGrouping.bandwidth(); 
+                var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
                 return "translate(" + spaceLeft + ", " + margin.top + ")";  
             }); 
         
-        // create new grouping level to contain multiple bars. how many bars per grouping? 
-
-        var barMultiDisplay = responseGrouping.selectAll("g"); //does this exist yet? 
+        // barMultiDisplay shows rect, line, etc. 
+        var barMultiDisplay = responseGrouping.selectAll("g"); 
         
-         //scale
-        var xBandwidth = x.bandwidth(); 
-        console.log("xBandwidth: ", xBandwidth);
+        //scale
+        // var xBandwidth = x.bandwidth(); 
+        // console.log("xBandwidth: ", xBandwidth);
 
-        var xResponseBand = d3.scaleBand()
-            .domain(legendCategoryNames) 
-            .rangeRound([0, xBandwidth]) //total width of response band (188)
-            .padding(0.1);
+        // var xResponseBand = d3.scaleBand()
+        //     .domain(legendCategoryNames) //2 items
+        //     .rangeRound([0, xBandwidth]); //total width of response band (188)
+            // .padding(0.1);
 
-        barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
-            .enter()
-            .append("g")
-            .attr("class", "bar_multi_display")
-            .attr("transform", function (d) {
-                var bandwidth = xResponseBand.bandwidth(); 
-                var spaceLeft = xResponseBand.bandwidth() + xResponseBand(d); 
-                console.log("bar spacing: ", spaceLeft);
-                return "translate(" + spaceLeft + ", " + margin.top + ")"; 
-            }); // accurate? 
+        // barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
+        //     .enter()
+        //     .append("g")
+        //     .attr("class", "bar_multi_display")
+        //     .attr("transform", function (d) {
+        //         var bandwidth = xResponseBand.bandwidth(); 
+        //         var spaceLeft = xResponseBand.bandwidth() + xResponseBand(d); 
+        //         console.log("bar spacing: ", spaceLeft);
+        //         return "translate(" + spaceLeft + ", " + margin.top + ")"; 
+        //     }); // accurate? 
 
         
     
