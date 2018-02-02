@@ -1,4 +1,6 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
+    console.log("config: ", chartConfigObject);
+    console.log("data: ", jsonData);
     //set chart data variables
     let totalBars = jsonData.length; 
     let barColors = chartConfigObject.colorsArrStr;
@@ -12,6 +14,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
+    console.log("legend: ", legendCategoryNames);
     
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
@@ -92,11 +95,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const width = 700 - margin.left - margin.right;
     const height = 700 - margin.top - margin.bottom;
     const totalWidth = width + margin.left + margin.right; 
+    const halfTotalWidth = totalWidth / 2; 
     const totalHeight = height + margin.top + margin.bottom;
     const chartTopBufferDataValue = 15; //verify this value with team
+    const chartBottomBufferLegend = totalHeight - margin.bottom + 100; //FIX
     const spaceFromTop = height + margin.top; 
     const legendColorKeyWidth = 20;
     const legendColorKeyHeight = 20;
+    const legendItemHeight = 20;
+    const legendItemPadding = 10;
 
     //tool tip
     var div = d3.select("body").append("div")
@@ -225,17 +232,30 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .select(".domain").remove(); //remove y-axis line
 
     //legend 
-    var legend = chart.append("g")
+    var legend = chart.append("g") //create & position legend area
         .attr("class", "legend")
-    legend.append("rect")
-        .attr("x", width / 2 - legendColorKeyWidth)
-        .attr("y", height + margin.bottom)
+        .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
+    var legendEntry =  legend.selectAll("g") //groupings do not exist yet
+        .data(legendCategoryNames) //count data
+        .enter() //run methods once per data count
+        .append("g") //produces new groupings
+        .attr("height", legendColorKeyHeight); 
+    var colorKey = legendEntry.append("rect")
         .attr("width", legendColorKeyWidth)
         .attr("height", legendColorKeyHeight)
-        .style("fill", barColors[0]); //hard-coded first color in array
-    legend.append("text")
-        .data(legendCategoryNames)
-        .attr("x", width / 2 + 10) //refactor later if legend expands
-        .attr("y", height + margin.bottom + 13)
-        .text(function (d) { return d; });
+        .attr("transform", function (d, i) {
+            let legendItemYPosition = legendItemHeight*i;
+            return "translate(0, " + legendItemYPosition + ")";
+        })
+        .style("fill", function (d, i) {
+            return barColors[i];
+        });
+    var label = legendEntry.append("text")
+        .text(function (d) { return d; }) 
+        //.attr("height", legendColorKeyHeight)
+        .attr("transform", function (d, i) {
+            let legendItemYPosition = legendItemHeight*i;
+            let paddingLeft = legendColorKeyWidth*2; 
+            return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+        });
 } 
