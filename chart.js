@@ -15,7 +15,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
-    
+
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
     let xAxisType = chartConfigObject.xAxisType; 
@@ -31,7 +31,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         //save data codes. then, map titles. 
         xAxisCategoryDataCodes.push(obj[xAxisColumn]);
-        legendCategoryDataCodes.push(obj[legendColumn]);
+        if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
+            legendCategoryDataCodes.push(obj[legendColumn]);            
+        }
 
         let confidenceIndicator = {
             lci: obj.lci,
@@ -69,8 +71,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     });
 
     legendEntryCount = legendCategoryNames.length; //***** get count
-    console.log("count: ", legendEntryCount);
-    console.log("legendCategoryNames: ", legendCategoryNames);
     
     function make_tooltip_display (obj) {   
         let column = obj[xAxisColumn];
@@ -134,15 +134,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     //determine rendering of single or multi-bar chart
     switch (legendEntryCount) {
         case 1: 
-            console.log("display single-bar chart"); 
+            // console.log("display single-bar chart"); 
             makeChartSingleBar();
             break;
         case 2: 
-            console.log("display multi-bar chart");
+            // console.log("display multi-bar chart");
             makeChartMultiBar();
             break; 
         default:
-            console.log("error"); 
+            // console.log("error"); 
             break; 
     }
 
@@ -314,17 +314,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter()
             .append("g")
             .attr("class", "response_grouping")
-            .attr("transform", function (d) { 
-                // var bandwidth = xResponseGrouping.bandwidth(); 
-                var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
-                return "translate(" + spaceLeft + ", " + margin.top + ")";  
+            .attr("transform", function (d, i) { 
+                var bandwidth = xResponseGrouping.bandwidth(); 
+                // var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
+                // return "translate(" + spaceLeft + ", " + margin.top + ")";  
+                var spaceLeft = margin.left + bandwidth*i;
+                return "translate(" + spaceLeft + ", " + margin.top + ")";                
             }); 
-        
+       
         //scale x-axis bars within response bandwidths
         var xMultiBarScaling = d3.scaleBand()
             .domain(legendCategoryNames) //2 legends
             .rangeRound([0, xResponseGroupingWidth])
-            .padding(0.2);
+            .padding(0);
         var xMultiBarScalingWidth = xMultiBarScaling.bandwidth(); 
         console.log("xMultiBarScalingWidth", xMultiBarScalingWidth); //should be ~100
         
@@ -338,13 +340,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var spaceLeft = xMultiBarScalingWidth*i; 
                 return "translate(" + spaceLeft + ", " + margin.top + ")"; 
             });
-
-        // bar.append("rect")
-        //     .data(barDataValues)
-        //     .attr("y", function (d) { return y(d); }) //y coordinate
-        //     .attr("height", function (d) { return height - y(d); }) //height
-        //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
-        //     .style("fill", barColors[0]) //hard-coded first color in array
+       
+        //WRONG DATA
+        barMultiDisplay.append("rect")
+            .data(barDataValues)
+            .attr("y", function (d) { return y(d); }) //y coordinate
+            .attr("height", function (d) { return height - y(d); }) //height
+            .attr("width", function (d, i) { return x.bandwidth() / 3; })
+            .style("fill", barColors[0]); //hard-coded first color in array
         //     .data(tooltipDisplay)
         //     .on("mouseover", function (d, i) {
         //         div.transition()
