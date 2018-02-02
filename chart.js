@@ -301,7 +301,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
 
-        //scale 
+        //scale x-axis response bandwidths
         var xResponseGrouping = d3.scaleBand()
             .domain(xAxisCategoryNames) 
             .rangeRound([0, width]) //total width 
@@ -315,36 +315,30 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .append("g")
             .attr("class", "response_grouping")
             .attr("transform", function (d) { 
-                var bandwidth = xResponseGrouping.bandwidth(); 
+                // var bandwidth = xResponseGrouping.bandwidth(); 
                 var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
                 return "translate(" + spaceLeft + ", " + margin.top + ")";  
             }); 
         
-        // barMultiDisplay shows rect, line, etc. 
+        //scale x-axis bars within response bandwidths
+        var xMultiBarScaling = d3.scaleBand()
+            .domain(legendCategoryNames) //2 legends
+            .rangeRound([0, xResponseGroupingWidth])
+            .padding(0.2);
+        var xMultiBarScalingWidth = xMultiBarScaling.bandwidth(); 
+        console.log("xMultiBarScalingWidth", xMultiBarScalingWidth); //should be ~100
+        
+        // barMultiDisplay grouping contains rectangle and ci line
         var barMultiDisplay = responseGrouping.selectAll("g"); 
-        
-        //scale
-        // var xBandwidth = x.bandwidth(); 
-        // console.log("xBandwidth: ", xBandwidth);
+        barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
+            .enter()
+            .append("g")
+            .attr("class", "bar_multi_display")
+            .attr("transform", function (d, i) {
+                var spaceLeft = xMultiBarScalingWidth*i; 
+                return "translate(" + spaceLeft + ", " + margin.top + ")"; 
+            });
 
-        // var xResponseBand = d3.scaleBand()
-        //     .domain(legendCategoryNames) //2 items
-        //     .rangeRound([0, xBandwidth]); //total width of response band (188)
-            // .padding(0.1);
-
-        // barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
-        //     .enter()
-        //     .append("g")
-        //     .attr("class", "bar_multi_display")
-        //     .attr("transform", function (d) {
-        //         var bandwidth = xResponseBand.bandwidth(); 
-        //         var spaceLeft = xResponseBand.bandwidth() + xResponseBand(d); 
-        //         console.log("bar spacing: ", spaceLeft);
-        //         return "translate(" + spaceLeft + ", " + margin.top + ")"; 
-        //     }); // accurate? 
-
-        
-    
         // bar.append("rect")
         //     .data(barDataValues)
         //     .attr("y", function (d) { return y(d); }) //y coordinate
