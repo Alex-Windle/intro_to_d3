@@ -290,7 +290,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .attr("preserveAspectRatio", "xMinYMin meet");
 
         //create bar grouping
-        var responseGrouping = chart.selectAll("g"); 
+        // var responseGrouping = chart.selectAll("g"); 
+        var responseGrouping = chart.selectAll("g"); //var slice = svg.selectAll(".slice")
 
         // add the Y gridlines
         chart.append("g")			
@@ -301,53 +302,91 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
 
+        //scale
+        var x0 = d3.scaleBand()
+            .rangeRound([0, width])
+            .paddingInner(0.1);
+
+        var x1 = d3.scaleBand()
+            .padding(0.05);
+
+        //data
+        console.log("json Data: ", jsonData);
+        console.log("s2s ....", barDataValues); 
+        console.log("responses: ", xAxisCategoryNames);
+        
+        x0.domain(xAxisCategoryNames); //splits into 3 sections
+        x1.domain(barDataValues)
+            .range([0, x0.bandwidth()]); 
+        y.domain([0, d3.max(barDataValues, function(bar) { return d3.max(barDataValues, function(d) { return d; }); })]);
+
+        responseGrouping
+            .data(barDataValues)
+            .enter().append("g")
+            .attr("class", "g")
+            .attr("transform", function (d, i) {
+                var xoBandwidth = x0.bandwidth();                
+                var spaceLeft = 0 + xoBandwidth*i; 
+                console.log("d: ", d);
+                return "translate(" + spaceLeft + ", 0)";
+            });
+
+        responseGrouping.selectAll("text")
+            .data(barDataValues)
+            .enter().append("text")
+            .attr("width", "100px")
+            .attr("height", "100px")
+            .attr("transform", "translate(200,200")
+            .text("helloooo");
+
+            // .attr("height", function (d) { return height - y(0); });
         //scale x-axis response bandwidths
-        var xResponseGrouping = d3.scaleBand()
-            .domain(xAxisCategoryNames) 
-            .rangeRound([0, width]) //total width 
-            .padding(0);
-        var xResponseGroupingWidth = xResponseGrouping.bandwidth(); 
-        console.log("xResponseGroupingWidth: ", xResponseGroupingWidth);
+        // var xResponseGrouping = d3.scaleBand()
+        //     .domain(xAxisCategoryNames) 
+        //     .rangeRound([0, width]) //total width 
+        //     .padding(0);
+        // var xResponseGroupingWidth = xResponseGrouping.bandwidth(); 
+        // console.log("xResponseGroupingWidth: ", xResponseGroupingWidth);
 
         // calculate # of response areas and # of bars within each
-        responseGrouping = responseGrouping.data(xAxisCategoryNames) // makes 1 grouping per response
-            .enter()
-            .append("g")
-            .attr("class", "response_grouping")
-            .attr("transform", function (d, i) { 
-                var bandwidth = xResponseGrouping.bandwidth(); 
-                // var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
-                // return "translate(" + spaceLeft + ", " + margin.top + ")";  
-                var spaceLeft = margin.left + bandwidth*i;
-                return "translate(" + spaceLeft + ", " + margin.top + ")";                
-            }); 
+        // responseGrouping = responseGrouping.data(xAxisCategoryNames) // makes 1 grouping per response
+        //     .enter()
+        //     .append("g")
+        //     .attr("class", "response_grouping")
+        //     .attr("transform", function (d, i) { 
+        //         var bandwidth = xResponseGrouping.bandwidth(); 
+        //         // var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
+        //         // return "translate(" + spaceLeft + ", " + margin.top + ")";  
+        //         var spaceLeft = margin.left + bandwidth*i;
+        //         return "translate(" + spaceLeft + ", " + margin.top + ")";                
+        //     }); 
        
         //scale x-axis bars within response bandwidths
-        var xMultiBarScaling = d3.scaleBand()
-            .domain(legendCategoryNames) //2 legends
-            .rangeRound([0, xResponseGroupingWidth])
-            .padding(0);
-        var xMultiBarScalingWidth = xMultiBarScaling.bandwidth(); 
-        console.log("xMultiBarScalingWidth", xMultiBarScalingWidth); //should be ~100
+        // var xMultiBarScaling = d3.scaleBand()
+        //     .domain(legendCategoryNames) //2 legends
+        //     .rangeRound([0, xResponseGroupingWidth])
+        //     .padding(0);
+        // var xMultiBarScalingWidth = xMultiBarScaling.bandwidth(); 
+        // console.log("xMultiBarScalingWidth", xMultiBarScalingWidth); //should be ~100
         
         // barMultiDisplay grouping contains rectangle and ci line
-        var barMultiDisplay = responseGrouping.selectAll("g"); 
-        barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
-            .enter()
-            .append("g")
-            .attr("class", "bar_multi_display")
-            .attr("transform", function (d, i) {
-                var spaceLeft = xMultiBarScalingWidth*i; 
-                return "translate(" + spaceLeft + ", " + margin.top + ")"; 
-            });
-       
-        //WRONG DATA
-        barMultiDisplay.append("rect")
-            .data(barDataValues)
-            .attr("y", function (d) { return y(d); }) //y coordinate
-            .attr("height", function (d) { return height - y(d); }) //height
-            .attr("width", function (d, i) { return x.bandwidth() / 3; })
-            .style("fill", barColors[0]); //hard-coded first color in array
+        // var barMultiDisplay = responseGrouping.selectAll("g"); 
+        // barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
+        //     .enter()
+        //     .append("g")
+        //     .attr("class", "bar_multi_display")
+        //     .attr("transform", function (d, i) {
+        //         var spaceLeft = xMultiBarScalingWidth*i; 
+        //         return "translate(" + spaceLeft + ", " + margin.top + ")"; 
+        //     });
+        // console.log("resp", xAxisCategoryNames); 
+        // console.log("bar data", barDataValues); 
+        // barMultiDisplay.append("rect")
+        //     .data(barDataValues)
+        //     .attr("y", function (d) { return y(d); }) //y coordinate
+        //     .attr("height", function (d) { return height - y(d); }) //height
+        //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
+        //     .style("fill", barColors[0]); //hard-coded first color in array
         //     .data(tooltipDisplay)
         //     .on("mouseover", function (d, i) {
         //         div.transition()
