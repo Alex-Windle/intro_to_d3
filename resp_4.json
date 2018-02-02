@@ -1,0 +1,30 @@
+[  
+   {  
+      "qi":"BINGE",
+      "yr":"YR4",
+      "s1":"AGE01",
+      "s2":"DISABL",
+      "rs":"YESNO01",
+      "dvt":"PREV",
+      "dv":25.3,
+      "lci":21.4,
+      "hci":29.7,
+      "wn":480305,
+      "sc1":"AGEGRP",
+      "sc2":"DISSTAT"
+   },
+   {  
+      "qi":"BINGE",
+      "yr":"YR4",
+      "s1":"AGE01",
+      "s2":"NODIS",
+      "rs":"YESNO01",
+      "dvt":"PREV",
+      "dv":21.8,
+      "lci":20.3,
+      "hci":23.5,
+      "wn":2464908,
+      "sc1":"AGEGRP",
+      "sc2":"DISSTAT"
+   }
+]
