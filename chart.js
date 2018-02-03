@@ -368,13 +368,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 //POSITION AGE GROUP RESP
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
             .selectAll("rect")
-            .data(function (data) { 
-                console.log('looping over response data ', data ); 
-                return data; 
-            });
-            // .enter().append("rect")
-            //     .attr("x", function (d) { return x1(100) })
-            //     .attr("y", function (d) { return y()}); 
+            .data(testData.map(function (d) { 
+                console.log(d.data);
+                return d.data; 
+            }))
+            .enter().append("rect") 
+                .attr("x", function (d) { 
+                    console.log(d.key); 
+                    return x1(d.key); 
+                })
+                .attr("y", function (d) {
+                    console.log(d.key); 
+                    return y(d.value); 
+                }); 
         
         // x0.domain(xAxisCategoryNames); //splits into 3 sections
         // x1.domain(barDataValues)
