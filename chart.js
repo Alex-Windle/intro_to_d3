@@ -1,6 +1,4 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
-    console.log("config: ", chartConfigObject);
-    console.log("data: ", jsonData);
     //set chart data variables
     let totalBars = jsonData.length; 
     let barColors = chartConfigObject.colorsArrStr;
@@ -116,15 +114,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .style("opacity", 0);
 
     //scale
-    var x = d3.scaleBand()
-        .domain(xAxisCategoryNames) 
-        .rangeRound([0, width]) //total width 
-        .padding(0.1);
+    // var x = d3.scaleBand()
+    //     .domain(xAxisCategoryNames) 
+    //     .rangeRound([0, width]) //total width 
+    //     .padding(0.1);
 
-    var y = d3.scaleLinear()
-        //set value scaling with buffer
-        .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
-        .range([height, 0]);
+    // var y = d3.scaleLinear()
+    //     //set value scaling with buffer
+    //     .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
+    //     .range([height, 0]);
 
     //gridlines in y axis 
     function make_y_gridlines() {
@@ -282,208 +280,133 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     // }
 
     function makeChartMultiBar () {
+        console.log("jsonData ", jsonData);
+        console.log("config ", chartConfigObject);
+        console.log("bar vals ", barDataValues);
+        console.log("resp vals ", xAxisCategoryNames);
+
+        //SELECT SVG AREA
         var chart = d3.select(".chart") 
-        // .attr("height", "700") //refactor for compatibility with ie
-        .attr("viewBox", function () {
-            return "0 0 700 700";
-        })
+        .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
 
-        //create bar grouping
-        // var responseGrouping = chart.selectAll("g"); 
-        var responseGrouping = chart.selectAll("g"); //var slice = svg.selectAll(".slice")
-
-        // add the Y gridlines
-        chart.append("g")			
-            .attr("class", "grid")
-            .call(make_y_gridlines()
-                .tickSize(-width) //full graph width
-                .tickFormat("")
-            )
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
-
-        //scale
+        //SCALE X0 - RESPONSE CATEGORIES (3 OPTIONS)
+        //SCALE X1 - LEGEND COLUMNS (2 OPTIONS, DISABL AND ABL)
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0.1);
+            .paddingInner(0);
 
         var x1 = d3.scaleBand()
-            .padding(0.05);
+            .padding(0);
 
-        //data
-        console.log("json Data: ", jsonData);
-        console.log("s2s ....", barDataValues); 
-        console.log("responses: ", xAxisCategoryNames);
-        
-        x0.domain(xAxisCategoryNames); //splits into 3 sections
-        x1.domain(barDataValues)
-            .range([0, x0.bandwidth()]); 
-        y.domain([0, d3.max(barDataValues, function(bar) { return d3.max(barDataValues, function(d) { return d; }); })]);
+        var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
 
-        responseGrouping
-            .data(barDataValues)
+        //HOW SHOULD THE DATA BE ORGANIZED
+        //RESPONSES, LEGEND CATEGORIES, AND BAR VALUES
+        var testData = [
+            {
+                 response: "18 - 44",
+                 data: [
+                    { 
+                        "key" : "NODIS",
+                        "value": 10
+                    },
+                    { 
+                        "key" : "DIS",
+                        "value": 9
+                    }
+                 ]
+            }, 
+            {
+                response: "45 - 64",
+                data: [
+                    { 
+                        "key" : "NODIS",
+                        "value": 8
+                    },
+                    { 
+                        "key" : "DIS",
+                        "value": 7
+                    }
+                ]
+            }, 
+            {
+                response: "65+",
+                data: [
+                    { 
+                        "key" : "NODIS",
+                        "value": 6
+                    },
+                    { 
+                        "key" : "DIS",
+                        "value": 5
+                    }
+                ]
+            }
+        ]; 
+
+        var testDataValues = [10,9,8,7,6,5]; 
+        ///////////////////////////////////////////////
+        x0.domain(testData.map(function (d) { return d.response; })); 
+        // x1.domain(function (testData) {
+        //     var array = []; 
+        //     for (var i = 0; i < testData.length; i++) {
+        //         for (var j = 0; j < testData[i].data.length; j++) {
+        //             array.push(testData[i].data[j]); 
+        //         }
+        //     }
+        //     console.log(array); 
+        //     return array; 
+        // }).rangeRound([0, x0.bandwidth()]);
+        y.domain([0, d3.max(testDataValues)]); 
+
+        chart = chart.append("g")
+            .selectAll("g")
+            .data(testData.map(function (d) { return d.response; }))
             .enter().append("g")
-            .attr("class", "g")
-            .attr("transform", function (d, i) {
-                var xoBandwidth = x0.bandwidth();                
-                var spaceLeft = 0 + xoBandwidth*i; 
-                console.log("d: ", d);
-                return "translate(" + spaceLeft + ", 0)";
+                //POSITION AGE GROUP RESP
+                .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
+            .selectAll("rect")
+            .data(function (data) { 
+                console.log('looping over response data ', data ); 
+                return data; 
             });
-
-        responseGrouping.selectAll("text")
-            .data(barDataValues)
-            .enter().append("text")
-            .attr("width", "100px")
-            .attr("height", "100px")
-            .attr("transform", "translate(200,200")
-            .text("helloooo");
-
-            // .attr("height", function (d) { return height - y(0); });
-        //scale x-axis response bandwidths
-        // var xResponseGrouping = d3.scaleBand()
-        //     .domain(xAxisCategoryNames) 
-        //     .rangeRound([0, width]) //total width 
-        //     .padding(0);
-        // var xResponseGroupingWidth = xResponseGrouping.bandwidth(); 
-        // console.log("xResponseGroupingWidth: ", xResponseGroupingWidth);
-
-        // calculate # of response areas and # of bars within each
-        // responseGrouping = responseGrouping.data(xAxisCategoryNames) // makes 1 grouping per response
-        //     .enter()
-        //     .append("g")
-        //     .attr("class", "response_grouping")
-        //     .attr("transform", function (d, i) { 
-        //         var bandwidth = xResponseGrouping.bandwidth(); 
-        //         // var spaceLeft = xResponseGrouping.bandwidth() + xResponseGrouping(d);
-        //         // return "translate(" + spaceLeft + ", " + margin.top + ")";  
-        //         var spaceLeft = margin.left + bandwidth*i;
-        //         return "translate(" + spaceLeft + ", " + margin.top + ")";                
-        //     }); 
-       
-        //scale x-axis bars within response bandwidths
-        // var xMultiBarScaling = d3.scaleBand()
-        //     .domain(legendCategoryNames) //2 legends
-        //     .rangeRound([0, xResponseGroupingWidth])
-        //     .padding(0);
-        // var xMultiBarScalingWidth = xMultiBarScaling.bandwidth(); 
-        // console.log("xMultiBarScalingWidth", xMultiBarScalingWidth); //should be ~100
+            // .enter().append("rect")
+            //     .attr("x", function (d) { return x1(100) })
+            //     .attr("y", function (d) { return y()}); 
         
-        // barMultiDisplay grouping contains rectangle and ci line
-        // var barMultiDisplay = responseGrouping.selectAll("g"); 
-        // barMultiDisplay = barMultiDisplay.data(legendCategoryNames) // count 2 data items to display
-        //     .enter()
-        //     .append("g")
-        //     .attr("class", "bar_multi_display")
-        //     .attr("transform", function (d, i) {
-        //         var spaceLeft = xMultiBarScalingWidth*i; 
-        //         return "translate(" + spaceLeft + ", " + margin.top + ")"; 
-        //     });
-        // console.log("resp", xAxisCategoryNames); 
-        // console.log("bar data", barDataValues); 
-        // barMultiDisplay.append("rect")
+        // x0.domain(xAxisCategoryNames); //splits into 3 sections
+        // x1.domain(barDataValues)
+        //     .range([0, x0.bandwidth()]); 
+        // y.domain([0, d3.max(barDataValues, function(bar) { return d3.max(barDataValues, function(d) { return d; }); })]);
+
+        // responseGrouping
         //     .data(barDataValues)
-        //     .attr("y", function (d) { return y(d); }) //y coordinate
-        //     .attr("height", function (d) { return height - y(d); }) //height
-        //     .attr("width", function (d, i) { return x.bandwidth() / 3; })
-        //     .style("fill", barColors[0]); //hard-coded first color in array
-        //     .data(tooltipDisplay)
-        //     .on("mouseover", function (d, i) {
-        //         div.transition()
-        //             .duration(200)
-        //             .style("opacity", .9);
-        //         div.html(`
-        //             <h3>${d.title}</h3> 
-        //             <h3>${d.dv}</h3>
-        //             CI (${d.lci} - ${d.hci})
-        //             <br />WN = ${d.wn}
-        //         `)                  
-        //             .style("left", (d3.event.pageX - 70) + "px")
-        //             .style("top", (d3.event.pageY - 90) + "px");
-        //     })
-        //     .on("mouseout", function (d) {
-        //         div.transition()
-        //             .duration(500)
-        //             .style("opacity", 0);
-        //     }); 
-
-        //confidence indicator line
-        // var line = bar.append("line")
-        //     .attr("class", "confidence_indicator")
-        //     .data(confidenceIndicators)
-        //     .attr("x1", function () { return x.bandwidth() / 6; })
-        //     .attr("y1", function (d) { return y(d.lci); }) 
-        //     .attr("x2", function () { return x.bandwidth() / 6; }) 
-        //     .attr("y2", function (d) { return y(d.hci); });
-        //confidence indicator linecaps
-        // var linecapHalfWidth = 5; 
-        // var linecap_top = bar.append("line")
-        //     .attr("class", "linecap_top")
-        //     .data(confidenceIndicators)
-        //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-        //     .attr("y1", function (d) { return y(d.hci); })
-        //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-        //     .attr("y2", function (d) { return y(d.hci); });
-        // var linecap_bottom = bar.append("line")
-        //     .attr("class", "linecap_top")
-        //     .data(confidenceIndicators)
-        //     .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-        //     .attr("y1", function (d) { return y(d.lci); })
-        //     .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-        //     .attr("y2", function (d) { return y(d.lci); });
-
-        //axes labels
-        // var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-        // var paddingLeft = 14;         
-        // var yAxisLabel = chart.append("text")
-        //     .attr("class", "label")
-        //     .attr("id", "y_axis_label")
-        //     .text(yAxisTitle)
-        //     .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-        //     .attr("text-anchor", "middle");         
-
-        //axes
-        // var xAxis = chart.append("g")
-        //     .attr("class", "axis")             
-        //     .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-        //     .call(d3.axisBottom(x))
-        //     .selectAll("text")
-        //     .style("text-anchor", "end")
-        //     .attr("dx", "-.8em")
-        //     .attr("dy", ".15em")
-        //     .attr("transform", "rotate(-45)");
-        // var yAxis = chart.append("g")
-        //     .attr("class", "axis")
-        //     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-        //     .call(d3.axisLeft(y))
-        //     .select(".domain").remove(); //remove y-axis line
-
-        //legend 
-        // var legend = chart.append("g") //create & position legend area
-        //     .attr("class", "legend")
-        //     .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
-        // var legendEntry =  legend.selectAll("g") //groupings do not exist yet
-        //     .data(legendCategoryNames) //count data
-        //     .enter() //run methods once per data count
-        //     .append("g") //produces new groupings
-        //     .attr("height", legendColorKeyHeight); 
-        // var colorKey = legendEntry.append("rect")
-        //     .attr("width", legendColorKeyWidth)
-        //     .attr("height", legendColorKeyHeight)
+        //     .enter().append("g")
+        //     .attr("class", "g")
         //     .attr("transform", function (d, i) {
-        //         let legendItemYPosition = legendItemHeight*i;
-        //         return "translate(0, " + legendItemYPosition + ")";
-        //     })
-        //     .style("fill", function (d, i) {
-        //         return barColors[i];
+        //         var xoBandwidth = x0.bandwidth();                
+        //         var spaceLeft = 0 + xoBandwidth*i; 
+        //         console.log("d: ", d);
+        //         return "translate(" + spaceLeft + ", 0)";
         //     });
-        // var label = legendEntry.append("text")
-        //     .text(function (d) { return d; }) 
-        //     //.attr("height", legendColorKeyHeight)
-        //     .attr("transform", function (d, i) {
-        //         let legendItemYPosition = legendItemHeight*i;
-        //         let paddingLeft = legendColorKeyWidth*2; 
-        //         return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
-        // });
+
+        // responseGrouping.selectAll("text")
+        //     .data(barDataValues)
+        //     .enter().append("text")
+        //     .attr("width", "100px")
+        //     .attr("height", "100px")
+        //     .attr("transform", "translate(200,200")
+        //     .text("helloooo");
     }
 } 
+
+
+
+
+
+
+
+
+// open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
