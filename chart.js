@@ -27,10 +27,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let barDataValue = Number(obj.dv.toFixed(decimalPlaces));
         barDataValues.push(barDataValue);
 
-        //save data codes. then, map titles. 
-        xAxisCategoryDataCodes.push(obj[xAxisColumn]);
+        //save data codes. then, map titles.
+        if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {
+            xAxisCategoryDataCodes.push(obj[xAxisColumn]);
+        }
+
         if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
-            legendCategoryDataCodes.push(obj[legendColumn]);            
+            legendCategoryDataCodes.push(obj[legendColumn]);                  
         }
 
         let confidenceIndicator = {
@@ -294,10 +297,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         //SCALE X1 - LEGEND COLUMNS (2 OPTIONS, DISABL AND ABL)
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0);
+            .paddingInner(0.);
 
         var x1 = d3.scaleBand()
-            .padding(0);
+            .padding(0.0);
 
         var y = d3.scaleLinear()
             .rangeRound([height, 0]);
@@ -347,64 +350,104 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         ]; 
 
         var testDataValues = [10,9,8,7,6,5]; 
+        var testKeyValuePairs = [
+            {
+                "key" : "NODIS",
+                "value": 10
+            },
+            {
+                "key" : "DIS",
+                "value": 9
+            },
+            {
+                "key" : "NODIS",
+                "value": 8
+            },
+            {
+                "key" : "DIS",
+                "value": 7
+            },
+            {
+                "key" : "NODIS",
+                "value": 6
+            },
+            {
+                "key" : "DIS",
+                "value": 5
+            },
+        ];
+
+        //filter by response object
+        var filteredJSON = jsonData.filter(function (d) {
+            var filterByKey = chartConfigObject.xAxisColumn;
+            var str = xAxisCategoryDataCodes; 
+            console.log('str ', str); 
+            return d[filterByKey] === str[1]; 
+        })
+        // console.log('filtered JSON ', filteredJSON); 
+
+        //create a new array with 2 data items
+        var newDataArray = []; 
+        filteredJSON.forEach(function (d) {
+            newDataArray.push({
+                key: d.s2,
+                val: d.dv
+            });
+            return;
+        })
+        // console.log('new data array ', newDataArray);
+
+        console.log('codes ', xAxisCategoryDataCodes) 
         ///////////////////////////////////////////////
-        x0.domain(testData.map(function (d) { return d.response; })); 
-        // x1.domain(function (testData) {
-        //     var array = []; 
-        //     for (var i = 0; i < testData.length; i++) {
-        //         for (var j = 0; j < testData[i].data.length; j++) {
-        //             array.push(testData[i].data[j]); 
-        //         }
-        //     }
-        //     console.log(array); 
-        //     return array; 
-        // }).rangeRound([0, x0.bandwidth()]);
-        y.domain([0, d3.max(testDataValues)]); 
+        x0.domain(xAxisCategoryNames); 
+        x1.domain(barDataValues).range([0, x0.bandwidth()])
+        y.domain([0, d3.max(barDataValues)]); 
+        console.log('json data ', jsonData);
+
+        // xAxisCategoryDataCodes.map(function (d, i) {
+        //     var filteredData = jsonData.filter(function (e) {
+        //         return e[xAxisColumn] === d; 
+        //     }); 
+        //     console.log('filteredData ', filteredData);
+        //     return filteredData;
+        // }); 
+        // console.log('woo ', xAxisCategoryDataCodes);
 
         chart = chart.append("g")
             .selectAll("g")
-            .data(testData.map(function (d) { return d.response; }))
+            .data(xAxisCategoryNames)
             .enter().append("g")
-                //POSITION AGE GROUP RESP
+                .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
-            .selectAll("rect")
-            .data(testData.map(function (d) { 
-                console.log(d.data);
-                return d.data; 
-            }))
-            .enter().append("rect") 
-                .attr("x", function (d) { 
-                    console.log(d.key); 
-                    return x1(d.key); 
-                })
-                .attr("y", function (d) {
-                    console.log(d.key); 
-                    return y(d.value); 
+            .selectAll("rect") 
+            // .data(newDataArray) //SHOWS REPEATING DATA
+
+            //WHAT DATA GOES IN HERE? I WANT TO FILTER BY 3 AGE RANGES AND RETURN A DIFFERENT 
+            //ARRAY EACH TIME! 
+            .data(xAxisCategoryDataCodes.map(function (d, i) {
+                var filteredData = jsonData.filter(function (e) {
+                    return e[xAxisColumn] === d; 
                 }); 
-        
-        // x0.domain(xAxisCategoryNames); //splits into 3 sections
-        // x1.domain(barDataValues)
-        //     .range([0, x0.bandwidth()]); 
-        // y.domain([0, d3.max(barDataValues, function(bar) { return d3.max(barDataValues, function(d) { return d; }); })]);
+                console.log('filteredData ', filteredData);
 
-        // responseGrouping
-        //     .data(barDataValues)
-        //     .enter().append("g")
-        //     .attr("class", "g")
-        //     .attr("transform", function (d, i) {
-        //         var xoBandwidth = x0.bandwidth();                
-        //         var spaceLeft = 0 + xoBandwidth*i; 
-        //         console.log("d: ", d);
-        //         return "translate(" + spaceLeft + ", 0)";
-        //     });
-
-        // responseGrouping.selectAll("text")
-        //     .data(barDataValues)
-        //     .enter().append("text")
-        //     .attr("width", "100px")
-        //     .attr("height", "100px")
-        //     .attr("transform", "translate(200,200")
-        //     .text("helloooo");
+                // for (var i=0; i<filteredData.length; i++) {
+                //     console.log('item ', filteredData[i]);
+                // }
+                
+                // return filteredData;
+            }))
+                .enter().append("rect") 
+        //         .attr("class", "bar")
+        //         .attr("x", function (d, i) {
+        //             console.log('x ', d);
+        //             var width = x1.bandwidth();
+        //             var spaceLeft = x1.bandwidth()*i;
+        //             return width + spaceLeft;
+        //         })
+        //         .attr("y", function (d) { return y(d.val); })
+        //         .attr("width", x1.bandwidth())
+        //         .attr("height", function (d) { return height - y(d.val); })
+        //         .attr("fill", function (d, i) { return barColors[i]; });
     }
 } 
 
