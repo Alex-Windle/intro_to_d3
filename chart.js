@@ -359,13 +359,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .enter().append("rect") 
                     .attr("class", "bar")
                     .attr("x", function (d, i) {
-                        // console.log('bar data ', d);
+                        console.log('bar data ', d);
                         // var width = x1.bandwidth();
                         // var spaceLeft = x1.bandwidth()*i;
                         // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
                         var width = x0.bandwidth()/2; 
                         var spaceLeft = width*i; 
                         return margin.left + spaceLeft; 
+                        // console.log('d.key', d.key); 
                     })
                     .attr("y", function (d) { return yMulti(d.val); })
                     // .attr("width", x1.bandwidth()) //skinny bars
@@ -373,13 +374,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .attr("height", function (d) { return height - yMulti(d.val); })
                     .attr("fill", function (d, i) { return barColors[i]; });
                     //confidence indicator line
-                        // var line = bar.append("line")
-                        // .attr("class", "confidence_indicator")
-                        // .data(confidenceIndicators)
-                        // .attr("x1", function () { return x1.bandwidth() / 6; })
-                        // .attr("y1", function (d) { return y(d.lci); }) 
-                        // .attr("x2", function () { return x1.bandwidth() / 6; }) 
-                        // .attr("y2", function (d) { return y(d.hci); });
+                    var line = bar.append("line")
+                        .attr("class", "confidence_indicator")
+                        .data(confidenceIndicators)
+                        .attr("x1", function () { return x1.bandwidth() / 6; })
+                        .attr("y1", function (d) { return y(d.lci); }) 
+                        .attr("x2", function () { return x1.bandwidth() / 6; }) 
+                        .attr("y2", function (d) { return y(d.hci); });
                     
                     //axes labels
                     var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
@@ -408,7 +409,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     //legend 
                     var legend = chart.append("g") //create & position legend area
                         .attr("class", "legend")
-                        .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
+                        .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
+        //add legend title string 
                     var legendEntry =  legend.selectAll("g") //groupings do not exist yet
                         .data(legendCategoryNames) //count data
                         .enter() //run methods once per data count
@@ -435,5 +437,4 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     });
     }
 } 
-
 // open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
