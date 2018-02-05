@@ -397,6 +397,33 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
                         .call(d3.axisLeft(yMulti))
                         .select(".domain").remove(); //remove y-axis line
+                    //legend 
+                    var legend = chart.append("g") //create & position legend area
+                        .attr("class", "legend")
+                        .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
+                    var legendEntry =  legend.selectAll("g") //groupings do not exist yet
+                        .data(legendCategoryNames) //count data
+                        .enter() //run methods once per data count
+                        .append("g") //produces new groupings
+                        .attr("height", legendColorKeyHeight); 
+                    var colorKey = legendEntry.append("rect")
+                        .attr("width", legendColorKeyWidth)
+                        .attr("height", legendColorKeyHeight)
+                        .attr("transform", function (d, i) {
+                            let legendItemYPosition = legendItemHeight*i;
+                            return "translate(0, " + legendItemYPosition + ")";
+                        })
+                        .style("fill", function (d, i) {
+                            return barColors[i];
+                        });
+                    var label = legendEntry.append("text")
+                        .text(function (d) { return d; }) 
+                        //.attr("height", legendColorKeyHeight)
+                        .attr("transform", function (d, i) {
+                            let legendItemYPosition = legendItemHeight*i;
+                            let paddingLeft = legendColorKeyWidth*2; 
+                            return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+                    });
     }
 } 
 
