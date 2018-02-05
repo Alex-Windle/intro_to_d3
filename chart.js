@@ -303,6 +303,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .rangeRound([height, 0]);
 
         //create data matrix
+        let dataMatrix = []; 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
             // the output  needs to follow this structure: 
             // [
@@ -310,11 +311,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}], //45-64
             //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}], //65+
             // ]
-            var dataMatrix = []; //big array 
+            // var dataMatrix = []; //big array 
 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
-                //filter for jsondata matches and return 
+                //filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
@@ -329,8 +330,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 }); 
                 dataMatrix.push(keysFromFilteredJSON); 
             }
-            console.log('data matrix ', dataMatrix);
         }
+        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
+        console.log('data matrix ', dataMatrix);
 
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
@@ -348,13 +350,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
                 //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
                 // ])
-                .data(createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData))
+                .data(dataMatrix)
             .selectAll("rect")
                 .data(function(d, i) {return d;})
                     .enter().append("rect") 
                     .attr("class", "bar")
                     .attr("x", function (d, i) {
-                        console.log('x ', d);
+                        console.log('bar data ', d);
                         var width = x1.bandwidth();
                         var spaceLeft = x1.bandwidth()*i;
                         return width + spaceLeft;
