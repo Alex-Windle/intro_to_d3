@@ -104,7 +104,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const halfTotalWidth = totalWidth / 2; 
     const totalHeight = height + margin.top + margin.bottom;
     const chartTopBufferDataValue = 10; //verify this value with team
-    const chartBottomBufferLegend = totalHeight - margin.bottom + 100; //FIX
+    const chartBottomBufferLegend = totalHeight - margin.bottom + 150; //FIX
     const spaceFromTop = height + margin.top; 
     const legendColorKeyWidth = 20;
     const legendColorKeyHeight = 20;
@@ -265,6 +265,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("height", legendColorKeyHeight)
             .attr("transform", function (d, i) {
                 let legendItemYPosition = legendItemHeight*i;
+                // legendItemYPosition = legendItemYPosition/2; 
                 return "translate(0, " + legendItemYPosition + ")";
             })
             .style("fill", function (d, i) {
@@ -274,7 +275,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .text(function (d) { return d; }) 
             //.attr("height", legendColorKeyHeight)
             .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i;
+                let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
                 let paddingLeft = legendColorKeyWidth*2; 
                 return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
         });
@@ -288,10 +289,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0.1);
+            .paddingInner(.1);
 
         var x1 = d3.scaleBand()
-            .padding(0);
+            .padding(0.05);//NOT WORKING
 
         var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
@@ -324,7 +325,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
 
         x0.domain(xAxisCategoryNames); 
-        x1.domain(barDataValues).range([0, x0.bandwidth()])
+        x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
         yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
 
         chart = chart.append("g")
@@ -427,7 +428,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .text(function (d) { return d; }) 
                         //.attr("height", legendColorKeyHeight)
                         .attr("transform", function (d, i) {
-                            let legendItemYPosition = legendItemHeight*i;
+                            // let legendItemYPosition = legendItemHeight*i;
+                            let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
                             let paddingLeft = legendColorKeyWidth*2; 
                             return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
                     });
