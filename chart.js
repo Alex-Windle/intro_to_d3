@@ -283,9 +283,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
-        var chart = d3.select(".chart") 
-        .attr("viewBox", function () { return "0 0 700 700"; })
-        .attr("preserveAspectRatio", "xMinYMin meet");
+         var chart = d3.select(".chart") 
+            .attr("viewBox", function () { return "0 0 700 700"; })
+            .attr("preserveAspectRatio", "xMinYMin meet");
 
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
@@ -294,9 +294,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var x1 = d3.scaleBand()
             .padding(0.0);
 
-        var y = d3.scaleLinear()
+        var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
 
+                //gridlines in y axis 
+        function make_y_gridlines_multi() {
+            return d3.axisLeft(yMulti)
+        }
         //create data matrix
         let dataMatrix = []; 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
@@ -321,7 +325,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
-        y.domain([0, d3.max(barDataValues)]); 
+        yMulti.domain([0, d3.max(barDataValues)]); 
 
         chart = chart.append("g")
         var bar = chart.selectAll("g")
@@ -329,7 +333,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         // add the Y gridlines
         chart.append("g")			
             .attr("class", "grid")
-            .call(make_y_gridlines()
+            .call(make_y_gridlines_multi()
                 .tickSize(-width) //full graph width
                 .tickFormat("")
             )
@@ -356,9 +360,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         var spaceLeft = x1.bandwidth()*i;
                         return width + spaceLeft + margin.left;
                     })
-                    .attr("y", function (d) { return y(d.val); })
+                    .attr("y", function (d) { return yMulti(d.val); })
                     .attr("width", x1.bandwidth())
-                    .attr("height", function (d) { return height - y(d.val); })
+                    .attr("height", function (d) { return height - yMulti(d.val); })
                     .attr("fill", function (d, i) { return barColors[i]; });
                     //confidence indicator line
                         // var line = bar.append("line")
@@ -391,7 +395,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     var yAxis = chart.append("g")
                         .attr("class", "axis")
                         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-                        .call(d3.axisLeft(y))
+                        .call(d3.axisLeft(yMulti))
                         .select(".domain").remove(); //remove y-axis line
     }
 } 
