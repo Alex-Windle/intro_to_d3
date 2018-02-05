@@ -103,7 +103,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const totalWidth = width + margin.left + margin.right; 
     const halfTotalWidth = totalWidth / 2; 
     const totalHeight = height + margin.top + margin.bottom;
-    const chartTopBufferDataValue = 15; //verify this value with team
+    const chartTopBufferDataValue = 10; //verify this value with team
     const chartBottomBufferLegend = totalHeight - margin.bottom + 100; //FIX
     const spaceFromTop = height + margin.top; 
     const legendColorKeyWidth = 20;
@@ -288,7 +288,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0);
+            .paddingInner(0.1);
 
         var x1 = d3.scaleBand()
             .padding(0);
@@ -325,7 +325,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
-        yMulti.domain([0, d3.max(barDataValues)]); 
+        yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
 
         chart = chart.append("g")
         var bar = chart.selectAll("g")
@@ -333,7 +333,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         // add the Y gridlines
         chart.append("g")			
             .attr("class", "grid")
-            .call(make_y_gridlines_multi()
+            .call(make_y_gridlines_multi() 
                 .tickSize(-width) //full graph width
                 .tickFormat("")
             )
