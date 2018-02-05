@@ -6,7 +6,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let xAxisCategoryNames = []; 
     let yAxisTitle = chartConfigObject.yAxisTitle; 
     let legendTitle = chartConfigObject.legendTitleStr;
-    let legendCategoryNames = []; //count items to distinguish how many bars***** 
+    let legendCategoryNames = [];  
     let legendEntryCount = []; 
     let confidenceIndicators = [];             
     let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
@@ -71,7 +71,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         }
     });
 
-    legendEntryCount = legendCategoryNames.length; //***** get count
+    legendEntryCount = legendCategoryNames.length; 
     
     function make_tooltip_display (obj) {   
         let column = obj[xAxisColumn];
@@ -117,15 +117,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .style("opacity", 0);
 
     //scale
-    // var x = d3.scaleBand()
-    //     .domain(xAxisCategoryNames) 
-    //     .rangeRound([0, width]) //total width 
-    //     .padding(0.1);
+    var x = d3.scaleBand()
+        .domain(xAxisCategoryNames) 
+        .rangeRound([0, width]) //total width 
+        .padding(0.1);
 
-    // var y = d3.scaleLinear()
-    //     //set value scaling with buffer
-    //     .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
-    //     .range([height, 0]);
+    var y = d3.scaleLinear()
+        //set value scaling with buffer
+        .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
+        .range([height, 0]);
 
     //gridlines in y axis 
     function make_y_gridlines() {
@@ -135,159 +135,154 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     //determine rendering of single or multi-bar chart
     switch (legendEntryCount) {
         case 1: 
-            // console.log("display single-bar chart"); 
+            console.log("Display single-bar chart"); 
             makeChartSingleBar();
             break;
         case 2: 
-            // console.log("display multi-bar chart");
+            console.log("Display multi-bar chart");
             makeChartMultiBar();
             break; 
         default:
-            // console.log("error"); 
+            console.log("Error"); 
             break; 
     }
 
-    // function makeChartSingleBar () {
-    //     var chart = d3.select(".chart") 
-    //     // .attr("height", "700") //refactor for compatibility with ie
-    //     .attr("viewBox", function () {
-    //         return "0 0 700 700";
-    //     })
-    //     .attr("preserveAspectRatio", "xMinYMin meet");
+    function makeChartSingleBar () {
+        var chart = d3.select(".chart") 
+        // .attr("height", "700") //refactor for compatibility with ie
+        .attr("viewBox", function () {
+            return "0 0 700 700";
+        })
+        .attr("preserveAspectRatio", "xMinYMin meet");
 
-    //     //create bar grouping
-    //     var bar = chart.selectAll("g"); 
+        //create bar grouping
+        var bar = chart.selectAll("g"); 
 
-    //     // add the Y gridlines
-    //     chart.append("g")			
-    //         .attr("class", "grid")
-    //         .call(make_y_gridlines()
-    //             .tickSize(-width) //full graph width
-    //             .tickFormat("")
-    //         )
-    //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+        // add the Y gridlines
+        chart.append("g")			
+            .attr("class", "grid")
+            .call(make_y_gridlines()
+                .tickSize(-width) //full graph width
+                .tickFormat("")
+            )
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
 
-    //     //bars
-    //     bar = bar.data(xAxisCategoryNames)
-    //         .enter()
-    //         .append("g") 
-    //         .attr("transform", function (d) { 
-    //             var bandwidth = x.bandwidth(); 
-    //             var spaceLeft = x.bandwidth() + x(d);
-    //             return "translate(" + spaceLeft + ", " + margin.top + ")";  
-    //         }); 
-    //     bar.append("rect")
-    //         .data(barDataValues)
-    //         .attr("y", function (d) { return y(d); }) //y coordinate
-    //         .attr("height", function (d) { return height - y(d); }) //height
-    //         .attr("width", function (d, i) { return x.bandwidth() / 3; })
-    //         .style("fill", barColors[0]) //hard-coded first color in array
-    //         .data(tooltipDisplay)
-    //         .on("mouseover", function (d, i) {
-    //             div.transition()
-    //                 .duration(200)
-    //                 .style("opacity", .9);
-    //             div.html(`
-    //                 <h3>${d.title}</h3> 
-    //                 <h3>${d.dv}</h3>
-    //                 CI (${d.lci} - ${d.hci})
-    //                 <br />WN = ${d.wn}
-    //             `)                  
-    //                 .style("left", (d3.event.pageX - 70) + "px")
-    //                 .style("top", (d3.event.pageY - 90) + "px");
-    //         })
-    //         .on("mouseout", function (d) {
-    //             div.transition()
-    //                 .duration(500)
-    //                 .style("opacity", 0);
-    //         }); 
+        //bars
+        bar = bar.data(xAxisCategoryNames)
+            .enter()
+            .append("g") 
+            .attr("transform", function (d) { 
+                var bandwidth = x.bandwidth(); 
+                var spaceLeft = x.bandwidth() + x(d);
+                return "translate(" + spaceLeft + ", " + margin.top + ")";  
+            }); 
+        bar.append("rect")
+            .data(barDataValues)
+            .attr("y", function (d) { return y(d); }) //y coordinate
+            .attr("height", function (d) { return height - y(d); }) //height
+            .attr("width", function (d, i) { return x.bandwidth() / 3; })
+            .style("fill", barColors[0]) //hard-coded first color in array
+            .data(tooltipDisplay)
+            .on("mouseover", function (d, i) {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.html(`
+                    <h3>${d.title}</h3> 
+                    <h3>${d.dv}</h3>
+                    CI (${d.lci} - ${d.hci})
+                    <br />WN = ${d.wn}
+                `)                  
+                    .style("left", (d3.event.pageX - 70) + "px")
+                    .style("top", (d3.event.pageY - 90) + "px");
+            })
+            .on("mouseout", function (d) {
+                div.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            }); 
 
-    //     //confidence indicator line
-    //     var line = bar.append("line")
-    //         .attr("class", "confidence_indicator")
-    //         .data(confidenceIndicators)
-    //         .attr("x1", function () { return x.bandwidth() / 6; })
-    //         .attr("y1", function (d) { return y(d.lci); }) 
-    //         .attr("x2", function () { return x.bandwidth() / 6; }) 
-    //         .attr("y2", function (d) { return y(d.hci); });
-    //     //confidence indicator linecaps
-    //     var linecapHalfWidth = 5; 
-    //     var linecap_top = bar.append("line")
-    //         .attr("class", "linecap_top")
-    //         .data(confidenceIndicators)
-    //         .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-    //         .attr("y1", function (d) { return y(d.hci); })
-    //         .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-    //         .attr("y2", function (d) { return y(d.hci); });
-    //     var linecap_bottom = bar.append("line")
-    //         .attr("class", "linecap_top")
-    //         .data(confidenceIndicators)
-    //         .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
-    //         .attr("y1", function (d) { return y(d.lci); })
-    //         .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
-    //         .attr("y2", function (d) { return y(d.lci); });
+        //confidence indicator line
+        var line = bar.append("line")
+            .attr("class", "confidence_indicator")
+            .data(confidenceIndicators)
+            .attr("x1", function () { return x.bandwidth() / 6; })
+            .attr("y1", function (d) { return y(d.lci); }) 
+            .attr("x2", function () { return x.bandwidth() / 6; }) 
+            .attr("y2", function (d) { return y(d.hci); });
+        //confidence indicator linecaps
+        var linecapHalfWidth = 5; 
+        var linecap_top = bar.append("line")
+            .attr("class", "linecap_top")
+            .data(confidenceIndicators)
+            .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+            .attr("y1", function (d) { return y(d.hci); })
+            .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+            .attr("y2", function (d) { return y(d.hci); });
+        var linecap_bottom = bar.append("line")
+            .attr("class", "linecap_top")
+            .data(confidenceIndicators)
+            .attr("x1", function () { return x.bandwidth() / 6 - linecapHalfWidth; })
+            .attr("y1", function (d) { return y(d.lci); })
+            .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
+            .attr("y2", function (d) { return y(d.lci); });
 
-    //     //axes labels
-    //     var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-    //     var paddingLeft = 14;         
-    //     var yAxisLabel = chart.append("text")
-    //         .attr("class", "label")
-    //         .attr("id", "y_axis_label")
-    //         .text(yAxisTitle)
-    //         .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-    //         .attr("text-anchor", "middle");         
+        //axes labels
+        var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+        var paddingLeft = 14;         
+        var yAxisLabel = chart.append("text")
+            .attr("class", "label")
+            .attr("id", "y_axis_label")
+            .text(yAxisTitle)
+            .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+            .attr("text-anchor", "middle");         
 
-    //     //axes
-    //     var xAxis = chart.append("g")
-    //         .attr("class", "axis")             
-    //         .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-    //         .call(d3.axisBottom(x))
-    //         .selectAll("text")
-    //         .style("text-anchor", "end")
-    //         .attr("dx", "-.8em")
-    //         .attr("dy", ".15em")
-    //         .attr("transform", "rotate(-45)");
-    //     var yAxis = chart.append("g")
-    //         .attr("class", "axis")
-    //         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-    //         .call(d3.axisLeft(y))
-    //         .select(".domain").remove(); //remove y-axis line
+        //axes
+        var xAxis = chart.append("g")
+            .attr("class", "axis")             
+            .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-45)");
+        var yAxis = chart.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+            .call(d3.axisLeft(y))
+            .select(".domain").remove(); //remove y-axis line
 
-    //     //legend 
-    //     var legend = chart.append("g") //create & position legend area
-    //         .attr("class", "legend")
-    //         .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
-    //     var legendEntry =  legend.selectAll("g") //groupings do not exist yet
-    //         .data(legendCategoryNames) //count data
-    //         .enter() //run methods once per data count
-    //         .append("g") //produces new groupings
-    //         .attr("height", legendColorKeyHeight); 
-    //     var colorKey = legendEntry.append("rect")
-    //         .attr("width", legendColorKeyWidth)
-    //         .attr("height", legendColorKeyHeight)
-    //         .attr("transform", function (d, i) {
-    //             let legendItemYPosition = legendItemHeight*i;
-    //             return "translate(0, " + legendItemYPosition + ")";
-    //         })
-    //         .style("fill", function (d, i) {
-    //             return barColors[i];
-    //         });
-    //     var label = legendEntry.append("text")
-    //         .text(function (d) { return d; }) 
-    //         //.attr("height", legendColorKeyHeight)
-    //         .attr("transform", function (d, i) {
-    //             let legendItemYPosition = legendItemHeight*i;
-    //             let paddingLeft = legendColorKeyWidth*2; 
-    //             return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
-    //     });
-    // }
+        //legend 
+        var legend = chart.append("g") //create & position legend area
+            .attr("class", "legend")
+            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
+        var legendEntry =  legend.selectAll("g") //groupings do not exist yet
+            .data(legendCategoryNames) //count data
+            .enter() //run methods once per data count
+            .append("g") //produces new groupings
+            .attr("height", legendColorKeyHeight); 
+        var colorKey = legendEntry.append("rect")
+            .attr("width", legendColorKeyWidth)
+            .attr("height", legendColorKeyHeight)
+            .attr("transform", function (d, i) {
+                let legendItemYPosition = legendItemHeight*i;
+                return "translate(0, " + legendItemYPosition + ")";
+            })
+            .style("fill", function (d, i) {
+                return barColors[i];
+            });
+        var label = legendEntry.append("text")
+            .text(function (d) { return d; }) 
+            //.attr("height", legendColorKeyHeight)
+            .attr("transform", function (d, i) {
+                let legendItemYPosition = legendItemHeight*i;
+                let paddingLeft = legendColorKeyWidth*2; 
+                return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+        });
+    }
 
     function makeChartMultiBar () {
-        // console.log("jsonData ", jsonData);
-        // console.log("config ", chartConfigObject);
-        // console.log("bar vals ", barDataValues);
-        // console.log("resp vals ", xAxisCategoryNames);
-
         var chart = d3.select(".chart") 
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
@@ -305,14 +300,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         //create data matrix
         let dataMatrix = []; 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
-            // the output  needs to follow this structure: 
-            // [
-            //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
-            //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}], //45-64
-            //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}], //65+
-            // ]
-            // var dataMatrix = []; //big array 
-
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
                 //filter for json data matches and return 
@@ -322,7 +309,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 console.log('filtered data ', filteredJSON);
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
-                    // console.log('object ', object); 
                     return {
                         key: object[xAxisColumn],
                         val: object.dv
@@ -332,7 +318,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             }
         }
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
-        console.log('data matrix ', dataMatrix);
 
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
