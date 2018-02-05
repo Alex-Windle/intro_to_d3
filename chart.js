@@ -367,7 +367,23 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("id", "y_axis_label")
                         .text(yAxisTitle)
                         .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-                        .attr("text-anchor", "middle");      
+                        .attr("text-anchor", "middle");   
+                        
+                    //axes
+                    var xAxis = chart.append("g")
+                        .attr("class", "axis")             
+                        .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
+                        .call(d3.axisBottom(x))
+                        .selectAll("text")
+                        .style("text-anchor", "end")
+                        .attr("dx", "-.8em")
+                        .attr("dy", ".15em")
+                        .attr("transform", "rotate(-45)");
+                    var yAxis = chart.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+                        .call(d3.axisLeft(y))
+                        .select(".domain").remove(); //remove y-axis line
     }
 } 
 
