@@ -420,41 +420,26 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
-        var resp = d3.selectAll("g") 
-            // .data(newDataArray) //SHOWS REPEATING DATA
-            .data([
-                [{key: "DISABL", val: 11.8}, {key: "NODIS", val: 10}],
-                [{key: "DISABL", val: 21.8}, {key: "NODIS", val: 25}],
-                [{key: "DISABL", val: 5}, {key: "NODIS", val: 8}],
-            ])
+                // .data(newDataArray) //SHOWS REPEATING DATA
+                .data([
+                    [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
+                    [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
+                    [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
+                ])
             .selectAll("rect")
-            .data(function(d, i) {return d;})
-            //WHAT DATA GOES IN HERE? I WANT TO FILTER BY 3 AGE RANGES AND RETURN A DIFFERENT 
-            //ARRAY EACH TIME! 
-            // .data(xAxisCategoryDataCodes.map(function (d, i) {
-            //     var filteredData = jsonData.filter(function (e) {
-            //         return e[xAxisColumn] === d; 
-            //     }); 
-            //     console.log('filteredData ', filteredData);
-
-                // for (var i=0; i<filteredData.length; i++) {
-                //     console.log('item ', filteredData[i]);
-                // }
-                
-                // return filteredData;
-            // }))
-                .enter().append("rect") 
-                .attr("class", "bar")
-                .attr("x", function (d, i) {
-                    console.log('x ', d);
-                    var width = x1.bandwidth();
-                    var spaceLeft = x1.bandwidth()*i;
-                    return width + spaceLeft;
-                })
-                .attr("y", function (d) { return y(d.val); })
-                .attr("width", x1.bandwidth())
-                .attr("height", function (d) { return height - y(d.val); })
-                .attr("fill", function (d, i) { return barColors[i]; });
+                .data(function(d, i) {return d;})
+                    .enter().append("rect") 
+                    .attr("class", "bar")
+                    .attr("x", function (d, i) {
+                        console.log('x ', d);
+                        var width = x1.bandwidth();
+                        var spaceLeft = x1.bandwidth()*i;
+                        return width + spaceLeft;
+                    })
+                    .attr("y", function (d) { return y(d.val); })
+                    .attr("width", x1.bandwidth())
+                    .attr("height", function (d) { return height - y(d.val); })
+                    .attr("fill", function (d, i) { return barColors[i]; });
     }
 } 
 
