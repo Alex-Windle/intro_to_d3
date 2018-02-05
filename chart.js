@@ -283,10 +283,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     // }
 
     function makeChartMultiBar () {
-        console.log("jsonData ", jsonData);
-        console.log("config ", chartConfigObject);
-        console.log("bar vals ", barDataValues);
-        console.log("resp vals ", xAxisCategoryNames);
+        // console.log("jsonData ", jsonData);
+        // console.log("config ", chartConfigObject);
+        // console.log("bar vals ", barDataValues);
+        // console.log("resp vals ", xAxisCategoryNames);
 
         //SELECT SVG AREA
         var chart = d3.select(".chart") 
@@ -348,7 +348,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 ]
             }
         ]; 
-
         var testDataValues = [10,9,8,7,6,5]; 
         var testKeyValuePairs = [
             {
@@ -396,13 +395,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             return;
         })
         // console.log('new data array ', newDataArray);
+        //THIS ARRAY IS A PROBLEM. IT SHOWS THE SAME TWIN BARS ACROSS
+        //3 CATEGORIES. HOW TO DISPLAY UNIQUE TWIN BARS? 
 
-        console.log('codes ', xAxisCategoryDataCodes) 
+        // console.log('codes ', xAxisCategoryDataCodes) 
         ///////////////////////////////////////////////
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
         y.domain([0, d3.max(barDataValues)]); 
-        console.log('json data ', jsonData);
+        // console.log('json data ', jsonData);
 
         // xAxisCategoryDataCodes.map(function (d, i) {
         //     var filteredData = jsonData.filter(function (e) {
@@ -419,35 +420,41 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
-            .selectAll("rect") 
+        var resp = d3.selectAll("g") 
             // .data(newDataArray) //SHOWS REPEATING DATA
-
+            .data([
+                [{key: "DISABL", val: 11.8}, {key: "NODIS", val: 10}],
+                [{key: "DISABL", val: 21.8}, {key: "NODIS", val: 25}],
+                [{key: "DISABL", val: 5}, {key: "NODIS", val: 8}],
+            ])
+            .selectAll("rect")
+            .data(function(d, i) {return d;})
             //WHAT DATA GOES IN HERE? I WANT TO FILTER BY 3 AGE RANGES AND RETURN A DIFFERENT 
             //ARRAY EACH TIME! 
-            .data(xAxisCategoryDataCodes.map(function (d, i) {
-                var filteredData = jsonData.filter(function (e) {
-                    return e[xAxisColumn] === d; 
-                }); 
-                console.log('filteredData ', filteredData);
+            // .data(xAxisCategoryDataCodes.map(function (d, i) {
+            //     var filteredData = jsonData.filter(function (e) {
+            //         return e[xAxisColumn] === d; 
+            //     }); 
+            //     console.log('filteredData ', filteredData);
 
                 // for (var i=0; i<filteredData.length; i++) {
                 //     console.log('item ', filteredData[i]);
                 // }
                 
                 // return filteredData;
-            }))
+            // }))
                 .enter().append("rect") 
-        //         .attr("class", "bar")
-        //         .attr("x", function (d, i) {
-        //             console.log('x ', d);
-        //             var width = x1.bandwidth();
-        //             var spaceLeft = x1.bandwidth()*i;
-        //             return width + spaceLeft;
-        //         })
-        //         .attr("y", function (d) { return y(d.val); })
-        //         .attr("width", x1.bandwidth())
-        //         .attr("height", function (d) { return height - y(d.val); })
-        //         .attr("fill", function (d, i) { return barColors[i]; });
+                .attr("class", "bar")
+                .attr("x", function (d, i) {
+                    console.log('x ', d);
+                    var width = x1.bandwidth();
+                    var spaceLeft = x1.bandwidth()*i;
+                    return width + spaceLeft;
+                })
+                .attr("y", function (d) { return y(d.val); })
+                .attr("width", x1.bandwidth())
+                .attr("height", function (d) { return height - y(d.val); })
+                .attr("fill", function (d, i) { return barColors[i]; });
     }
 } 
 
