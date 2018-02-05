@@ -307,93 +307,129 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         //HOW SHOULD THE DATA BE ORGANIZED
         //RESPONSES, LEGEND CATEGORIES, AND BAR VALUES
-        var testData = [
-            {
-                 response: "18 - 44",
-                 data: [
-                    { 
-                        "key" : "NODIS",
-                        "value": 10
-                    },
-                    { 
-                        "key" : "DIS",
-                        "value": 9
-                    }
-                 ]
-            }, 
-            {
-                response: "45 - 64",
-                data: [
-                    { 
-                        "key" : "NODIS",
-                        "value": 8
-                    },
-                    { 
-                        "key" : "DIS",
-                        "value": 7
-                    }
-                ]
-            }, 
-            {
-                response: "65+",
-                data: [
-                    { 
-                        "key" : "NODIS",
-                        "value": 6
-                    },
-                    { 
-                        "key" : "DIS",
-                        "value": 5
-                    }
-                ]
-            }
-        ]; 
-        var testDataValues = [10,9,8,7,6,5]; 
-        var testKeyValuePairs = [
-            {
-                "key" : "NODIS",
-                "value": 10
-            },
-            {
-                "key" : "DIS",
-                "value": 9
-            },
-            {
-                "key" : "NODIS",
-                "value": 8
-            },
-            {
-                "key" : "DIS",
-                "value": 7
-            },
-            {
-                "key" : "NODIS",
-                "value": 6
-            },
-            {
-                "key" : "DIS",
-                "value": 5
-            },
-        ];
+        // var testData = [
+        //     {
+        //          response: "18 - 44",
+        //          data: [
+        //             { 
+        //                 "key" : "NODIS",
+        //                 "value": 10
+        //             },
+        //             { 
+        //                 "key" : "DIS",
+        //                 "value": 9
+        //             }
+        //          ]
+        //     }, 
+        //     {
+        //         response: "45 - 64",
+        //         data: [
+        //             { 
+        //                 "key" : "NODIS",
+        //                 "value": 8
+        //             },
+        //             { 
+        //                 "key" : "DIS",
+        //                 "value": 7
+        //             }
+        //         ]
+        //     }, 
+        //     {
+        //         response: "65+",
+        //         data: [
+        //             { 
+        //                 "key" : "NODIS",
+        //                 "value": 6
+        //             },
+        //             { 
+        //                 "key" : "DIS",
+        //                 "value": 5
+        //             }
+        //         ]
+        //     }
+        // ]; 
+        // var testDataValues = [10,9,8,7,6,5]; 
+        // var testKeyValuePairs = [
+        //     {
+        //         "key" : "NODIS",
+        //         "value": 10
+        //     },
+        //     {
+        //         "key" : "DIS",
+        //         "value": 9
+        //     },
+        //     {
+        //         "key" : "NODIS",
+        //         "value": 8
+        //     },
+        //     {
+        //         "key" : "DIS",
+        //         "value": 7
+        //     },
+        //     {
+        //         "key" : "NODIS",
+        //         "value": 6
+        //     },
+        //     {
+        //         "key" : "DIS",
+        //         "value": 5
+        //     },
+        // ];
 
         //filter by response object
-        var filteredJSON = jsonData.filter(function (d) {
-            var filterByKey = chartConfigObject.xAxisColumn;
-            var str = xAxisCategoryDataCodes; 
-            console.log('str ', str); 
-            return d[filterByKey] === str[1]; 
-        })
+        // var filteredJSON = jsonData.filter(function (d) {
+        //     var filterByKey = chartConfigObject.xAxisColumn;
+        //     var str = xAxisCategoryDataCodes; 
+        //     console.log('str ', str); 
+        //     return d[filterByKey] === str[1]; 
+        // })
         // console.log('filtered JSON ', filteredJSON); 
 
-        //create a new array with 2 data items
+        //create a new array with 6 ordered data items
         var newDataArray = []; 
-        filteredJSON.forEach(function (d) {
-            newDataArray.push({
-                key: d.s2,
-                val: d.dv
-            });
-            return;
-        })
+
+        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
+            console.log("inside create Data Matrix!");
+            console.log("xAxisCategoryNames ", xAxisCategoryNames); 
+            console.log("jsonData ", jsonData); 
+
+            // [
+            //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
+            //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}], //45-64
+            //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}], //65+
+            // ]
+            var dataMatrix = []; //big array 
+
+            for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
+                var singleDataEntry = []; //make 3 of these, push into dataMatrix
+                //loop through each response category 
+                //filter for jsondata matches and return 
+                var filteredJSON = jsonData.filter(function (object, index, array) {
+                    return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
+                })
+                console.log('filtered data ', filteredJSON);
+                singleDataEntry.push(filteredJSON);  
+                dataMatrix.push(singleDataEntry); 
+                singleDataEntry = []; //clear array 
+            }
+            console.log('data matrix ', dataMatrix);
+        }
+        // xAxisCategoryNames.map(function (resp) {
+        //     var array = []; 
+        //     arr.push({
+        //         key: d.s2,
+        //         val: d.dv
+        //     })
+        //     return array; 
+        // })
+
+        // filteredJSON.forEach(function (d) {
+        //     newDataArray.push({
+        //         key: d.s2,
+        //         val: d.dv
+        //     });
+        //     return;
+        // })
         // console.log('new data array ', newDataArray);
         //THIS ARRAY IS A PROBLEM. IT SHOWS THE SAME TWIN BARS ACROSS
         //3 CATEGORIES. HOW TO DISPLAY UNIQUE TWIN BARS? 
@@ -421,33 +457,29 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
                 // .data(newDataArray) //SHOWS REPEATING DATA
-                .data([
-                    [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
-                    [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
-                    [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
-                ])
-            .selectAll("rect")
-                .data(function(d, i) {return d;})
-                    .enter().append("rect") 
-                    .attr("class", "bar")
-                    .attr("x", function (d, i) {
-                        console.log('x ', d);
-                        var width = x1.bandwidth();
-                        var spaceLeft = x1.bandwidth()*i;
-                        return width + spaceLeft;
-                    })
-                    .attr("y", function (d) { return y(d.val); })
-                    .attr("width", x1.bandwidth())
-                    .attr("height", function (d) { return height - y(d.val); })
-                    .attr("fill", function (d, i) { return barColors[i]; });
+
+                //convert this code into a dynamic matrix! 
+                // .data([
+                //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
+                //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
+                //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
+                // ])
+                .data(createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData))
+            // .selectAll("rect")
+            //     .data(function(d, i) {return d;})
+            //         .enter().append("rect") 
+            //         .attr("class", "bar")
+            //         .attr("x", function (d, i) {
+            //             console.log('x ', d);
+            //             var width = x1.bandwidth();
+            //             var spaceLeft = x1.bandwidth()*i;
+            //             return width + spaceLeft;
+            //         })
+            //         .attr("y", function (d) { return y(d.val); })
+            //         .attr("width", x1.bandwidth())
+            //         .attr("height", function (d) { return height - y(d.val); })
+            //         .attr("fill", function (d, i) { return barColors[i]; });
     }
 } 
-
-
-
-
-
-
-
 
 // open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
