@@ -288,13 +288,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         // console.log("bar vals ", barDataValues);
         // console.log("resp vals ", xAxisCategoryNames);
 
-        //SELECT SVG AREA
         var chart = d3.select(".chart") 
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
 
-        //SCALE X0 - RESPONSE CATEGORIES (3 OPTIONS)
-        //SCALE X1 - LEGEND COLUMNS (2 OPTIONS, DISABL AND ABL)
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
             .paddingInner(0.);
@@ -305,94 +302,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var y = d3.scaleLinear()
             .rangeRound([height, 0]);
 
-        //HOW SHOULD THE DATA BE ORGANIZED
-        //RESPONSES, LEGEND CATEGORIES, AND BAR VALUES
-        // var testData = [
-        //     {
-        //          response: "18 - 44",
-        //          data: [
-        //             { 
-        //                 "key" : "NODIS",
-        //                 "value": 10
-        //             },
-        //             { 
-        //                 "key" : "DIS",
-        //                 "value": 9
-        //             }
-        //          ]
-        //     }, 
-        //     {
-        //         response: "45 - 64",
-        //         data: [
-        //             { 
-        //                 "key" : "NODIS",
-        //                 "value": 8
-        //             },
-        //             { 
-        //                 "key" : "DIS",
-        //                 "value": 7
-        //             }
-        //         ]
-        //     }, 
-        //     {
-        //         response: "65+",
-        //         data: [
-        //             { 
-        //                 "key" : "NODIS",
-        //                 "value": 6
-        //             },
-        //             { 
-        //                 "key" : "DIS",
-        //                 "value": 5
-        //             }
-        //         ]
-        //     }
-        // ]; 
-        // var testDataValues = [10,9,8,7,6,5]; 
-        // var testKeyValuePairs = [
-        //     {
-        //         "key" : "NODIS",
-        //         "value": 10
-        //     },
-        //     {
-        //         "key" : "DIS",
-        //         "value": 9
-        //     },
-        //     {
-        //         "key" : "NODIS",
-        //         "value": 8
-        //     },
-        //     {
-        //         "key" : "DIS",
-        //         "value": 7
-        //     },
-        //     {
-        //         "key" : "NODIS",
-        //         "value": 6
-        //     },
-        //     {
-        //         "key" : "DIS",
-        //         "value": 5
-        //     },
-        // ];
-
-        //filter by response object
-        // var filteredJSON = jsonData.filter(function (d) {
-        //     var filterByKey = chartConfigObject.xAxisColumn;
-        //     var str = xAxisCategoryDataCodes; 
-        //     console.log('str ', str); 
-        //     return d[filterByKey] === str[1]; 
-        // })
-        // console.log('filtered JSON ', filteredJSON); 
-
-        //create a new array with 6 ordered data items
-        var newDataArray = []; 
-
+        //create data matrix
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
-            console.log("inside create Data Matrix!");
-            console.log("xAxisCategoryNames ", xAxisCategoryNames); 
-            console.log("jsonData ", jsonData); 
-
+            // the output  needs to follow this structure: 
             // [
             //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
             //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}], //45-64
@@ -401,54 +313,28 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             var dataMatrix = []; //big array 
 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
-                var singleDataEntry = []; //make 3 of these, push into dataMatrix
                 //loop through each response category 
                 //filter for jsondata matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
                 console.log('filtered data ', filteredJSON);
-                singleDataEntry.push(filteredJSON);  
-                dataMatrix.push(singleDataEntry); 
-                singleDataEntry = []; //clear array 
+                //create key objects
+                var keysFromFilteredJSON = filteredJSON.map(function (object) {
+                    // console.log('object ', object); 
+                    return {
+                        key: object[xAxisColumn],
+                        val: object.dv
+                    }
+                }); 
+                dataMatrix.push(keysFromFilteredJSON); 
             }
             console.log('data matrix ', dataMatrix);
         }
-        // xAxisCategoryNames.map(function (resp) {
-        //     var array = []; 
-        //     arr.push({
-        //         key: d.s2,
-        //         val: d.dv
-        //     })
-        //     return array; 
-        // })
 
-        // filteredJSON.forEach(function (d) {
-        //     newDataArray.push({
-        //         key: d.s2,
-        //         val: d.dv
-        //     });
-        //     return;
-        // })
-        // console.log('new data array ', newDataArray);
-        //THIS ARRAY IS A PROBLEM. IT SHOWS THE SAME TWIN BARS ACROSS
-        //3 CATEGORIES. HOW TO DISPLAY UNIQUE TWIN BARS? 
-
-        // console.log('codes ', xAxisCategoryDataCodes) 
-        ///////////////////////////////////////////////
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).range([0, x0.bandwidth()])
         y.domain([0, d3.max(barDataValues)]); 
-        // console.log('json data ', jsonData);
-
-        // xAxisCategoryDataCodes.map(function (d, i) {
-        //     var filteredData = jsonData.filter(function (e) {
-        //         return e[xAxisColumn] === d; 
-        //     }); 
-        //     console.log('filteredData ', filteredData);
-        //     return filteredData;
-        // }); 
-        // console.log('woo ', xAxisCategoryDataCodes);
 
         chart = chart.append("g")
             .selectAll("g")
@@ -456,29 +342,27 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
-                // .data(newDataArray) //SHOWS REPEATING DATA
-
-                //convert this code into a dynamic matrix! 
+                //test data
                 // .data([
                 //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
                 //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
                 //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
                 // ])
                 .data(createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData))
-            // .selectAll("rect")
-            //     .data(function(d, i) {return d;})
-            //         .enter().append("rect") 
-            //         .attr("class", "bar")
-            //         .attr("x", function (d, i) {
-            //             console.log('x ', d);
-            //             var width = x1.bandwidth();
-            //             var spaceLeft = x1.bandwidth()*i;
-            //             return width + spaceLeft;
-            //         })
-            //         .attr("y", function (d) { return y(d.val); })
-            //         .attr("width", x1.bandwidth())
-            //         .attr("height", function (d) { return height - y(d.val); })
-            //         .attr("fill", function (d, i) { return barColors[i]; });
+            .selectAll("rect")
+                .data(function(d, i) {return d;})
+                    .enter().append("rect") 
+                    .attr("class", "bar")
+                    .attr("x", function (d, i) {
+                        console.log('x ', d);
+                        var width = x1.bandwidth();
+                        var spaceLeft = x1.bandwidth()*i;
+                        return width + spaceLeft;
+                    })
+                    .attr("y", function (d) { return y(d.val); })
+                    .attr("width", x1.bandwidth())
+                    .attr("height", function (d) { return height - y(d.val); })
+                    .attr("fill", function (d, i) { return barColors[i]; });
     }
 } 
 
