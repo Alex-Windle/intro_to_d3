@@ -325,7 +325,17 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         chart = chart.append("g")
         var bar = chart.selectAll("g")
-            .data(xAxisCategoryNames)
+
+        // add the Y gridlines
+        chart.append("g")			
+            .attr("class", "grid")
+            .call(make_y_gridlines()
+                .tickSize(-width) //full graph width
+                .tickFormat("")
+            )
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+
+        bar.data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; })
@@ -368,7 +378,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .text(yAxisTitle)
                         .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
                         .attr("text-anchor", "middle");   
-                        
                     //axes
                     var xAxis = chart.append("g")
                         .attr("class", "axis")             
