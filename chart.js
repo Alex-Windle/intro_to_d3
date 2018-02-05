@@ -328,7 +328,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
-                .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
+                .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; })
                 //test data
                 // .data([
                 //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
@@ -344,7 +344,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         console.log('bar data ', d);
                         var width = x1.bandwidth();
                         var spaceLeft = x1.bandwidth()*i;
-                        return width + spaceLeft;
+                        return width + spaceLeft + margin.left;
                     })
                     .attr("y", function (d) { return y(d.val); })
                     .attr("width", x1.bandwidth())
