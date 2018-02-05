@@ -49,7 +49,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     //map codes to category names
     xAxisCategoryDataCodes.forEach(function (code) {
         let lku = lookup[xAxisType]; 
-        for (key in lku) {
+        for (var key in lku) {
             if (code === key) {
                 const name = lku[code].name;
                 if (xAxisCategoryNames.indexOf(name) < 0)
@@ -60,7 +60,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
     legendCategoryDataCodes.forEach(function (code) {
         let lku = lookup[legendType]; 
-        for (key in lku) {
+        for (var key in lku) {
             if (code === key) {
                 const name = lku[code].name;
                 //check array for existing str
@@ -150,9 +150,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     function makeChartSingleBar () {
         var chart = d3.select(".chart") 
         // .attr("height", "700") //refactor for compatibility with ie
-        .attr("viewBox", function () {
-            return "0 0 700 700";
-        })
+        .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
 
         //create bar grouping
@@ -284,23 +282,25 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
     function makeChartMultiBar () {
          var chart = d3.select(".chart") 
+             // .attr("height", "700") //refactor for compatibility with ie
             .attr("viewBox", function () { return "0 0 700 700"; })
             .attr("preserveAspectRatio", "xMinYMin meet");
 
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0.);
+            .paddingInner(0);
 
         var x1 = d3.scaleBand()
-            .padding(0.0);
+            .padding(0);
 
         var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
 
-                //gridlines in y axis 
+        //gridlines in y axis 
         function make_y_gridlines_multi() {
             return d3.axisLeft(yMulti)
         }
+
         //create data matrix
         let dataMatrix = []; 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
@@ -342,7 +342,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         bar.data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
-                .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; })
+                .attr("transform", function (d) {
+                    // var spaceLeft = margin.left + x0(d); 
+                    return "translate(" + x0(d) + ", " + margin.top + ")";  
+                })
                 //test data
                 // .data([
                 //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
@@ -355,13 +358,17 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .enter().append("rect") 
                     .attr("class", "bar")
                     .attr("x", function (d, i) {
-                        console.log('bar data ', d);
-                        var width = x1.bandwidth();
-                        var spaceLeft = x1.bandwidth()*i;
-                        return width + spaceLeft + margin.left;
+                        // console.log('bar data ', d);
+                        // var width = x1.bandwidth();
+                        // var spaceLeft = x1.bandwidth()*i;
+                        // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
+                        var width = x0.bandwidth()/2; 
+                        var spaceLeft = width*i; 
+                        return margin.left + spaceLeft; 
                     })
                     .attr("y", function (d) { return yMulti(d.val); })
-                    .attr("width", x1.bandwidth())
+                    // .attr("width", x1.bandwidth()) //skinny bars
+                    .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
                     .attr("height", function (d) { return height - yMulti(d.val); })
                     .attr("fill", function (d, i) { return barColors[i]; });
                     //confidence indicator line
