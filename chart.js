@@ -324,14 +324,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         y.domain([0, d3.max(barDataValues)]); 
 
         chart = chart.append("g")
-            .selectAll("g")
+        var bar = chart.selectAll("g")
             .data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", 0)"; })
                 //test data
                 // .data([
-                //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}], //18-44
+                //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
                 //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
                 //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
                 // ])
@@ -350,6 +350,24 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .attr("width", x1.bandwidth())
                     .attr("height", function (d) { return height - y(d.val); })
                     .attr("fill", function (d, i) { return barColors[i]; });
+                    //confidence indicator line
+                        // var line = bar.append("line")
+                        // .attr("class", "confidence_indicator")
+                        // .data(confidenceIndicators)
+                        // .attr("x1", function () { return x1.bandwidth() / 6; })
+                        // .attr("y1", function (d) { return y(d.lci); }) 
+                        // .attr("x2", function () { return x1.bandwidth() / 6; }) 
+                        // .attr("y2", function (d) { return y(d.hci); });
+                    
+                    //axes labels
+                    var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+                    var paddingLeft = 14;         
+                    var yAxisLabel = chart.append("text")
+                        .attr("class", "label")
+                        .attr("id", "y_axis_label")
+                        .text(yAxisTitle)
+                        .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+                        .attr("text-anchor", "middle");      
     }
 } 
 
