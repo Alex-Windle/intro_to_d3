@@ -324,6 +324,29 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         }
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
 
+        //create ci matrix
+        let ciMatrix = []; 
+        function createCIMatrix () {
+            console.log('ci data ', confidenceIndicators); 
+            for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
+                //loop through each response category 
+                //filter for json data matches and return 
+                var filteredJSON = jsonData.filter(function (object, index, array) {
+                    return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
+                })
+                console.log('filtered data ', filteredJSON);
+                //create key objects
+                var keysFromFilteredJSON = filteredJSON.map(function (object) {
+                    return {
+                        lci: object.lci,
+                        hci: object.hci
+                    }
+                }); 
+                ciMatrix.push(keysFromFilteredJSON); 
+            }  
+        }
+        createCIMatrix(); 
+        console.log('ci matrix ', ciMatrix);
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
         yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
@@ -359,7 +382,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .enter().append("rect") 
                     .attr("class", "bar")
                     .attr("x", function (d, i) {
-                        console.log('bar data ', d);
+                        // console.log('bar data ', d);
                         // var width = x1.bandwidth();
                         // var spaceLeft = x1.bandwidth()*i;
                         // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
@@ -372,15 +395,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     // .attr("width", x1.bandwidth()) //skinny bars
                     .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
                     .attr("height", function (d) { return height - yMulti(d.val); })
-                    .attr("fill", function (d, i) { return barColors[i]; });
+                    .attr("fill", function (d, i) { return barColors[i]; })
+                    
                     //confidence indicator line
-                    var line = bar.append("line")
-                        .attr("class", "confidence_indicator")
-                        .data(confidenceIndicators)
-                        .attr("x1", function () { return x1.bandwidth() / 6; })
-                        .attr("y1", function (d) { return y(d.lci); }) 
-                        .attr("x2", function () { return x1.bandwidth() / 6; }) 
-                        .attr("y2", function (d) { return y(d.hci); });
+                    // var line = bar.append("line")
+                    
+                    // .data(confidenceIndicators)
+                        // .append("line")
+                        // .attr("class", "confidence_indicator")
+                        
+                        // .attr("x1", function () { return x1.bandwidth() / 6; })
+                        // .attr("y1", function (d) { return yMulti(d.lci); }) 
+                        // .attr("x2", function () { return x1.bandwidth() / 6; }) 
+                        // .attr("y2", function (d) { return yMulti(d.hci); });
                     
                     //axes labels
                     var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
