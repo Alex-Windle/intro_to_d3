@@ -282,6 +282,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
+        console.log('does the col go into the function? ', xAxisColumn); 
         //instantiate chart
          var chart = d3.select(".chart"); 
              
@@ -399,26 +400,27 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .on("mouseover", function (d, i) {
-                            // console.log('d ', d); 
-
-                            //HANDLE WN
-                            //HANDLE TITLE
-
-                            var display; 
-
-                            function make_tooltip_display(d){
+                            let display; 
+                            function make_tooltip_display(d, xAxisColumn){
+                                let wn = String(d.wn); 
+                                if (wn.length > 3 && wn.length < 7) {
+                                    wn = wn.split("").reverse().join("");
+                                    wn = wn.substring(0,3) + "," + wn.substring(3);
+                                    wn = wn.split("").reverse().join("");
+                                } else if (wn.length > 6 && wn.length < 10) {
+                                    wn = wn.split("").reverse().join("");
+                                    wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
+                                    wn = wn.split("").reverse().join("");
+                                }
                                 display = {
                                     'title': d.title,
                                     'dv': d.val,
                                     'lci': d.lci,
                                     'hci': d.hci,
-                                    'wn': d.wn
+                                    'wn': wn
                                 }
                             }
-                            make_tooltip_display(d); 
-
-                            //SOLUTION: PUT THE TOOLTIP DATA INSIDE THE DATA MATRIX
-                            
+                            make_tooltip_display(d, xAxisColumn); 
                             div.transition()
                                 .duration(200)
                                 .style('opacity', .9);
@@ -426,7 +428,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 <h3>${display.title}</h3>
                                 <h3>${display.dv}</h3>
                                 CI (${display.lci} - ${display.hci})
-                                <br />WN = ${d.wn}
+                                <br />WN = ${display.wn}
                             `)
                                 .style("left", (d3.event.pageX - 70) + 'px')
                                 .style("top", (d3.event.pageY - 90) + 'px');
