@@ -314,7 +314,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
-                console.log('filtered data ', filteredJSON);
+                // console.log('filtered data ', filteredJSON);
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
@@ -328,14 +328,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
 
         function createCIMatrix () {
-            console.log('ci data ', confidenceIndicators); 
+            // console.log('ci data ', confidenceIndicators); 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
                 //filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
-                console.log('filtered data ', filteredJSON);
+                // console.log('filtered data ', filteredJSON);
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
@@ -347,7 +347,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             }  
         }
         createCIMatrix(); 
-        console.log('ci matrix ', ciMatrix);
+        // console.log('ci matrix ', ciMatrix);
 
         //set chart attributes
         //chart.attr("height", "700") //refactor for compatibility with ie
@@ -397,10 +397,36 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         // .attr("width", x1.bandwidth()) //skinny bars
                         .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
                         .attr("height", function (d) { return height - yMulti(d.val); })
-                        .attr("fill", function (d, i) { return barColors[i]; });
+                        .attr("fill", function (d, i) { return barColors[i]; })
+        
+                        // DATA 
+                        .data(tooltipDisplay)
+                        // console.log('tooltip display ', tooltipDisplay);
+
+                        // HOVER METHOD
+                        .on("mouseover", function (d, i) {
+                            console.log('d ', d, 'i ', i);
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", .9);
+                            div.html(`
+                                <h3>${d.title}</h3> 
+                                <h3>${d.dv}</h3>
+                                CI (${d.lci} - ${d.hci})
+                                <br />WN = ${d.wn}
+                            `)                  
+                                .style("left", (d3.event.pageX - 70) + "px")
+                                .style("top", (d3.event.pageY - 90) + "px");
+                        })
+                        .on("mouseout", function (d) {
+                            div.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        }); 
+
                  //...ci data 
                 var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
-                ciIntervals
+                    ciIntervals
                     .selectAll("line")
                     .data(function (d, i) { return d; })                 
                     .enter().append("line")
@@ -410,7 +436,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
                     .attr("y2", function (d) { return yMulti(d.hci); }); 
                 var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-                ciIntervalCapsTop
+                    ciIntervalCapsTop
                     .selectAll("line") 
                     .data(function (d, i) { return d; })
                     .enter().append("line")
@@ -426,7 +452,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     })
                     .attr("y2", function (d) { return yMulti(d.hci); });
                 var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-                ciIntervalCapsBottom
+                    ciIntervalCapsBottom
                     .selectAll("line") 
                     .data(function (d, i) { return d; })
                     .enter().append("line")
@@ -437,9 +463,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         return spaceLeft - linecapHalfWidth; 
                     })
                     .attr("y1", function (d) { return yMulti(d.lci); })
-                    .attr("x2", function (d, i) { 
-                        console.log('d ', d, 'i ', i);                        
-                        // var linecapHalfWidth = 5; 
+                    .attr("x2", function (d, i) {    
                         var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
                         return spaceLeft + linecapHalfWidth; 
                     })
