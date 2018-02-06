@@ -115,18 +115,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
-
     //scale
     var x = d3.scaleBand()
         .domain(xAxisCategoryNames) 
         .rangeRound([0, width]) //total width 
         .padding(0.1);
-
     var y = d3.scaleLinear()
         //set value scaling with buffer
         .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
         .range([height, 0]);
-
     //gridlines in y axis 
     function make_y_gridlines() {
         return d3.axisLeft(y)
@@ -152,10 +149,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
-
         //create bar grouping
         var bar = chart.selectAll("g"); 
-
         // add the Y gridlines
         chart.append("g")			
             .attr("class", "grid")
@@ -164,7 +159,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .tickFormat("")
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
-
         //bars
         bar = bar.data(xAxisCategoryNames)
             .enter()
@@ -199,7 +193,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .duration(500)
                     .style("opacity", 0);
             }); 
-
         //confidence indicator line
         var line = bar.append("line")
             .attr("class", "confidence_indicator")
@@ -224,7 +217,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("y1", function (d) { return y(d.lci); })
             .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
             .attr("y2", function (d) { return y(d.lci); });
-
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
         var paddingLeft = 14;         
@@ -234,7 +226,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .text(yAxisTitle)
             .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
             .attr("text-anchor", "middle");         
-
         //axes
         var xAxis = chart.append("g")
             .attr("class", "axis")             
@@ -250,7 +241,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(y))
             .select(".domain").remove(); //remove y-axis line
-
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
@@ -282,10 +272,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
-        console.log('does the col go into the function? ', xAxisColumn); 
         //instantiate chart
-         var chart = d3.select(".chart"); 
-             
+         var chart = d3.select(".chart");  
         //scaling
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
@@ -297,12 +285,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         x0.domain(xAxisCategoryNames); 
         x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
         yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
-
         //gridlines in y axis 
         function make_y_gridlines_multi() {
             return d3.axisLeft(yMulti)
         }
-
         //data
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
@@ -315,7 +301,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
-                // console.log('filtered data ', filteredJSON);
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
@@ -336,14 +321,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData); 
 
         function createCIMatrix () {
-            // console.log('ci data ', confidenceIndicators); 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
                 //filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
-                // console.log('filtered data ', filteredJSON);
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
@@ -403,9 +386,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .on("mouseover", function (d, i) {
                             let display; 
                             let title; 
-                            //fix - put the age 2 here! 
                             function make_tooltip_display(d, xAxisColumn){
-                                let column = d.key; console.log('col ', column); 
+                                let column = d.key; 
                                 let title = lookup[xAxisType][column].name; 
 
                                 let wn = String(d.wn); 
@@ -446,106 +428,108 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 .duration(500)
                                 .style("opacity", 0);
                         });  
-        
-                 //...ci data 
-                var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
-                    ciIntervals
-                    .selectAll("line")
-                    .data(function (d, i) { return d; })                 
-                    .enter().append("line")
-                    .attr("class", "confidence_indicator")
-                    .attr("x1", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; })
-                    .attr("y1", function (d) { return yMulti(d.lci); }) 
-                    .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
-                    .attr("y2", function (d) { return yMulti(d.hci); }); 
-                var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-                    ciIntervalCapsTop
-                    .selectAll("line") 
-                    .data(function (d, i) { return d; })
-                    .enter().append("line")
-                    .attr("class", "linecap_top")
-                    .attr("x1", function (d, i) { 
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                        return spaceLeft - linecapHalfWidth; 
-                    })
-                    .attr("y1", function (d) { return yMulti(d.hci); })
-                    .attr("x2", function (d, i) {    
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                        return spaceLeft + linecapHalfWidth; 
-                    })
-                    .attr("y2", function (d) { return yMulti(d.hci); });
-                var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-                    ciIntervalCapsBottom
-                    .selectAll("line") 
-                    .data(function (d, i) { return d; })
-                    .enter().append("line")
-                    .attr("class", "linecap_bottom")
-                    .attr("x1", function (d, i) { 
-                        
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                        return spaceLeft - linecapHalfWidth; 
-                    })
-                    .attr("y1", function (d) { return yMulti(d.lci); })
-                    .attr("x2", function (d, i) {    
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                        return spaceLeft + linecapHalfWidth; 
-                    })
-                    .attr("y2", function (d) { return yMulti(d.lci); });
-  
-                //axes labels
-                    var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-                    var paddingLeft = 14;         
-                    var yAxisLabel = chart.append("text")
-                        .attr("class", "label")
-                        .attr("id", "y_axis_label")
-                        .text(yAxisTitle)
-                        .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-                        .attr("text-anchor", "middle");   
 
-                    //axes
-                    var xAxis = chart.append("g")
-                        .attr("class", "axis")             
-                        .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-                        .call(d3.axisBottom(x))
-                        .selectAll("text")
-                        .style("text-anchor", "end")
-                        .attr("dx", "-.8em")
-                        .attr("dy", ".15em")
-                        .attr("transform", "rotate(-45)");
-                    var yAxis = chart.append("g")
-                        .attr("class", "axis")
-                        .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-                        .call(d3.axisLeft(yMulti))
-                        .select(".domain").remove(); //remove y-axis line
-                    //legend 
-                    var legend = chart.append("g") //create & position legend area
-                        .attr("class", "legend")
-                        .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
+            //...ci data 
+            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
+                ciIntervals
+                .selectAll("line")
+                .data(function (d, i) { return d; })                 
+                .enter().append("line")
+                .attr("class", "confidence_indicator")
+                .attr("x1", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; })
+                .attr("y1", function (d) { return yMulti(d.lci); }) 
+                .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
+                .attr("y2", function (d) { return yMulti(d.hci); }); 
+            var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+                ciIntervalCapsTop
+                .selectAll("line") 
+                .data(function (d, i) { return d; })
+                .enter().append("line")
+                .attr("class", "linecap_top")
+                .attr("x1", function (d, i) { 
+                    var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                    return spaceLeft - linecapHalfWidth; 
+                })
+        .attr("y1", function (d) { return yMulti(d.hci); })
+        .attr("x2", function (d, i) {    
+            var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+            return spaceLeft + linecapHalfWidth; 
+        })
+        .attr("y2", function (d) { return yMulti(d.hci); });
+        var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
+            ciIntervalCapsBottom
+            .selectAll("line") 
+            .data(function (d, i) { return d; })
+            .enter().append("line")
+            .attr("class", "linecap_bottom")
+            .attr("x1", function (d, i) { 
+                
+                var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                return spaceLeft - linecapHalfWidth; 
+            })
+            .attr("y1", function (d) { return yMulti(d.lci); })
+            .attr("x2", function (d, i) {    
+                var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                return spaceLeft + linecapHalfWidth; 
+            })
+            .attr("y2", function (d) { return yMulti(d.lci); });
+
+        //axes labels
+        var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+        var paddingLeft = 14;         
+        var yAxisLabel = chart.append("text")
+            .attr("class", "label")
+            .attr("id", "y_axis_label")
+            .text(yAxisTitle)
+            .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+            .attr("text-anchor", "middle");   
+
+        //axes
+        var xAxis = chart.append("g")
+            .attr("class", "axis")             
+            .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-45)");
+        var yAxis = chart.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+            .call(d3.axisLeft(yMulti))
+            .select(".domain").remove(); //remove y-axis line
+        //legend 
+        var legend = chart.append("g") //create & position legend area
+            .attr("class", "legend")
+            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
+                    
         //add legend title string 
-                    var legendEntry =  legend.selectAll("g") //groupings do not exist yet
-                        .data(legendCategoryNames) //count data
-                        .enter() //run methods once per data count
-                        .append("g") //produces new groupings
-                        .attr("height", legendColorKeyHeight); 
-                    var colorKey = legendEntry.append("rect")
-                        .attr("width", legendColorKeyWidth)
-                        .attr("height", legendColorKeyHeight)
-                        .attr("transform", function (d, i) {
-                            let legendItemYPosition = legendItemHeight*i;
-                            return "translate(0, " + legendItemYPosition + ")";
-                        })
-                        .style("fill", function (d, i) {
-                            return barColors[i];
-                        });
-                    var label = legendEntry.append("text")
-                        .text(function (d) { return d; }) 
-                        //.attr("height", legendColorKeyHeight)
-                        .attr("transform", function (d, i) {
-                            // let legendItemYPosition = legendItemHeight*i;
-                            let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
-                            let paddingLeft = legendColorKeyWidth*2; 
-                            return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
-                    });
+
+        var legendEntry =  legend.selectAll("g") //groupings do not exist yet
+            .data(legendCategoryNames) //count data
+            .enter() //run methods once per data count
+            .append("g") //produces new groupings
+            .attr("height", legendColorKeyHeight); 
+        var colorKey = legendEntry.append("rect")
+            .attr("width", legendColorKeyWidth)
+            .attr("height", legendColorKeyHeight)
+            .attr("transform", function (d, i) {
+                let legendItemYPosition = legendItemHeight*i;
+                return "translate(0, " + legendItemYPosition + ")";
+            })
+            .style("fill", function (d, i) {
+                return barColors[i];
+            });
+        var label = legendEntry.append("text")
+            .text(function (d) { return d; }) 
+            //.attr("height", legendColorKeyHeight)
+            .attr("transform", function (d, i) {
+                // let legendItemYPosition = legendItemHeight*i;
+                let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
+                let paddingLeft = legendColorKeyWidth*2; 
+                return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+        });
     }
 } 
 // open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
