@@ -308,7 +308,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let ciMatrix = []; //maps CI intervals
         var linecapHalfWidth = 5; //REFACTOR DYNAMIC
         
-        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
+        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
                 //filter for json data matches and return 
@@ -324,6 +324,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         val: object.dv, 
                         //keys render tooltip 
                         title: object[xAxisColumn],
+                        titleLegendColumn: object[legendColumn],
                         lci: object.lci,
                         hci: object.hci,
                         wn: object.wn
@@ -332,7 +333,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 dataMatrix.push(keysFromFilteredJSON); 
             }
         }
-        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
+        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData); 
 
         function createCIMatrix () {
             // console.log('ci data ', confidenceIndicators); 
@@ -401,7 +402,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .on("mouseover", function (d, i) {
                             let display; 
+                            let title; 
+                            //fix - put the age 2 here! 
                             function make_tooltip_display(d, xAxisColumn){
+                                let column = d.key; console.log('col ', column); 
+                                let title = lookup[xAxisType][column].name; 
+
                                 let wn = String(d.wn); 
                                 if (wn.length > 3 && wn.length < 7) {
                                     wn = wn.split("").reverse().join("");
@@ -414,6 +420,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 }
                                 display = {
                                     'title': d.title,
+                                    'titleLegendColumn': d.titleLegendColumn,
                                     'dv': d.val,
                                     'lci': d.lci,
                                     'hci': d.hci,
@@ -426,6 +433,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 .style('opacity', .9);
                             div.html(`
                                 <h3>${display.title}</h3>
+                                <h3>${display.titleLegendColumn}</h3>
                                 <h3>${display.dv}</h3>
                                 CI (${display.lci} - ${display.hci})
                                 <br />WN = ${display.wn}
