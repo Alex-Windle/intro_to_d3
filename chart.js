@@ -318,9 +318,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
+                        //keys render bars
                         key: object[xAxisColumn],
                         val: object.dv, 
-                        // title: object[xAxisColumn],
+                        //keys render tooltip 
+                        title: object[xAxisColumn],
                         lci: object.lci,
                         hci: object.hci,
                         wn: object.wn
@@ -397,9 +399,38 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .on("mouseover", function (d, i) {
+                            // console.log('d ', d); 
+
+                            //HANDLE WN
+                            //HANDLE TITLE
+
+                            var display; 
+
+                            function make_tooltip_display(d){
+                                display = {
+                                    'title': d.title,
+                                    'dv': d.val,
+                                    'lci': d.lci,
+                                    'hci': d.hci,
+                                    'wn': d.wn
+                                }
+                            }
+                            make_tooltip_display(d); 
+
                             //SOLUTION: PUT THE TOOLTIP DATA INSIDE THE DATA MATRIX
-                            console.log(d);
-                        })
+                            
+                            div.transition()
+                                .duration(200)
+                                .style('opacity', .9);
+                            div.html(`
+                                <h3>${display.title}</h3>
+                                <h3>${display.dv}</h3>
+                                CI (${display.lci} - ${display.hci})
+                                <br />WN = ${d.wn}
+                            `)
+                                .style("left", (d3.event.pageX - 70) + 'px')
+                                .style("top", (d3.event.pageY - 90) + 'px');
+                        }); 
         
                  //...ci data 
                 var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
