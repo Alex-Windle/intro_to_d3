@@ -400,16 +400,18 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 //...ci data 
                 responseGrouping.data(ciMatrix)
                     .selectAll("line")
-                    .data(function (d, i) { //i think the problem is trying to loop all CIS inside 1 resp grouping
-                        console.log('d ', d); 
-                        console.log('i ', i);
-                        return d; 
-                    })
+                    .data(function (d, i) { return d; })
                     .enter().append("line")
                     .attr("class", "confidence_indicator")
-                    .attr("x1", function () { return x1.bandwidth() / 6; })
+                    .attr("x1", function (d, i) { 
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; 
+                        return spaceLeft; 
+                    })
                     .attr("y1", function (d) { return yMulti(d.lci); }) 
-                    .attr("x2", function () { return x1.bandwidth() / 6; }) 
+                    .attr("x2", function (d, i) { 
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; 
+                        return spaceLeft;  
+                    }) 
                     .attr("y2", function (d) { return yMulti(d.hci); });
                     
                     //axes labels
