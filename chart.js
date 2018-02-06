@@ -305,6 +305,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         //data
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
+        var linecapHalfWidth = 5; //REFACTOR DYNAMIC
         
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -397,24 +398,54 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; });
-                //...ci data 
-                responseGrouping.data(ciMatrix)
+                 //...ci data 
+                var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
+                ciIntervals
                     .selectAll("line")
-                    .data(function (d, i) { return d; })
+                    .data(function (d, i) { return d; })                 
                     .enter().append("line")
                     .attr("class", "confidence_indicator")
-                    .attr("x1", function (d, i) { 
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; 
-                        return spaceLeft; 
-                    })
+                    .attr("x1", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; })
                     .attr("y1", function (d) { return yMulti(d.lci); }) 
-                    .attr("x2", function (d, i) { 
-                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; 
-                        return spaceLeft;  
-                    }) 
+                    .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
+                    .attr("y2", function (d) { return yMulti(d.hci); }); 
+                var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+                ciIntervalCapsTop
+                    .selectAll("line") 
+                    .data(function (d, i) { return d; })
+                    .enter().append("line")
+                    .attr("class", "linecap_top")
+                    .attr("x1", function (d, i) { 
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                        return spaceLeft - linecapHalfWidth; 
+                    })
+                    .attr("y1", function (d) { return yMulti(d.hci); })
+                    .attr("x2", function (d, i) {    
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                        return spaceLeft + linecapHalfWidth; 
+                    })
                     .attr("y2", function (d) { return yMulti(d.hci); });
-                    
-                    //axes labels
+                var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
+                ciIntervalCapsBottom
+                    .selectAll("line") 
+                    .data(function (d, i) { return d; })
+                    .enter().append("line")
+                    .attr("class", "linecap_bottom")
+                    .attr("x1", function (d, i) { 
+                        
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                        return spaceLeft - linecapHalfWidth; 
+                    })
+                    .attr("y1", function (d) { return yMulti(d.lci); })
+                    .attr("x2", function (d, i) { 
+                        console.log('d ', d, 'i ', i);                        
+                        // var linecapHalfWidth = 5; 
+                        var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
+                        return spaceLeft + linecapHalfWidth; 
+                    })
+                    .attr("y2", function (d) { return yMulti(d.lci); });
+  
+                //axes labels
                     var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
                     var paddingLeft = 14;         
                     var yAxisLabel = chart.append("text")
