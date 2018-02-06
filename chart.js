@@ -282,28 +282,30 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
-         var chart = d3.select(".chart") 
-             // .attr("height", "700") //refactor for compatibility with ie
-            .attr("viewBox", function () { return "0 0 700 700"; })
-            .attr("preserveAspectRatio", "xMinYMin meet");
-
+        //instantiate chart
+         var chart = d3.select(".chart"); 
+             
+        //scaling
         var x0 = d3.scaleBand()
             .rangeRound([0, width])
             .paddingInner(.1);
-
         var x1 = d3.scaleBand()
             .padding(0.05);//NOT WORKING
-
         var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
+        x0.domain(xAxisCategoryNames); 
+        x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
+        yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
 
         //gridlines in y axis 
         function make_y_gridlines_multi() {
             return d3.axisLeft(yMulti)
         }
 
-        //create data matrix
-        let dataMatrix = []; 
+        //data
+        let dataMatrix = []; //maps bar data vals
+        let ciMatrix = []; //maps CI intervals
+        
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
@@ -324,8 +326,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         }
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, jsonData); 
 
-        //create ci matrix
-        let ciMatrix = []; 
         function createCIMatrix () {
             console.log('ci data ', confidenceIndicators); 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -347,67 +347,70 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         }
         createCIMatrix(); 
         console.log('ci matrix ', ciMatrix);
-        x0.domain(xAxisCategoryNames); 
-        x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
-        yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
 
+        //set chart attributes
+        //chart.attr("height", "700") //refactor for compatibility with ie
+        chart.attr("viewBox", function () { return "0 0 700 700"; })
+            .attr("preserveAspectRatio", "xMinYMin meet");
+        
+        //append first grouping (container for y gridlines, response groupings, axis, legend, etc)
         chart = chart.append("g")
-        var bar = chart.selectAll("g")
-
-        // add the Y gridlines
-        chart.append("g")			
+            
+            // resp grouping...
+            var responseGrouping = chart.selectAll("g")
+            
+            // y gridlines (inserted for visual layering. refactor later as a sorted element)
+            chart.append("g")			
             .attr("class", "grid")
             .call(make_y_gridlines_multi() 
                 .tickSize(-width) //full graph width
                 .tickFormat("")
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
-
-        bar.data(xAxisCategoryNames)
+            
+            //...resp grouping cont'd
+            responseGrouping = responseGrouping.data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) {
                     // var spaceLeft = margin.left + x0(d); 
                     return "translate(" + x0(d) + ", " + margin.top + ")";  
-                })
-                //test data
-                // .data([
-                //     [{key: "DISABL", val: 20}, {key: "NODIS", val: 19}],
-                //     [{key: "DISABL", val: 18}, {key: "NODIS", val: 17}],
-                //     [{key: "DISABL", val: 16}, {key: "NODIS", val: 15}],
-                // ])
-                .data(dataMatrix)
-            .selectAll("rect")
-                .data(function(d, i) {return d;})
-                    .enter().append("rect") 
-                    .attr("class", "bar")
-                    .attr("x", function (d, i) {
-                        // console.log('bar data ', d);
-                        // var width = x1.bandwidth();
-                        // var spaceLeft = x1.bandwidth()*i;
-                        // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
-                        var width = x0.bandwidth()/2; 
-                        var spaceLeft = width*i; 
-                        return margin.left + spaceLeft; 
-                        // console.log('d.key', d.key); 
+                }); 
+                //...bar data 
+                responseGrouping.data(dataMatrix) //set matrix data
+                    .selectAll("rect") //container
+                    .data(function(d, i) {return d;}) //process arrays
+                        .enter().append("rect") //render matrix into grouped bars
+                        .attr("class", "bar") 
+                        .attr("x", function (d, i) {
+                            // console.log('bar data ', d);
+                            // var width = x1.bandwidth();
+                            // var spaceLeft = x1.bandwidth()*i;
+                            // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
+                            var width = x0.bandwidth()/2; 
+                            var spaceLeft = width*i; 
+                            return margin.left + spaceLeft; 
+                            // console.log('d.key', d.key); 
+                        })
+                        .attr("y", function (d) { return yMulti(d.val); })
+                        // .attr("width", x1.bandwidth()) //skinny bars
+                        .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
+                        .attr("height", function (d) { return height - yMulti(d.val); })
+                        .attr("fill", function (d, i) { return barColors[i]; });
+                //...ci data 
+                responseGrouping.data(ciMatrix)
+                    .selectAll("line")
+                    .data(function (d, i) { //i think the problem is trying to loop all CIS inside 1 resp grouping
+                        console.log('d ', d); 
+                        console.log('i ', i);
+                        return d; 
                     })
-                    .attr("y", function (d) { return yMulti(d.val); })
-                    // .attr("width", x1.bandwidth()) //skinny bars
-                    .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
-                    .attr("height", function (d) { return height - yMulti(d.val); })
-                    .attr("fill", function (d, i) { return barColors[i]; })
-                    
-                    //confidence indicator line
-                    // var line = bar.append("line")
-                    
-                    // .data(confidenceIndicators)
-                        // .append("line")
-                        // .attr("class", "confidence_indicator")
-                        
-                        // .attr("x1", function () { return x1.bandwidth() / 6; })
-                        // .attr("y1", function (d) { return yMulti(d.lci); }) 
-                        // .attr("x2", function () { return x1.bandwidth() / 6; }) 
-                        // .attr("y2", function (d) { return yMulti(d.hci); });
+                    .enter().append("line")
+                    .attr("class", "confidence_indicator")
+                    .attr("x1", function () { return x1.bandwidth() / 6; })
+                    .attr("y1", function (d) { return yMulti(d.lci); }) 
+                    .attr("x2", function () { return x1.bandwidth() / 6; }) 
+                    .attr("y2", function (d) { return yMulti(d.hci); });
                     
                     //axes labels
                     var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
@@ -418,6 +421,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .text(yAxisTitle)
                         .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
                         .attr("text-anchor", "middle");   
+
                     //axes
                     var xAxis = chart.append("g")
                         .attr("class", "axis")             
