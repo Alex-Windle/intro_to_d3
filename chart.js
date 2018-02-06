@@ -319,7 +319,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
                     return {
                         key: object[xAxisColumn],
-                        val: object.dv
+                        val: object.dv, 
+                        // title: object[xAxisColumn],
+                        lci: object.lci,
+                        hci: object.hci,
+                        wn: object.wn
                     }
                 }); 
                 dataMatrix.push(keysFromFilteredJSON); 
@@ -347,7 +351,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             }  
         }
         createCIMatrix(); 
-        // console.log('ci matrix ', ciMatrix);
 
         //set chart attributes
         //chart.attr("height", "700") //refactor for compatibility with ie
@@ -378,52 +381,26 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     return "translate(" + x0(d) + ", " + margin.top + ")";  
                 }); 
                 //...bar data 
-                responseGrouping.data(dataMatrix) //set matrix data
+                responseGrouping
+                    .data(dataMatrix) //set matrix data
                     .selectAll("rect") //container
                     .data(function(d, i) {return d;}) //process arrays
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
                         .attr("x", function (d, i) {
-                            // console.log('bar data ', d);
-                            // var width = x1.bandwidth();
-                            // var spaceLeft = x1.bandwidth()*i;
-                            // return width + spaceLeft + margin.left; //styling coordinates w/ x1.bandwidth() width 
                             var width = x0.bandwidth()/2; 
                             var spaceLeft = width*i; 
                             return margin.left + spaceLeft; 
-                            // console.log('d.key', d.key); 
                         })
                         .attr("y", function (d) { return yMulti(d.val); })
-                        // .attr("width", x1.bandwidth()) //skinny bars
                         .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
-        
-                        // DATA 
-                        .data(tooltipDisplay)
-                        // console.log('tooltip display ', tooltipDisplay);
-
-                        // HOVER METHOD
                         .on("mouseover", function (d, i) {
-                            console.log('d ', d, 'i ', i);
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", .9);
-                            div.html(`
-                                <h3>${d.title}</h3> 
-                                <h3>${d.dv}</h3>
-                                CI (${d.lci} - ${d.hci})
-                                <br />WN = ${d.wn}
-                            `)                  
-                                .style("left", (d3.event.pageX - 70) + "px")
-                                .style("top", (d3.event.pageY - 90) + "px");
+                            //SOLUTION: PUT THE TOOLTIP DATA INSIDE THE DATA MATRIX
+                            console.log(d);
                         })
-                        .on("mouseout", function (d) {
-                            div.transition()
-                                .duration(500)
-                                .style("opacity", 0);
-                        }); 
-
+        
                  //...ci data 
                 var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
                     ciIntervals
