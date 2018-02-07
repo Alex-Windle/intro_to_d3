@@ -285,20 +285,25 @@ function makeChart (chartConfigObject, jsonData, lookup) {
  
             var x1 = d3.scaleBand()
             .domain(legendCategoryNames) //2 items
-            .range([0, x0.bandwidth()]) //total bandwidth is 216
-            .padding(0);//NOT WORKING
+            .rangeRound([0, x0.bandwidth()]);  //total bandwidth is 216
+            
+            // console.log('x1 bandwidth: ', x1.bandwidth()); 
 
-            console.log('legend for x1  ', legendCategoryNames);
-            console.log('bandwidth for x1 ', x0.bandwidth() ); 
+            // The total bandwidth starts at 108 with no padding 
+            
+            x1
+                x1.paddingInner(0.5);  //bandwith 96, step 120
+            // x1.paddingOuter(0.2); //bandwidth 90, step 90
+            // .padding(0.2); //bandwidth 78, step 98
 
-//******************************************************
+//***************************************************************************
             var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
         
         // x0.domain(xAxisCategoryNames); //labels
    
         //IS RANGE OR RANGE ROUND CORRECT IN V4?
-        x1.range([0, x0.bandwidth()]); 
+        // x1.range([0, x0.bandwidth()]); 
 
         yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
         //gridlines in y axis 
@@ -392,23 +397,29 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("class", "bar") 
                         .attr("x", function (d, i) {
 // FIX THIS - MESSING UP BANDWIDTH ******************************************************
-                            // console.log('xo bandwidth ', x0.bandwidth()/2);
-                            // var width = x0.bandwidth()/2; 
-                           
-                            // var spaceLeft = width*i; 
-                            // return margin.left + spaceLeft; 
+                        //paddingWidth calculates the padding between bands, which 
+                        //forces a way for us to CENTER the bars in the middle of the3 
+                        //x0 bandwidth. Is there a d3 method that accomplishes this? 
+                        
+                        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; 
+                        // console.log('padding width: ', paddingWidth); 
+
+                        return paddingWidth + margin.left + x1.bandwidth()*i; 
+                        // return margin.left + x1.step()*i; 
+                        // return margin.left; 
                         })
                         .attr("y", function (d) { return yMulti(d.val); })
 // FIX THIS MESS!!!!! ******************************************************
                         .attr("width", function (d) {
-                            //calculate bar width by dividing band by the number of bars? 
-
                             //the bandwidth method returns how long each band is
-                            //the step method returns the length (may be smaller if padding) 
+                            //the step method returns the length (may be bigger if padding is added) 
                             //with no padding, bandwidth and step should be equal
-                            console.log('x1 bandwidth...should be 108...', x1.bandwidth() ); 
-                            console.log('x1 step ...should be 108...', x1.step() ); 
-                            return; 
+                            
+                            console.log('calculated x1 bandwidth: ', x1.bandwidth() ); 
+                            console.log('calculated x1 step: ', x1.step() ); 
+                            
+                            return x1.bandwidth();
+                            // return x1.step();  
                         }) 
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
