@@ -111,9 +111,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const height = 700 - margin.top - margin.bottom;
     const totalWidth = width + margin.left + margin.right; 
     const halfTotalWidth = totalWidth / 2; 
+    const twoThirdsTotalWidth = totalWidth * .677; 
     const totalHeight = height + margin.top + margin.bottom;
     const chartTopBufferDataValue = 10; //verify this value with team
-    const chartBottomBufferLegend = totalHeight - margin.bottom + 150; //FIX
+    const chartBottomBufferLegend = totalHeight - margin.bottom + 100; 
     const spaceFromTop = height + margin.top; 
     const legendColorKeyWidth = 20;
     const legendColorKeyHeight = 20;
@@ -152,7 +153,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     function makeChartSingleBar () {
         //clear previous chart
         d3.selectAll("svg > *").remove(); 
-        
+
         var chart = d3.select(".chart") 
         // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
