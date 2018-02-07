@@ -272,8 +272,16 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
+        //clear previous chart (method 1/2) 
+            d3.selectAll("svg > *").remove(); 
+        
+        //clear previous chart (method 2/2)
+            // var svg = d3.select("svg");
+            // svg.selectAll("*").remove();
+
         //instantiate chart
-         var chart = d3.select(".chart");  
+        //  var chart = d3.select(".chart");  
+         var chart = d3.select(".chart"); 
         
          //scaling
         var x0 = d3.scaleBand()
@@ -300,6 +308,17 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
         let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars
 
+// *********************************************************************************************
+        console.log('x axis category names: ', xAxisCategoryNames); 
+        console.log('x axis data codes: ', xAxisCategoryDataCodes); 
+        console.log('x axis column: ', xAxisColumn); 
+        console.log('x axis type: ', xAxisType);
+        console.log('json data: ', jsonData);
+        console.log('chart config: ', chartConfigObject); 
+
+
+// *********************************************************************************************
+
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
@@ -313,8 +332,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         key: object[xAxisColumn],
                         val: object.dv, 
                         //keys render tooltip 
-                        title: object[xAxisColumn],
-                        titleLegendColumn: object[legendColumn],
+                        title: object[xAxisColumn], //shows AGE01. map to semantic english. 
+                        titleLegendColumn: object[legendColumn], //shows DISABL. map to semantic english. 
                         lci: object.lci,
                         hci: object.hci,
                         wn: object.wn
@@ -324,6 +343,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             }
         }
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData); 
+
+// *********************************************************************************************
 
         function createCIMatrix () {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -410,6 +431,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             div.transition()
                             .duration(200)
                             .style('opacity', .9);
+
+// *********************************************************************************************
+                            console.log('display data: ', display); 
+// *********************************************************************************************
+
+
                             div.html(`
                             <h3>${display.title}</h3>
                             <h3>${display.titleLegendColumn}</h3>
