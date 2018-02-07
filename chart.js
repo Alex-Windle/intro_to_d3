@@ -278,47 +278,31 @@ function makeChart (chartConfigObject, jsonData, lookup) {
          //scaling
         var x0 = d3.scaleBand()
             .domain(xAxisCategoryNames)
-            .rangeRound([0, width]);  
-            // .padding(0);
-
-//FIX THIS MESS!!!!! ******************************************************
+            .rangeRound([0, width]); 
  
-            var x1 = d3.scaleBand()
-            .domain(legendCategoryNames) //2 items
-            .rangeRound([0, x0.bandwidth()]);  //total bandwidth is 216
-            
-            // console.log('x1 bandwidth: ', x1.bandwidth()); 
+        var x1 = d3.scaleBand()
+            .domain(legendCategoryNames)
+            .rangeRound([0, x0.bandwidth()])
+            .paddingInner(0.5); 
 
-            // The total bandwidth starts at 108 with no padding 
-            
-            x1
-                x1.paddingInner(0.5);  //bandwith 96, step 120
-            // x1.paddingOuter(0.2); //bandwidth 90, step 90
-            // .padding(0.2); //bandwidth 78, step 98
-
-//***************************************************************************
-            var yMulti = d3.scaleLinear()
+        var yMulti = d3.scaleLinear()
+            .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
             .rangeRound([height, 0]);
-        
-        // x0.domain(xAxisCategoryNames); //labels
-   
-        //IS RANGE OR RANGE ROUND CORRECT IN V4?
-        // x1.range([0, x0.bandwidth()]); 
 
-        yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
         //gridlines in y axis 
         function make_y_gridlines_multi() {
             return d3.axisLeft(yMulti)
         }
+
         //data
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
-        var linecapHalfWidth = x1.bandwidth()/8; //REFACTOR DYNAMIC
-        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2;
+        const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
+        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars
+
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
-                //loop through each response category 
-                //filter for json data matches and return 
+                //loop through each response category. filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
@@ -343,8 +327,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
         function createCIMatrix () {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
-                //loop through each response category 
-                //filter for json data matches and return 
+                //loop through each response category. filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
@@ -384,10 +367,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             responseGrouping = responseGrouping.data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
-                .attr("transform", function (d) {
-                    // var spaceLeft = margin.left + x0(d); 
-                    return "translate(" + x0(d) + ", " + margin.top + ")";  
-                }); 
+                .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; }); 
                 //...bar data 
                 responseGrouping
                     .data(dataMatrix) //set matrix data
@@ -395,41 +375,16 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .data(function(d, i) {return d;}) //process arrays
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
-                        .attr("x", function (d, i) {
-// FIX THIS - MESSING UP BANDWIDTH ******************************************************
-                        //paddingWidth calculates the padding between bands, which 
-                        //forces a way for us to CENTER the bars in the middle of the3 
-                        //x0 bandwidth. Is there a d3 method that accomplishes this? 
-                        
-                        // let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; 
-                        // console.log('padding width: ', paddingWidth); 
-
-                        return paddingWidth + margin.left + x1.bandwidth()*i; 
-                        // return margin.left + x1.step()*i; 
-                        // return margin.left; 
-                        })
+                        .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
                         .attr("y", function (d) { return yMulti(d.val); })
-// FIX THIS MESS!!!!! ******************************************************
-                        .attr("width", function (d) {
-                            //the bandwidth method returns how long each band is
-                            //the step method returns the length (may be bigger if padding is added) 
-                            //with no padding, bandwidth and step should be equal
-                            
-                            console.log('calculated x1 bandwidth: ', x1.bandwidth() ); 
-                            console.log('calculated x1 step: ', x1.step() ); 
-                            
-                            return x1.bandwidth();
-                            // return x1.step();  
-                        }) 
+                        .attr("width", function (d) { return x1.bandwidth(); }) 
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .on("mouseover", function (d, i) {
-                            let display; 
-                            let title; 
+                            let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
                                 let column = d.key; 
                                 let title = lookup[xAxisType][column].name; 
-
                                 let wn = String(d.wn); 
                                 if (wn.length > 3 && wn.length < 7) {
                                     wn = wn.split("").reverse().join("");
@@ -451,70 +406,52 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             }
                             make_tooltip_display(d, xAxisColumn); 
                             div.transition()
-                                .duration(200)
-                                .style('opacity', .9);
+                            .duration(200)
+                            .style('opacity', .9);
                             div.html(`
-                                <h3>${display.title}</h3>
-                                <h3>${display.titleLegendColumn}</h3>
-                                <h3>${display.dv}</h3>
-                                CI (${display.lci} - ${display.hci})
-                                <br />WN = ${display.wn}
+                            <h3>${display.title}</h3>
+                            <h3>${display.titleLegendColumn}</h3>
+                            <h3>${display.dv}</h3>
+                            CI (${display.lci} - ${display.hci})
+                            <br />WN = ${display.wn}
                             `)
-                                .style("left", (d3.event.pageX - 70) + 'px')
-                                .style("top", (d3.event.pageY - 90) + 'px');
+                            .style("left", (d3.event.pageX - 70) + 'px')
+                            .style("top", (d3.event.pageY - 90) + 'px');
                         })
                         .on("mouseout", function (d) {
                             div.transition()
-                                .duration(500)
-                                .style("opacity", 0);
+                            .duration(500)
+                            .style("opacity", 0);
                         });  
 
             //...ci data 
             var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
-                ciIntervals
-                .selectAll("line")
+                ciIntervals.selectAll("line")
                 .data(function (d, i) { return d; })                 
                 .enter().append("line")
                 .attr("class", "confidence_indicator")
-// FIX !!! ********************************************************
                 .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
                 .attr("y1", function (d) { return yMulti(d.lci); }) 
                 .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
-// FIX !!! ********************************************************
-
                 .attr("y2", function (d) { return yMulti(d.hci); }); 
             var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-                ciIntervalCapsTop
-                .selectAll("line") 
+                ciIntervalCapsTop.selectAll("line") 
                 .data(function (d, i) { return d; })
                 .enter().append("line")
                 .attr("class", "linecap_top")
-// FIX !!! ********************************************************
-
-                .attr("x1", function (d, i) { 
-                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; 
-                })
+                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
         .attr("y1", function (d) { return yMulti(d.hci); })
-        .attr("x2", function (d, i) {    
-            return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
-        })
-// FIX !!! ********************************************************
-
+        .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
         .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-            ciIntervalCapsBottom
+        ciIntervalCapsBottom
             .selectAll("line") 
             .data(function (d, i) { return d; })
             .enter().append("line")
             .attr("class", "linecap_bottom")
-            .attr("x1", function (d, i) { 
-                
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;
-            })
+            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
             .attr("y1", function (d) { return yMulti(d.lci); })
-            .attr("x2", function (d, i) {    
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;
-            })
+            .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
             .attr("y2", function (d) { return yMulti(d.lci); });
 
         //axes labels
@@ -542,13 +479,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(yMulti))
             .select(".domain").remove(); //remove y-axis line
+        
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
             .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
-                    
-        //add legend title string 
-
+//add legend title string************************************************************************************************
         var legendEntry =  legend.selectAll("g") //groupings do not exist yet
             .data(legendCategoryNames) //count data
             .enter() //run methods once per data count
@@ -561,14 +497,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 let legendItemYPosition = legendItemHeight*i;
                 return "translate(0, " + legendItemYPosition + ")";
             })
-            .style("fill", function (d, i) {
-                return barColors[i];
-            });
+            .style("fill", function (d, i) { return barColors[i]; });
         var label = legendEntry.append("text")
             .text(function (d) { return d; }) 
-            //.attr("height", legendColorKeyHeight)
             .attr("transform", function (d, i) {
-                // let legendItemYPosition = legendItemHeight*i;
                 let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
                 let paddingLeft = legendColorKeyWidth*2; 
                 return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
