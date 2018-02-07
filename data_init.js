@@ -184,7 +184,7 @@ var chartConfigObject = {
     "legendType":"Stratification",
     "legendTitleStr":"Race/Ethnicity",
     "displayTrendChart":false,
-    "chartDivId", "test123",
+    "chartDivId": "test123",
     "colorsArrStr":[  
        "#377eb8",
        "#e41a1c",
