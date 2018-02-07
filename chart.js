@@ -314,7 +314,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
         var linecapHalfWidth = 5; //REFACTOR DYNAMIC
-        
+        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2;
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category 
@@ -401,7 +401,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         //forces a way for us to CENTER the bars in the middle of the3 
                         //x0 bandwidth. Is there a d3 method that accomplishes this? 
                         
-                        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; 
+                        // let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; 
                         // console.log('padding width: ', paddingWidth); 
 
                         return paddingWidth + margin.left + x1.bandwidth()*i; 
@@ -476,9 +476,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .data(function (d, i) { return d; })                 
                 .enter().append("line")
                 .attr("class", "confidence_indicator")
+// FIX !!! ********************************************************
                 .attr("x1", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; })
                 .attr("y1", function (d) { return yMulti(d.lci); }) 
                 .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
+// FIX !!! ********************************************************
+
                 .attr("y2", function (d) { return yMulti(d.hci); }); 
             var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
                 ciIntervalCapsTop
