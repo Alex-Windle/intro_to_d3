@@ -380,6 +380,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("width", function (d) { return x1.bandwidth(); }) 
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
+// *********************************************************************************************
                         .on("mouseover", function (d, i) {
                             let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
@@ -405,6 +406,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 }
                             }
                             make_tooltip_display(d, xAxisColumn); 
+// *********************************************************************************************
                             div.transition()
                             .duration(200)
                             .style('opacity', .9);
@@ -507,4 +509,5 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         });
     }
 } 
+
 // open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
