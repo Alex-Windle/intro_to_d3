@@ -444,13 +444,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             }
                             make_tooltip_display(d, xAxisColumn); 
 // *********************************************************************************************
-                            div.transition()
+                            #chartDiv.transition()
                             .duration(200)
                             .style('opacity', .9);
 // *********************************************************************************************
                             console.log('display data: ', display); 
 // *********************************************************************************************
-                            div.html(`
+                            #chartDiv.html(`
                             <h3>${display.title}</h3>
                             <h3>${display.titleLegendColumn}</h3>
                             <h3>${display.dv}</h3>
@@ -461,40 +461,40 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             .style("top", (d3.event.pageY - 90) + 'px');
                         })
                         .on("mouseout", function (d) {
-                            div.transition()
+                            #chartDiv.transition()
                             .duration(500)
                             .style("opacity", 0);
                         });  
 
             //...ci data 
-        //     var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
-        //         ciIntervals.selectAll("line")
-        //         .data(function (d, i) { return d; })                 
-        //         .enter().append("line")
-        //         .attr("class", "confidence_indicator")
-        //         .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
-        //         .attr("y1", function (d) { return yMulti(d.lci); }) 
-        //         .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
-        //         .attr("y2", function (d) { return yMulti(d.hci); }); 
-        //     var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-        //         ciIntervalCapsTop.selectAll("line") 
-        //         .data(function (d, i) { return d; })
-        //         .enter().append("line")
-        //         .attr("class", "linecap_top")
-        //         .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
-        // .attr("y1", function (d) { return yMulti(d.hci); })
-        // .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
-        // .attr("y2", function (d) { return yMulti(d.hci); });
-        // var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-        // ciIntervalCapsBottom
-        //     .selectAll("line") 
-        //     .data(function (d, i) { return d; })
-        //     .enter().append("line")
-        //     .attr("class", "linecap_bottom")
-        //     .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
-        //     .attr("y1", function (d) { return yMulti(d.lci); })
-        //     .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
-        //     .attr("y2", function (d) { return yMulti(d.lci); });
+            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
+                ciIntervals.selectAll("line")
+                .data(function (d, i) { return d; })                 
+                .enter().append("line")
+                .attr("class", "confidence_indicator")
+                .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
+                .attr("y1", function (d) { return yMulti(d.lci); }) 
+                .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
+                .attr("y2", function (d) { return yMulti(d.hci); }); 
+            var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+                ciIntervalCapsTop.selectAll("line") 
+                .data(function (d, i) { return d; })
+                .enter().append("line")
+                .attr("class", "linecap_top")
+                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+        .attr("y1", function (d) { return yMulti(d.hci); })
+        .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
+        .attr("y2", function (d) { return yMulti(d.hci); });
+        var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
+        ciIntervalCapsBottom
+            .selectAll("line") 
+            .data(function (d, i) { return d; })
+            .enter().append("line")
+            .attr("class", "linecap_bottom")
+            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+            .attr("y1", function (d) { return yMulti(d.lci); })
+            .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
+            .attr("y2", function (d) { return yMulti(d.lci); });
 
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
