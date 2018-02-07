@@ -13,7 +13,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
-
+    console.log('bar data values ', barDataValues);
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
     let xAxisType = chartConfigObject.xAxisType; 
@@ -398,13 +398,25 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 responseGrouping
                     .data(dataMatrix) //set matrix data
                     .selectAll("rect") //container
-                    .data(function(d, i) {return d;}) //process arrays
+                    .data(function(d, i) {console.log('mat ', dataMatrix); return d;}) //process arrays
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
                         .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
-                        .attr("y", function (d) { return yMulti(d.val); })
+                        .attr("y", function (d) { 
+                            if (d.val) {
+                                return yMulti(d.val); 
+                            }
+                            console.log('error ', yMulti(d)); //NaN
+                            return yMulti(0); 
+                        })
                         .attr("width", function (d) { return x1.bandwidth(); }) 
-                        .attr("height", function (d) { return height - yMulti(d.val); })
+                        .attr("height", function (d) { 
+                            if (d.val) {
+                                return height - yMulti(d.val); 
+                            }
+                            console.log('rect height error: ', d); 
+                            return 0; 
+                        })
                         .attr("fill", function (d, i) { return barColors[i]; })
 // *********************************************************************************************
                         .on("mouseover", function (d, i) {
@@ -436,12 +448,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             div.transition()
                             .duration(200)
                             .style('opacity', .9);
-
 // *********************************************************************************************
                             console.log('display data: ', display); 
 // *********************************************************************************************
-
-
                             div.html(`
                             <h3>${display.title}</h3>
                             <h3>${display.titleLegendColumn}</h3>
@@ -459,34 +468,34 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         });  
 
             //...ci data 
-            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
-                ciIntervals.selectAll("line")
-                .data(function (d, i) { return d; })                 
-                .enter().append("line")
-                .attr("class", "confidence_indicator")
-                .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
-                .attr("y1", function (d) { return yMulti(d.lci); }) 
-                .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
-                .attr("y2", function (d) { return yMulti(d.hci); }); 
-            var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-                ciIntervalCapsTop.selectAll("line") 
-                .data(function (d, i) { return d; })
-                .enter().append("line")
-                .attr("class", "linecap_top")
-                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
-        .attr("y1", function (d) { return yMulti(d.hci); })
-        .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
-        .attr("y2", function (d) { return yMulti(d.hci); });
-        var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-        ciIntervalCapsBottom
-            .selectAll("line") 
-            .data(function (d, i) { return d; })
-            .enter().append("line")
-            .attr("class", "linecap_bottom")
-            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
-            .attr("y1", function (d) { return yMulti(d.lci); })
-            .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
-            .attr("y2", function (d) { return yMulti(d.lci); });
+        //     var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
+        //         ciIntervals.selectAll("line")
+        //         .data(function (d, i) { return d; })                 
+        //         .enter().append("line")
+        //         .attr("class", "confidence_indicator")
+        //         .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
+        //         .attr("y1", function (d) { return yMulti(d.lci); }) 
+        //         .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
+        //         .attr("y2", function (d) { return yMulti(d.hci); }); 
+        //     var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+        //         ciIntervalCapsTop.selectAll("line") 
+        //         .data(function (d, i) { return d; })
+        //         .enter().append("line")
+        //         .attr("class", "linecap_top")
+        //         .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+        // .attr("y1", function (d) { return yMulti(d.hci); })
+        // .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
+        // .attr("y2", function (d) { return yMulti(d.hci); });
+        // var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
+        // ciIntervalCapsBottom
+        //     .selectAll("line") 
+        //     .data(function (d, i) { return d; })
+        //     .enter().append("line")
+        //     .attr("class", "linecap_bottom")
+        //     .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+        //     .attr("y1", function (d) { return yMulti(d.lci); })
+        //     .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
+        //     .attr("y2", function (d) { return yMulti(d.lci); });
 
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
