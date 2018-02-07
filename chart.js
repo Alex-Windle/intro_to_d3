@@ -25,6 +25,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
 
+    //clear previous chart 
+    d3.selectAll("#" + chartDivId + " > *").remove(); 
+
     jsonData.forEach(function (obj, i) {
         //get data values
         let barDataValue = obj.dv; 
@@ -156,10 +159,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartSingleBar () {
-        //clear previous chart 
-        d3.selectAll("#" + chartDivId + " > *").remove(); 
 
-        var chart = d3.select(".chart") 
+        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart");
         // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
@@ -286,9 +287,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
-        //clear previous chart
-        d3.selectAll("#" + chartDivId + " > *").remove(); 
-
         //instantiate chart
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); 
         
