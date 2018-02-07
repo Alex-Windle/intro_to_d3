@@ -313,7 +313,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         //data
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
-        var linecapHalfWidth = 5; //REFACTOR DYNAMIC
+        var linecapHalfWidth = x1.bandwidth()/8; //REFACTOR DYNAMIC
         let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2;
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
