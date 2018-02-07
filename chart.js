@@ -24,8 +24,17 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
     jsonData.forEach(function (obj, i) {
         //get data values
-        let barDataValue = Number(obj.dv.toFixed(decimalPlaces));
-        barDataValues.push(barDataValue);
+        let barDataValue = obj.dv; 
+
+        if (barDataValue) {
+            barDataValue = Number(obj.dv.toFixed(decimalPlaces));
+            barDataValues.push(barDataValue);            
+        } else {
+            barDataValue = 0;
+            barDataValues.push(barDataValue); 
+        }
+
+        console.log(barDataValues);
 
         //save data codes. then, map titles.
         if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {
@@ -130,18 +139,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     //determine rendering of single or multi-bar chart
-    switch (legendEntryCount) {
-        case 1: 
-            console.log("Display single-bar chart"); 
-            makeChartSingleBar();
-            break;
-        case 2: 
-            console.log("Display multi-bar chart");
-            makeChartMultiBar();
-            break; 
-        default:
-            console.log("Error"); 
-            break; 
+    if (legendEntryCount === 1) {
+        console.log("Display single-bar chart"); 
+        makeChartSingleBar();
+    } else if (legendEntryCount >= 2) {
+        console.log("Display multi-bar chart");
+        makeChartMultiBar();
+    } else {
+        console.log("Error");         
     }
 
     function makeChartSingleBar () {
