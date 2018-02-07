@@ -29,6 +29,12 @@ let data_5 = new Promise(function (resolve, reject) {
 	})
 })
 
+let data_6 = new Promise(function (resolve, reject) {
+	d3.json("./resp_6.json", function (data) {
+		resolve(data)
+	})
+})
+
 //load lookup
 var lookup = new Promise(function (resolve, reject) {
 	d3.json("./lookup.json", function (data) {
@@ -36,7 +42,8 @@ var lookup = new Promise(function (resolve, reject) {
 	})
 })
 
-//configuration object - resp_1.json
+// TEST FOR SINGLE BAR CHART (1 BAR RENDERS PER RESPONSE GROUPING)
+// configuration object - resp_1.json
 // var chartConfigObject = {  
 //     "xAxisColumn":"rs", 
 //     "xAxisType":"Response", 
@@ -88,32 +95,34 @@ var lookup = new Promise(function (resolve, reject) {
 //     "confidenceIntervalLabel":"95% CI"
 //  }
 
-//configuration object - resp_3.json
-var chartConfigObject = {  
-    "xAxisColumn":"s1", //3 age ranges
-    "xAxisType":"Stratification",
-    "legendColumn":"s2", // DISABL, NODIS
-    "legendType":"Stratification",
-    "legendTitleStr":"Disability Status",
-    "displayTrendChart":false,
-    "colorsArrStr":[  
-       "#377eb8",
-       "#e41a1c",
-       "#4daf4a",
-       "#984ea3",
-       "#ff7f00",
-       "#a65628",
-       "#f781bf",
-       "#CAB2D6",
-       "#FF7F00",
-       "#FDBF6F",
-       "#FFFF99"
-    ],
-    "yAxisTitle":"Age-adjusted Prevalence (%)",
-    "decimalPlaces":1,
-    "confidenceIntervalLabel":"95% CI"
- }
+// TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
+// configuration object - resp_3.json
+// var chartConfigObject = {  
+//     "xAxisColumn":"s1", //3 age ranges OK
+//     "xAxisType":"Stratification",
+//     "legendColumn":"s2", // DISABL, NODIS
+//     "legendType":"Stratification",
+//     "legendTitleStr":"Disability Status",
+//     "displayTrendChart":false,
+//     "colorsArrStr":[  
+//        "#377eb8",
+//        "#e41a1c",
+//        "#4daf4a",
+//        "#984ea3",
+//        "#ff7f00",
+//        "#a65628",
+//        "#f781bf",
+//        "#CAB2D6",
+//        "#FF7F00",
+//        "#FDBF6F",
+//        "#FFFF99"
+//     ],
+//     "yAxisTitle":"Age-adjusted Prevalence (%)",
+//     "decimalPlaces":1,
+//     "confidenceIntervalLabel":"95% CI"
+//  }
 
+// TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING)
 //configuration object - resp_4.json
 // var chartConfigObject = {  
 //     "xAxisColumn":"rs",
@@ -166,13 +175,45 @@ var chartConfigObject = {
 //     "confidenceIntervalLabel":"95% CI"
 //  }
 
-Promise.all([data_1, data_2, data_3, data_4, data_5, lookup]).then(function (data) {
+// TEST FOR MISSING OR NULL DATA VALUES
+//configuration object - resp_6.json
+var chartConfigObject = {  
+    "xAxisColumn":"s1",
+    "xAxisType":"Stratification",
+    "legendColumn":"s2",
+    "legendType":"Stratification",
+    "legendTitleStr":"Race/Ethnicity",
+    "displayTrendChart":false,
+    "colorsArrStr":[  
+       "#377eb8",
+       "#e41a1c",
+       "#4daf4a",
+       "#984ea3",
+       "#ff7f00",
+       "#a65628",
+       "#f781bf",
+       "#CAB2D6",
+       "#FF7F00",
+       "#FDBF6F",
+       "#FFFF99"
+    ],
+    "yAxisTitle":"Crude Prevalence (%)",
+    "decimalPlaces":1,
+    "sampleSizeLabel":"Weighted No.",
+    "dataValuePrefix":"",
+    "dataValueSuffix":"%",
+    "chartTitle508":"chart 508 title goes here",
+    "chartDesc508":"chart 508 desc goes here"
+ };
+
+Promise.all([data_1, data_2, data_3, data_4, data_5, data_6, lookup]).then(function (data) {
     // *only turn on 1 jsonData at a time*
-    // var jsonData = data[0]; 
+    // var jsonData = data[0]; // TEST FOR SINGLE BAR CHART (1 BAR RENDERS PER EACH OF MULTIPLE RESPONSE GROUPINGS)
     // var jsonData = data[1]; 
-    var jsonData = data[2]; 
-    // var jsonData = data[3]; 
+    // var jsonData = data[2]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
+    // var jsonData = data[3]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING)
     // var jsonData = data[4]; 
-    var lookup = data[5]; 
+    var jsonData = data[5]; // TEST FOR MISSING OR NULL DATA VALUES
+    var lookup = data[6]; 
     makeChart(chartConfigObject, jsonData, lookup); 
 });
