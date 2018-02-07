@@ -274,16 +274,32 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     function makeChartMultiBar () {
         //instantiate chart
          var chart = d3.select(".chart");  
-        //scaling
+        
+         //scaling
         var x0 = d3.scaleBand()
-            .rangeRound([0, width])
-            .paddingInner(.1);
-        var x1 = d3.scaleBand()
-            .padding(0.05);//NOT WORKING
-        var yMulti = d3.scaleLinear()
+            .domain(xAxisCategoryNames)
+            .rangeRound([0, width]);  
+            // .padding(0);
+
+//FIX THIS MESS!!!!! ******************************************************
+ 
+            var x1 = d3.scaleBand()
+            .domain(legendCategoryNames) //2 items
+            .range([0, x0.bandwidth()]) //total bandwidth is 216
+            .padding(0);//NOT WORKING
+
+            console.log('legend for x1  ', legendCategoryNames);
+            console.log('bandwidth for x1 ', x0.bandwidth() ); 
+
+//******************************************************
+            var yMulti = d3.scaleLinear()
             .rangeRound([height, 0]);
-        x0.domain(xAxisCategoryNames); 
-        x1.domain(barDataValues).rangeRound([0, x0.bandwidth()]);
+        
+        // x0.domain(xAxisCategoryNames); //labels
+   
+        //IS RANGE OR RANGE ROUND CORRECT IN V4?
+        x1.range([0, x0.bandwidth()]); 
+
         yMulti.domain([0, d3.max(barDataValues) + chartTopBufferDataValue]); 
         //gridlines in y axis 
         function make_y_gridlines_multi() {
@@ -375,12 +391,25 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
                         .attr("x", function (d, i) {
-                            var width = x0.bandwidth()/2; 
-                            var spaceLeft = width*i; 
-                            return margin.left + spaceLeft; 
+// FIX THIS - MESSING UP BANDWIDTH ******************************************************
+                            // console.log('xo bandwidth ', x0.bandwidth()/2);
+                            // var width = x0.bandwidth()/2; 
+                           
+                            // var spaceLeft = width*i; 
+                            // return margin.left + spaceLeft; 
                         })
                         .attr("y", function (d) { return yMulti(d.val); })
-                        .attr("width", x0.bandwidth()/2) //wide bars fill x0.bandwidth()
+// FIX THIS MESS!!!!! ******************************************************
+                        .attr("width", function (d) {
+                            //calculate bar width by dividing band by the number of bars? 
+
+                            //the bandwidth method returns how long each band is
+                            //the step method returns the length (may be smaller if padding) 
+                            //with no padding, bandwidth and step should be equal
+                            console.log('x1 bandwidth...should be 108...', x1.bandwidth() ); 
+                            console.log('x1 step ...should be 108...', x1.step() ); 
+                            return; 
+                        }) 
                         .attr("height", function (d) { return height - yMulti(d.val); })
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .on("mouseover", function (d, i) {
