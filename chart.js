@@ -150,6 +150,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartSingleBar () {
+        //clear previous chart
+        d3.selectAll("svg > *").remove(); 
+        
         var chart = d3.select(".chart") 
         // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
@@ -277,16 +280,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
-        //clear previous chart (method 1/2) 
-            d3.selectAll("svg > *").remove(); 
-        
-        //clear previous chart (method 2/2)
-            // var svg = d3.select("svg");
-            // svg.selectAll("*").remove();
+        //clear previous chart
+        d3.selectAll("svg > *").remove(); 
 
         //instantiate chart
         //  var chart = d3.select(".chart");  
-         var chart = d3.select(".chart"); 
+        var chart = d3.select(".chart"); 
         
          //scaling
         var x0 = d3.scaleBand()
