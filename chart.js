@@ -477,9 +477,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .enter().append("line")
                 .attr("class", "confidence_indicator")
 // FIX !!! ********************************************************
-                .attr("x1", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; })
+                .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
                 .attr("y1", function (d) { return yMulti(d.lci); }) 
-                .attr("x2", function (d, i) { var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2; return spaceLeft; }) 
+                .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
 // FIX !!! ********************************************************
 
                 .attr("y2", function (d) { return yMulti(d.hci); }); 
@@ -489,15 +489,17 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .data(function (d, i) { return d; })
                 .enter().append("line")
                 .attr("class", "linecap_top")
+// FIX !!! ********************************************************
+
                 .attr("x1", function (d, i) { 
-                    var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                    return spaceLeft - linecapHalfWidth; 
+                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; 
                 })
         .attr("y1", function (d) { return yMulti(d.hci); })
         .attr("x2", function (d, i) {    
-            var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-            return spaceLeft + linecapHalfWidth; 
+            return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
         })
+// FIX !!! ********************************************************
+
         .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
             ciIntervalCapsBottom
@@ -507,13 +509,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("class", "linecap_bottom")
             .attr("x1", function (d, i) { 
                 
-                var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                return spaceLeft - linecapHalfWidth; 
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;
             })
             .attr("y1", function (d) { return yMulti(d.lci); })
             .attr("x2", function (d, i) {    
-                var spaceLeft = x0.bandwidth()/2*i + x0.bandwidth()/2 ; 
-                return spaceLeft + linecapHalfWidth; 
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;
             })
             .attr("y2", function (d) { return yMulti(d.lci); });
 
