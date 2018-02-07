@@ -13,6 +13,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
+//*******************************************************************************************    
+    let chartDivId = chartConfigObject.chartDivId; 
+    console.log(chartDivId);
     console.log('bar data values ', barDataValues);
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
@@ -122,7 +125,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const legendItemPadding = 10;
 
     //tool tip
-    var div = d3.select("body").append("div")
+//*******************************************************************************************
+    var tooltipDiv = d3.select("#" + chartDivId).append("div") 
+    // var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
     //scale
@@ -285,7 +290,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         d3.selectAll("svg > *").remove(); 
 
         //instantiate chart
-        var chart = d3.select("div").attr("id", "chartDiv").append("svg").attr("class", "chart"); 
+        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); 
         
          //scaling
         var x0 = d3.scaleBand()
@@ -444,13 +449,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             }
                             make_tooltip_display(d, xAxisColumn); 
 // *********************************************************************************************
-                            #chartDiv.transition()
+                            tooltipDiv.transition()
                             .duration(200)
                             .style('opacity', .9);
 // *********************************************************************************************
                             console.log('display data: ', display); 
 // *********************************************************************************************
-                            #chartDiv.html(`
+                            tooltipDiv.html(`
                             <h3>${display.title}</h3>
                             <h3>${display.titleLegendColumn}</h3>
                             <h3>${display.dv}</h3>
@@ -461,7 +466,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             .style("top", (d3.event.pageY - 90) + 'px');
                         })
                         .on("mouseout", function (d) {
-                            #chartDiv.transition()
+                            tooltipDiv.transition()
                             .duration(500)
                             .style("opacity", 0);
                         });  
