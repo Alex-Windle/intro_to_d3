@@ -285,8 +285,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         d3.selectAll("svg > *").remove(); 
 
         //instantiate chart
-        //  var chart = d3.select(".chart");  
-        var chart = d3.select(".chart"); 
+        var chart = d3.select("div").attr("id", "chartDiv").append("svg").attr("class", "chart"); 
         
          //scaling
         var x0 = d3.scaleBand()
