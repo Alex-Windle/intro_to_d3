@@ -390,6 +390,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             return 0; 
                         })
                         .attr("fill", function (d, i) { return barColors[i]; })
+                        .style("opacity", "0.8")
                         .on("mouseover", function (d, i) {
                             let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
