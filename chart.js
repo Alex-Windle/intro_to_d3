@@ -1,7 +1,5 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
-    console.log(jsonData); 
     //set chart data variables
-    // let totalBars = sortedJsonData.length; 
     let barColors = chartConfigObject.colorsArrStr;
     let barDataValues = []; //ordered by json order
     let xAxisCategoryNames = []; 
@@ -13,9 +11,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
-    let displayTrendChart = chartConfigObject.displayTrendChart; 
-//*******************************************************************************************    
+    let displayTrendChart = chartConfigObject.displayTrendChart;    
     let chartDivId = chartConfigObject.chartDivId; 
+    
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
     let xAxisType = chartConfigObject.xAxisType; 
@@ -25,24 +23,18 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendCategoryDataCodes = [];        
     let totalBars = jsonData.length; 
     
-    //SORT JSON HERE BEFORE PUSHING DATA INTO ARRAYS!
+    //sort data (x-axis responses display by ascending sort number) 
     var sortedJsonData = jsonData.sort(function (a, b) {
         let sortColA = a[xAxisColumn]; 
         let sortColB = b[xAxisColumn];
-        if ( lookup[xAxisType][sortColA].sort < lookup[xAxisType][sortColB].sort ) {
-            return -1; 
-        }
-        if ( lookup[xAxisType][sortColB].sort < lookup[xAxisType][sortColA].sort ) {
-            return 1; 
-        }
+        if ( lookup[xAxisType][sortColA].sort < lookup[xAxisType][sortColB].sort ) { return -1; }
+        if ( lookup[xAxisType][sortColB].sort < lookup[xAxisType][sortColA].sort ) { return 1; }
         return 0; 
     })
-    console.log('Is the data sorted correctly? ', sortedJsonData); 
 
+    //process data
     sortedJsonData.forEach(function (obj, i) {
-        //get data values
-        let barDataValue = obj.dv; 
-
+        let barDataValue = obj.dv; //get data values
         if (barDataValue) {
             barDataValue = Number(obj.dv.toFixed(decimalPlaces));
             barDataValues.push(barDataValue);            
@@ -51,21 +43,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             barDataValues.push(barDataValue); 
         }
 
-        console.log(barDataValues);
-
-        //save data codes. then, map titles.
-        if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {
+        if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {  //save data codes. then, map titles.
             xAxisCategoryDataCodes.push(obj[xAxisColumn]);
         }
-
         if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
             legendCategoryDataCodes.push(obj[legendColumn]);                  
         }
 
-        let confidenceIndicator = {
-            lci: obj.lci,
-            hci: obj.hci
-        };
+        let confidenceIndicator = { lci: obj.lci, hci: obj.hci };
         confidenceIndicators.push(confidenceIndicator);
             
         make_tooltip_display(obj);
@@ -139,9 +124,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const legendItemPadding = 10;
 
     //tool tip
-//*******************************************************************************************
     var tooltipDiv = d3.select("#" + chartDivId).append("div") 
-    // var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
     //scale
@@ -150,8 +133,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         .rangeRound([0, width]) //total width 
         .padding(0.1);
     var y = d3.scaleLinear()
-        //set value scaling with buffer
-        .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
+        .domain([0, d3.max(barDataValues) + chartTopBufferDataValue]) //set value scaling with buffer
         .range([height, 0]);
     //gridlines in y axis 
     function make_y_gridlines() {
@@ -332,27 +314,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
         let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars
 
-// *********************************************************************************************
-        console.log('x axis category names: ', xAxisCategoryNames); 
-        console.log('x axis data codes: ', xAxisCategoryDataCodes); 
-        console.log('x axis column: ', xAxisColumn); 
-        console.log('x axis type: ', xAxisType);
-        console.log('json data: ', sortedJsonData);
-        console.log('chart config: ', chartConfigObject); 
-
-
-// *********************************************************************************************
-
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
-            // BRING IN SORT NUMBER DATA 
-                // GET XAXIS COLUMN (S1) AND XAXISTYPE (STRAT...) FROM CONFIG OBJECT
-
-
-
-                // LOOKUP OBJECT > STRAT > ITEM.SORT ['NODIS' ... SORT: 1; ]
-
-            // PUSH ITEMS INTO THE ARRAY BY SORT NUMBER (ASCENDING)
-
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
                 var filteredJSON = sortedJsonData.filter(function (object, index, array) {
@@ -377,8 +339,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             }
         }
         createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData); 
-        console.log('DATA MATRIX!!! IS IT IN ORDER? ', dataMatrix); 
-// *********************************************************************************************
 
         function createCIMatrix () {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -444,7 +404,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             return 0; 
                         })
                         .attr("fill", function (d, i) { return barColors[i]; })
-// *********************************************************************************************
                         .on("mouseover", function (d, i) {
                             let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
@@ -470,13 +429,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                 }
                             }
                             make_tooltip_display(d, xAxisColumn); 
-// *********************************************************************************************
                             tooltipDiv.transition()
                             .duration(200)
                             .style('opacity', .9);
-// *********************************************************************************************
-                            console.log('display data: ', display); 
-// *********************************************************************************************
                             tooltipDiv.html(`
                             <h3>${display.title}</h3>
                             <h3>${display.titleLegendColumn}</h3>
@@ -494,7 +449,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         });  
 
             //...ci data 
-            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //CREATE NEW GROUPING
+            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //create new grouping
                 ciIntervals.selectAll("line")
                 .data(function (d, i) { return d; })                 
                 .enter().append("line")
