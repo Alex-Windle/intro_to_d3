@@ -2,7 +2,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     //set chart data variables
     let totalBars = jsonData.length; 
     let barColors = chartConfigObject.colorsArrStr;
-    let barDataValues = []; 
+    let barDataValues = []; //ordered by json order
     let xAxisCategoryNames = []; 
     let yAxisTitle = chartConfigObject.yAxisTitle; 
     let legendTitle = chartConfigObject.legendTitleStr;
@@ -13,7 +13,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
-
 //*******************************************************************************************    
     let chartDivId = chartConfigObject.chartDivId; 
     console.log(chartDivId);
@@ -26,7 +25,41 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
 
-    jsonData.forEach(function (obj, i) {
+    //SORT JSON HERE BEFORE PUSHING DATA INTO ARRAYS!!!!
+    var sortedJsonData = jsonData.sort(function (a, b) {
+        // console.log('a', a); 
+        // console.log('b ', b); 
+        let aSortNum, bSortNum; 
+
+        function getASortNum (a) {
+            // console.log('pass A into function - ', a[legendColumn]); 
+            let xAxisValue = a[xAxisColumn]; 
+            aSortNum = lookup[xAxisType][xAxisValue].sort; 
+            // console.log('aSortNum...', aSortNum); 
+            return; 
+        }
+        getASortNum(a); 
+
+        function getBSortNum (b) {
+            // console.log('pass A into function - ', a[legendColumn]); 
+            let xAxisValue = b[legendColumn]; 
+            bSortNum = lookup[xAxisType][xAxisValue].sort; 
+            // console.log('bSortNum...', bSortNum); 
+            return; 
+        }
+        getASortNum(b); 
+
+        if (aSortNum < bSortNum) { //a < b
+            return -1; 
+        }
+        if (bSortNum < aSortNum) { //a > b
+            return 1; 
+        }
+        return 0; 
+    })
+    console.log(sortedJsonData); 
+
+    sortedJsonData.forEach(function (obj, i) {
         //get data values
         let barDataValue = obj.dv; 
 
@@ -330,6 +363,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 // *********************************************************************************************
 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
+            // BRING IN SORT NUMBER DATA 
+                // GET XAXIS COLUMN (S1) AND XAXISTYPE (STRAT...) FROM CONFIG OBJECT
+
+
+
+                // LOOKUP OBJECT > STRAT > ITEM.SORT ['NODIS' ... SORT: 1; ]
+
+            // PUSH ITEMS INTO THE ARRAY BY SORT NUMBER (ASCENDING)
+
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
                 var filteredJSON = jsonData.filter(function (object, index, array) {
@@ -337,6 +379,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 })
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
+                    console.log('obj ', object); 
                     return {
                         //keys render bars
                         key: object[xAxisColumn],
