@@ -289,7 +289,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var x1 = d3.scaleBand()
             .domain(legendCategoryNames)
             .rangeRound([0, x0.bandwidth()])
-            .paddingInner([0.1]);
+            .paddingInner(0.5);
 
         var yMulti = d3.scaleLinear()
             .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -303,7 +303,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
         const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
-        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars
+        
+        // let paddingWidth = ( x1.step() - x1.bandwidth() ); //calc padding to use for centering grouped bars works best on multiple bars
+        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars works best w/ 2 bars
 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -363,7 +365,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { 
-                    console.log(x0(d)); 
                     return "translate(" + x0(d) + ", " + margin.top + ")"; 
                 }); 
                 
