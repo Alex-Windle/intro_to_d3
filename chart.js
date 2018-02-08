@@ -499,12 +499,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
             .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
-//add legend title string************************************************************************************************
         var legendEntry =  legend.selectAll("g") //groupings do not exist yet
             .data(legendCategoryNames) //count data
             .enter() //run methods once per data count
             .append("g") //produces new groupings
             .attr("height", legendColorKeyHeight); 
+        legendEntry.append("text")
+            .attr("height", legendColorKeyHeight)
+            .attr("transform", function () {
+                let yAlign = -10; 
+                let paddingLeft = legendColorKeyWidth*2;
+                return "translate(" + paddingLeft + "," + yAlign + ")"
+            })
+            .text(legendTitle); 
         var colorKey = legendEntry.append("rect")
             .attr("width", legendColorKeyWidth)
             .attr("height", legendColorKeyHeight)
