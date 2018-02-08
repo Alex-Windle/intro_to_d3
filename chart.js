@@ -13,6 +13,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let decimalPlaces = chartConfigObject.decimalPlaces; 
     let tooltipDisplay = []; 
     let displayTrendChart = chartConfigObject.displayTrendChart; 
+
 //*******************************************************************************************    
     let chartDivId = chartConfigObject.chartDivId; 
     console.log(chartDivId);
@@ -24,9 +25,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendColumn = chartConfigObject.legendColumn; 
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
-
-    //clear previous chart 
-    d3.selectAll("#" + chartDivId + " > *").remove(); 
 
     jsonData.forEach(function (obj, i) {
         //get data values
@@ -159,8 +157,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartSingleBar () {
+        //clear previous chart
+        d3.selectAll("svg > *").remove(); 
 
-        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart");
+        var chart = d3.select(".chart") 
         // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
@@ -287,6 +287,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartMultiBar () {
+        //clear previous chart
+        d3.selectAll("svg > *").remove(); 
+
         //instantiate chart
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); 
         
@@ -405,11 +408,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("class", "bar") 
                         .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
                         .attr("y", function (d) { 
-                            if (d.val) {
-                                return yMulti(d.val); 
-                            }
-                            console.log('error ', yMulti(d)); //NaN
-                            return yMulti(0); 
+                            if (d.val) { return yMulti(d.val); } //checks for missing values
+                            return yMulti(''); //0 
                         })
                         .attr("width", function (d) { return x1.bandwidth(); }) 
                         .attr("height", function (d) { 
@@ -475,7 +475,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .data(function (d, i) { return d; })                 
                 .enter().append("line")
                 .attr("class", "confidence_indicator")
-                .attr("x1", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
+                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
                 .attr("y1", function (d) { return yMulti(d.lci); }) 
                 .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
                 .attr("y2", function (d) { return yMulti(d.hci); }); 
@@ -484,10 +484,34 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .data(function (d, i) { return d; })
                 .enter().append("line")
                 .attr("class", "linecap_top")
-                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
-        .attr("y1", function (d) { return yMulti(d.hci); })
-        .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
-        .attr("y2", function (d) { return yMulti(d.hci); });
+                .attr("x1", function (d, i) { 
+                    // console.log('d', d); 
+                    if (!d.hci) { 
+                        console.log("undef d=", d); 
+                        return ''; 
+                        // linecapHalfWidth = 0; 
+                        // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
+                    }
+                    console.log('val d= ', d); 
+                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
+                    
+                })
+                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+                .attr("y1", function (d) { return yMulti(d.hci); })
+                .attr("x2", function (d, i) { 
+                     // console.log('d', d); 
+                     if (!d.hci) { 
+                        console.log("undef d=", d); 
+                        return ''; 
+                        // linecapHalfWidth = 0; 
+                        // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
+                    }
+                    console.log('val d= ', d); 
+                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
+                    
+                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
+                })
+                .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
         ciIntervalCapsBottom
             .selectAll("line") 
