@@ -151,8 +151,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     function makeChartSingleBar () {
         d3.selectAll("svg > *").remove(); //clear previous chart
 
-        var chart = d3.select(".chart") 
-        .attr("viewBox", function () { return "0 0 700 700"; })
+        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
+        
+        chart.attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
         
         var bar = chart.selectAll("g"); //create bar grouping
