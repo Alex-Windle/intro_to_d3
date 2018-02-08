@@ -1,4 +1,8 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
+    //508 compliance
+    let chartDesc = chartConfigObject.chartDesc; 
+    let chartTitle = chartConfigObject.chartTitle; 
+
     //chart variables
     let barColors = chartConfigObject.colorsArrStr;
     let barDataValues = []; //ordered by json order
@@ -154,6 +158,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             chart.attr("viewBox", function () { return "0 0 700 700"; })
             .attr("preserveAspectRatio", "xMinYMin meet");
         
+         //508 compliance
+         d3.select("#" + chartDivId).append("desc").html(chartDesc); 
+         d3.select("#" + chartDivId).append("title").html(chartTitle); 
+        
         var bar = chart.selectAll("g"); //create bar grouping
         chart.append("g")  // add the Y gridlines		
             .attr("class", "grid")
@@ -284,6 +292,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     function makeChartMultiBar () {
         d3.selectAll("svg > *").remove(); //clear previous chart
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
+        
+        //508 compliance
+        d3.select("#" + chartDivId).append("desc").html(chartDesc); 
+        d3.select("#" + chartDivId).append("title").html(chartTitle); 
         
         var x0 = d3.scaleBand()
             .domain(xAxisCategoryNames)
