@@ -102,7 +102,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     //svg chart variables
-    const margin = {top: 30, right: 0, bottom: 220, left: 50};
+    const margin = {top: 30, right: 0, bottom: 220, left: 60};
     const width = 700 - margin.left - margin.right;
     const height = 700 - margin.top - margin.bottom;
     const totalWidth = width + margin.left + margin.right; 
