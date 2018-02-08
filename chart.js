@@ -518,9 +518,33 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .data(function (d, i) { return d; })
             .enter().append("line")
             .attr("class", "linecap_bottom")
-            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
+            .attr("x1", function (d, i) { 
+                // console.log('d', d); 
+                if (!d.hci) { 
+                    console.log("undef d=", d); 
+                    return ''; 
+                    // linecapHalfWidth = 0; 
+                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
+                }
+                console.log('val d= ', d); 
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
+                
+                // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
+            })
             .attr("y1", function (d) { return yMulti(d.lci); })
-            .attr("x2", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; })
+            .attr("x2", function (d, i) { 
+                 // console.log('d', d); 
+                 if (!d.hci) { 
+                    console.log("undef d=", d); 
+                    return ''; 
+                    // linecapHalfWidth = 0; 
+                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
+                }
+                console.log('val d= ', d); 
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
+                
+                // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
+            })
             .attr("y2", function (d) { return yMulti(d.lci); });
 
         //axes labels
