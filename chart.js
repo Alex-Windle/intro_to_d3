@@ -150,14 +150,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
     function makeChartSingleBar () {
         d3.selectAll("svg > *").remove(); //clear previous chart
-
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
-        
-        chart.attr("viewBox", function () { return "0 0 700 700"; })
-        .attr("preserveAspectRatio", "xMinYMin meet");
+            chart.attr("viewBox", function () { return "0 0 700 700"; })
+            .attr("preserveAspectRatio", "xMinYMin meet");
         
         var bar = chart.selectAll("g"); //create bar grouping
-       
         chart.append("g")  // add the Y gridlines		
             .attr("class", "grid")
             .call(make_y_gridlines()
@@ -252,37 +249,40 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(y))
             .select(".domain").remove(); //remove y-axis line
-
+          
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
-            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
-        var legendEntry =  legend.selectAll("g") //groupings do not exist yet
-            .data(legendCategoryNames) //count data
+            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
+        legend.append("text")
+            .attr("class", "legend_title")
+            .attr("transform", function () { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; })
+            .text(function () { if (legend.length > 1) { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; } return ''; });  
+        var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
+        legendGrouping.data(legendCategoryNames) //count data
             .enter() //run methods once per data count
-            .append("g") //produces new groupings
-            .attr("height", legendColorKeyHeight); 
-        var colorKey = legendEntry.append("rect")
-            .attr("width", legendColorKeyWidth)
-            .attr("height", legendColorKeyHeight)
-            .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i;
-                // legendItemYPosition = legendItemYPosition/2; 
-                return "translate(0, " + legendItemYPosition + ")";
-            })
-            .style("fill", function (d, i) { return barColors[i]; });
-        var label = legendEntry.append("text")
+                .append("g") //produces new groupings
+            .append("rect")
+                .attr("width", legendColorKeyWidth)
+                .attr("height", legendColorKeyHeight)
+                .attr("transform", function (d, i) {
+                let yAlign = legendGroupingHeight*i + 15; return "translate(0, " + yAlign + ")"; })
+                .style("fill", function (d, i) { return barColors[i]; });
+        legendGrouping
+            .data(legendCategoryNames)
+            .enter()
+            .append("text")
             .text(function (d) { return d; }) 
             .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i + 14; 
+                let yAlign = (legendGroupingHeight*i) + (legendColorKeyHeight*2);
                 let paddingLeft = legendColorKeyWidth*2; 
-                return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+                return "translate(" + paddingLeft + ", " + yAlign + ")";
         });
     }
-// **********************************************************************************
+// *****************************************
+// *****************************************
     function makeChartMultiBar () {
         d3.selectAll("svg > *").remove(); //clear previous chart
-
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
         
         var x0 = d3.scaleBand()
@@ -514,11 +514,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
         legend.append("text")
             .attr("class", "legend_title")
-            // .attr("height", legendColorKeyHeight)
-            .attr("transform", function () {
-                let yAlign = -10; 
-                return "translate(" + 0 + "," + 0 + ")"
-            })
+            .attr("transform", function () { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; })
             .text(legendTitle); 
         var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
         legendGrouping.data(legendCategoryNames) //count data
