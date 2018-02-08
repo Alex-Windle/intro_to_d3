@@ -223,7 +223,7 @@ var chartConfigObject = {
     "legendType":"Stratification",
     "legendTitleStr":"Disability Status",
     "displayTrendChart":false,
-    "chartDivId":"chartDiv",
+    "chartDivId":"test123",
     "colorsArrStr":[  
        "#377eb8",
        "#e41a1c",
