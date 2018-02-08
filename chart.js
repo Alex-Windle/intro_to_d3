@@ -307,6 +307,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         
         // let paddingWidth = ( x1.step() - x1.bandwidth() ); //calc padding to use for centering grouped bars works best on multiple bars
         let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars works best w/ 2 bars
+        let padding20Percent = x1.bandwidth()/5; 
 
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
@@ -381,7 +382,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             if (d.val) { return yMulti(d.val); } //checks for missing values
                             return yMulti(''); 
                         })
-                        .attr("width", function (d) { return x1.bandwidth(); }) 
+                        .attr("width", function (d) { return x1.bandwidth() - padding20Percent; }) //bar width with 20% padding
                         .attr("height", function (d) { 
                             if (d.val) {
                                 return height - yMulti(d.val); 
@@ -438,9 +439,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .data(function (d, i) { return d; })                 
             .enter().append("line")
             .attr("class", "confidence_indicator")
-            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
+            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  })
             .attr("y1", function (d) { return yMulti(d.lci); }) 
-            .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
+            .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  }) 
             .attr("y2", function (d) { return yMulti(d.hci); }); 
         var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
             ciIntervalCapsTop.selectAll("line") 
@@ -449,12 +450,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("class", "linecap_top")
             .attr("x1", function (d, i) { 
                 if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
             })
             .attr("y1", function (d) { return yMulti(d.hci); })
             .attr("x2", function (d, i) { 
                     if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
             })
             .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
@@ -465,12 +466,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("class", "linecap_bottom")
             .attr("x1", function (d, i) { 
                 if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
             })
             .attr("y1", function (d) { return yMulti(d.lci); })
             .attr("x2", function (d, i) { 
                 if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
             })
             .attr("y2", function (d) { return yMulti(d.lci); });
 
