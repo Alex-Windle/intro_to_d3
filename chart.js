@@ -513,11 +513,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .append("g") //produces new groupings
             .attr("height", legendColorKeyHeight); 
         legendEntry.append("text")
+            .attr("class", "legend_title")
             .attr("height", legendColorKeyHeight)
             .attr("transform", function () {
                 let yAlign = -10; 
-                let paddingLeft = legendColorKeyWidth*2;
-                return "translate(" + paddingLeft + "," + yAlign + ")"
+                return "translate(" + 0 + "," + yAlign + ")"
             })
             .text(legendTitle); 
         var colorKey = legendEntry.append("rect")
