@@ -1,6 +1,7 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
+    console.log(jsonData); 
     //set chart data variables
-    let totalBars = jsonData.length; 
+    // let totalBars = sortedJsonData.length; 
     let barColors = chartConfigObject.colorsArrStr;
     let barDataValues = []; //ordered by json order
     let xAxisCategoryNames = []; 
@@ -15,8 +16,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let displayTrendChart = chartConfigObject.displayTrendChart; 
 //*******************************************************************************************    
     let chartDivId = chartConfigObject.chartDivId; 
-    console.log(chartDivId);
-    console.log('bar data values ', barDataValues);
     //process chart data variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
     let xAxisType = chartConfigObject.xAxisType; 
@@ -24,40 +23,21 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendColumn = chartConfigObject.legendColumn; 
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
-
-    //SORT JSON HERE BEFORE PUSHING DATA INTO ARRAYS!!!!
+    let totalBars = jsonData.length; 
+    
+    //SORT JSON HERE BEFORE PUSHING DATA INTO ARRAYS!
     var sortedJsonData = jsonData.sort(function (a, b) {
-        // console.log('a', a); 
-        // console.log('b ', b); 
-        let aSortNum, bSortNum; 
-
-        function getASortNum (a) {
-            // console.log('pass A into function - ', a[legendColumn]); 
-            let xAxisValue = a[xAxisColumn]; 
-            aSortNum = lookup[xAxisType][xAxisValue].sort; 
-            // console.log('aSortNum...', aSortNum); 
-            return; 
-        }
-        getASortNum(a); 
-
-        function getBSortNum (b) {
-            // console.log('pass A into function - ', a[legendColumn]); 
-            let xAxisValue = b[legendColumn]; 
-            bSortNum = lookup[xAxisType][xAxisValue].sort; 
-            // console.log('bSortNum...', bSortNum); 
-            return; 
-        }
-        getASortNum(b); 
-
-        if (aSortNum < bSortNum) { //a < b
+        let sortColA = a[xAxisColumn]; 
+        let sortColB = b[xAxisColumn];
+        if ( lookup[xAxisType][sortColA].sort < lookup[xAxisType][sortColB].sort ) {
             return -1; 
         }
-        if (bSortNum < aSortNum) { //a > b
+        if ( lookup[xAxisType][sortColB].sort < lookup[xAxisType][sortColA].sort ) {
             return 1; 
         }
         return 0; 
     })
-    console.log(sortedJsonData); 
+    console.log('Is the data sorted correctly? ', sortedJsonData); 
 
     sortedJsonData.forEach(function (obj, i) {
         //get data values
@@ -324,6 +304,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         d3.selectAll("svg > *").remove(); 
 
         //instantiate chart
+        console.log('ID ', chartDivId); 
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); 
         
          //scaling
@@ -356,13 +337,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         console.log('x axis data codes: ', xAxisCategoryDataCodes); 
         console.log('x axis column: ', xAxisColumn); 
         console.log('x axis type: ', xAxisType);
-        console.log('json data: ', jsonData);
+        console.log('json data: ', sortedJsonData);
         console.log('chart config: ', chartConfigObject); 
 
 
 // *********************************************************************************************
 
-        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData) {
+        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
             // BRING IN SORT NUMBER DATA 
                 // GET XAXIS COLUMN (S1) AND XAXISTYPE (STRAT...) FROM CONFIG OBJECT
 
@@ -374,7 +355,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
-                var filteredJSON = jsonData.filter(function (object, index, array) {
+                var filteredJSON = sortedJsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
                 //create key objects
@@ -395,14 +376,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 dataMatrix.push(keysFromFilteredJSON); 
             }
         }
-        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, jsonData); 
-
+        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData); 
+        console.log('DATA MATRIX!!! IS IT IN ORDER? ', dataMatrix); 
 // *********************************************************************************************
 
         function createCIMatrix () {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
-                var filteredJSON = jsonData.filter(function (object, index, array) {
+                var filteredJSON = sortedJsonData.filter(function (object, index, array) {
                     return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
                 })
                 //create key objects
