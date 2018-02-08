@@ -112,8 +112,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     const chartTopBufferDataValue = 10; //verify this value with team
     const chartBottomBufferLegend = totalHeight - margin.bottom + 100; 
     const spaceFromTop = height + margin.top; 
-    const legendColorKeyWidth = 20;
-    const legendColorKeyHeight = 20;
+    const legendGroupingHeight = 22;
+    const legendColorKeyWidth = 14;
+    const legendColorKeyHeight = 14;
     const legendItemHeight = 20;
     const legendItemPadding = 10;
 
@@ -507,33 +508,33 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
             .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
-        var legendEntry =  legend.selectAll("g") //groupings do not exist yet
-            .data(legendCategoryNames) //count data
-            .enter() //run methods once per data count
-            .append("g") //produces new groupings
-            .attr("height", legendColorKeyHeight); 
-        legendEntry.append("text")
+        legend.append("text")
             .attr("class", "legend_title")
-            .attr("height", legendColorKeyHeight)
+            // .attr("height", legendColorKeyHeight)
             .attr("transform", function () {
                 let yAlign = -10; 
-                return "translate(" + 0 + "," + yAlign + ")"
+                return "translate(" + 0 + "," + 0 + ")"
             })
             .text(legendTitle); 
-        var colorKey = legendEntry.append("rect")
-            .attr("width", legendColorKeyWidth)
-            .attr("height", legendColorKeyHeight)
-            .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i;
-                return "translate(0, " + legendItemYPosition + ")";
-            })
-            .style("fill", function (d, i) { return barColors[i]; });
-        var label = legendEntry.append("text")
+        var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
+        legendGrouping.data(legendCategoryNames) //count data
+            .enter() //run methods once per data count
+                .append("g") //produces new groupings
+            .append("rect")
+                .attr("width", legendColorKeyWidth)
+                .attr("height", legendColorKeyHeight)
+                .attr("transform", function (d, i) {
+                let yAlign = legendGroupingHeight*i + 15; return "translate(0, " + yAlign + ")"; })
+                .style("fill", function (d, i) { return barColors[i]; });
+        legendGrouping
+            .data(legendCategoryNames)
+            .enter()
+            .append("text")
             .text(function (d) { return d; }) 
             .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i + 14;
+                let yAlign = (legendGroupingHeight*i) + (legendColorKeyHeight*2);
                 let paddingLeft = legendColorKeyWidth*2; 
-                return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
+                return "translate(" + paddingLeft + ", " + yAlign + ")";
         });
     }
 } 
