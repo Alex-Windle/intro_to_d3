@@ -485,31 +485,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .enter().append("line")
                 .attr("class", "linecap_top")
                 .attr("x1", function (d, i) { 
-                    // console.log('d', d); 
-                    if (!d.hci) { 
-                        console.log("undef d=", d); 
-                        return ''; 
-                        // linecapHalfWidth = 0; 
-                        // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
-                    }
-                    console.log('val d= ', d); 
+                    if (!d.hci) { return ''; }
                     return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
-                    
                 })
-                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth; })
                 .attr("y1", function (d) { return yMulti(d.hci); })
                 .attr("x2", function (d, i) { 
-                     // console.log('d', d); 
-                     if (!d.hci) { 
-                        console.log("undef d=", d); 
-                        return ''; 
-                        // linecapHalfWidth = 0; 
-                        // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
-                    }
-                    console.log('val d= ', d); 
+                     if (!d.hci) { return ''; }
                     return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
-                    
-                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
                 })
                 .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
@@ -519,31 +501,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("line")
             .attr("class", "linecap_bottom")
             .attr("x1", function (d, i) { 
-                // console.log('d', d); 
-                if (!d.hci) { 
-                    console.log("undef d=", d); 
-                    return ''; 
-                    // linecapHalfWidth = 0; 
-                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
-                }
-                console.log('val d= ', d); 
+                if (!d.hci) { return ''; }
                 return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
-                
-                // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
             })
             .attr("y1", function (d) { return yMulti(d.lci); })
             .attr("x2", function (d, i) { 
-                 // console.log('d', d); 
-                 if (!d.hci) { 
-                    console.log("undef d=", d); 
-                    return ''; 
-                    // linecapHalfWidth = 0; 
-                    // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;  
-                }
-                console.log('val d= ', d); 
+                if (!d.hci) { return ''; }
                 return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
-                
-                // return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth; 
             })
             .attr("y2", function (d) { return yMulti(d.lci); });
 
