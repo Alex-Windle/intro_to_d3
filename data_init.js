@@ -77,13 +77,41 @@ var lookup = new Promise(function (resolve, reject) {
 
 // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
 // configuration object - resp_2.json
+// var chartConfigObject = {  
+//     "xAxisColumn":"yr",
+//     "xAxisType":"Year",
+//     "legendColumn":"s1",
+//     "legendType":"Stratification",
+//     "legendTitleStr":"Age Group",
+//     "displayTrendChart":true,
+//     "colorsArrStr":[  
+//        "#377eb8",
+//        "#e41a1c",
+//        "#4daf4a",
+//        "#984ea3",
+//        "#ff7f00",
+//        "#a65628",
+//        "#f781bf",
+//        "#CAB2D6",
+//        "#FF7F00",
+//        "#FDBF6F",
+//        "#FFFF99"
+//     ],
+//     "yAxisTitle":"Age-adjusted Prevalence (%)",
+//     "decimalPlaces":1,
+//     "confidenceIntervalLabel":"95% CI",
+//     "chartDivId": "test123"
+//  }
+
+// TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
+// configuration object - resp_3.json
 var chartConfigObject = {  
-    "xAxisColumn":"yr",
-    "xAxisType":"Year",
-    "legendColumn":"s1",
+    "xAxisColumn":"s1", //3 age ranges OK
+    "xAxisType":"Stratification",
+    "legendColumn":"s2", // DISABL, NODIS
     "legendType":"Stratification",
-    "legendTitleStr":"Age Group",
-    "displayTrendChart":true,
+    "legendTitleStr":"Disability Status",
+    "displayTrendChart":false,
     "colorsArrStr":[  
        "#377eb8",
        "#e41a1c",
@@ -102,33 +130,6 @@ var chartConfigObject = {
     "confidenceIntervalLabel":"95% CI",
     "chartDivId": "test123"
  }
-
-// TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
-// configuration object - resp_3.json
-// var chartConfigObject = {  
-//     "xAxisColumn":"s1", //3 age ranges OK
-//     "xAxisType":"Stratification",
-//     "legendColumn":"s2", // DISABL, NODIS
-//     "legendType":"Stratification",
-//     "legendTitleStr":"Disability Status",
-//     "displayTrendChart":false,
-//     "colorsArrStr":[  
-//        "#377eb8",
-//        "#e41a1c",
-//        "#4daf4a",
-//        "#984ea3",
-//        "#ff7f00",
-//        "#a65628",
-//        "#f781bf",
-//        "#CAB2D6",
-//        "#FF7F00",
-//        "#FDBF6F",
-//        "#FFFF99"
-//     ],
-//     "yAxisTitle":"Age-adjusted Prevalence (%)",
-//     "decimalPlaces":1,
-//     "confidenceIntervalLabel":"95% CI"
-//  }
 
 // TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING)
 // configuration object - resp_4.json
@@ -154,7 +155,8 @@ var chartConfigObject = {
 //     ],
 //     "yAxisTitle":"Age-adjusted Prevalence (%)",
 //     "decimalPlaces":1,
-//     "confidenceIntervalLabel":"95% CI"
+//     "confidenceIntervalLabel":"95% CI",
+//     "chartDivId": "test123"
 //  }
 
 // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 2 RESPONSE GROUPINGS)
@@ -253,9 +255,9 @@ var chartConfigObject = {
 Promise.all([data_1, data_2, data_3, data_4, data_5, data_6, data_7, lookup]).then(function (data) {
     // *only turn on 1 jsonData at a time*
     // var jsonData = data[0]; // TEST FOR SINGLE BAR CHART (1 BAR RENDERS PER EACH OF MULTIPLE RESPONSE GROUPINGS)
-    var jsonData = data[1]; // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
-    // var jsonData = data[2]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
-    // var jsonData = data[3]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING)
+    // var jsonData = data[1]; // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
+    var jsonData = data[2]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
+    // var jsonData = data[3]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING) 
     // var jsonData = data[4]; // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 2 RESPONSE GROUPINGS)
     // var jsonData = data[5]; // TEST FOR MISSING OR NULL DATA VALUES
     // var jsonData = data[6]; // TEST FOR SORTING RESPONSES IN ASCENDING ORDER
