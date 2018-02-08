@@ -289,7 +289,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var x1 = d3.scaleBand()
             .domain(legendCategoryNames)
             .rangeRound([0, x0.bandwidth()])
-            .paddingInner(0.5); 
+            .paddingInner([0.1]);
 
         var yMulti = d3.scaleLinear()
             .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -362,7 +362,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             responseGrouping = responseGrouping.data(xAxisCategoryNames)
             .enter().append("g")
                 .attr("class", "response_grouping")
-                .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; }); 
+                .attr("transform", function (d) { 
+                    console.log(x0(d)); 
+                    return "translate(" + x0(d) + ", " + margin.top + ")"; 
+                }); 
                 
                 //bar data 
                 responseGrouping
@@ -486,6 +489,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .call(d3.axisBottom(x))
             .selectAll("text")
             .style("text-anchor", "end")
+//********************************************************************
+            .attr("width", "50px") // NOT WORKING
+            // MASKING, WRAPPING OR BOTH? ASK JD. 
+//********************************************************************
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", "rotate(-45)");
@@ -523,7 +530,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var label = legendEntry.append("text")
             .text(function (d) { return d; }) 
             .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
+                let legendItemYPosition = legendItemHeight*i + 14;
                 let paddingLeft = legendColorKeyWidth*2; 
                 return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
         });
