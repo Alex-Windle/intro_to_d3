@@ -1,5 +1,5 @@
 function makeChart (chartConfigObject, jsonData, lookup) {
-    //set chart data variables
+    //chart variables
     let barColors = chartConfigObject.colorsArrStr;
     let barDataValues = []; //ordered by json order
     let xAxisCategoryNames = []; 
@@ -14,7 +14,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let displayTrendChart = chartConfigObject.displayTrendChart;    
     let chartDivId = chartConfigObject.chartDivId; 
     
-    //process chart data variables
+    //data used to process chart variables
     let xAxisColumn = chartConfigObject.xAxisColumn; 
     let xAxisType = chartConfigObject.xAxisType; 
     let xAxisCategoryDataCodes = []; 
@@ -22,9 +22,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
     let totalBars = jsonData.length; 
-    
-    //sort data (x-axis responses display by ascending sort number) 
-    var sortedJsonData = jsonData.sort(function (a, b) {
+     
+    var sortedJsonData = jsonData.sort(function (a, b) { //sort data (x-axis responses display by ascending sort number)
         let sortColA = a[xAxisColumn]; 
         let sortColB = b[xAxisColumn];
         if ( lookup[xAxisType][sortColA].sort < lookup[xAxisType][sortColB].sort ) { return -1; }
@@ -32,8 +31,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         return 0; 
     })
 
-    //process data
-    sortedJsonData.forEach(function (obj, i) {
+    sortedJsonData.forEach(function (obj, i) { //process data
         let barDataValue = obj.dv; //get data values
         if (barDataValue) {
             barDataValue = Number(obj.dv.toFixed(decimalPlaces));
@@ -42,17 +40,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             barDataValue = 0;
             barDataValues.push(barDataValue); 
         }
-
         if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {  //save data codes. then, map titles.
             xAxisCategoryDataCodes.push(obj[xAxisColumn]);
         }
         if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
             legendCategoryDataCodes.push(obj[legendColumn]);                  
         }
-
         let confidenceIndicator = { lci: obj.lci, hci: obj.hci };
         confidenceIndicators.push(confidenceIndicator);
-            
         make_tooltip_display(obj);
         return;
     });
@@ -74,8 +69,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         for (var key in lku) {
             if (code === key) {
                 const name = lku[code].name;
-                //check array for existing str
-                if (legendCategoryNames.indexOf(name) < 0) {
+                if (legendCategoryNames.indexOf(name) < 0) { //check array for existing str
                     legendCategoryNames.push(name);
                 }
             } 
@@ -127,6 +121,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     var tooltipDiv = d3.select("#" + chartDivId).append("div") 
         .attr("class", "tooltip")
         .style("opacity", 0);
+    
     //scale
     var x = d3.scaleBand()
         .domain(xAxisCategoryNames) 
@@ -135,12 +130,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     var y = d3.scaleLinear()
         .domain([0, d3.max(barDataValues) + chartTopBufferDataValue]) //set value scaling with buffer
         .range([height, 0]);
+    
     //gridlines in y axis 
     function make_y_gridlines() {
         return d3.axisLeft(y)
     }
 
-    //determine rendering of single or multi-bar chart
+    //commence render of single or multi-bar chart
     if (legendEntryCount === 1) {
         console.log("Display single-bar chart"); 
         makeChartSingleBar();
@@ -152,24 +148,22 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartSingleBar () {
-        //clear previous chart
-        d3.selectAll("svg > *").remove(); 
+        d3.selectAll("svg > *").remove(); //clear previous chart
 
         var chart = d3.select(".chart") 
-        // .attr("height", "700") //refactor for compatibility with ie
         .attr("viewBox", function () { return "0 0 700 700"; })
         .attr("preserveAspectRatio", "xMinYMin meet");
-        //create bar grouping
-        var bar = chart.selectAll("g"); 
-        // add the Y gridlines
-        chart.append("g")			
+        
+        var bar = chart.selectAll("g"); //create bar grouping
+       
+        chart.append("g")  // add the Y gridlines		
             .attr("class", "grid")
             .call(make_y_gridlines()
                 .tickSize(-width) //full graph width
                 .tickFormat("")
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
-        //bars
+        
         bar = bar.data(xAxisCategoryNames)
             .enter()
             .append("g") 
@@ -203,6 +197,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .duration(500)
                     .style("opacity", 0);
             }); 
+        
         //confidence indicator line
         var line = bar.append("line")
             .attr("class", "confidence_indicator")
@@ -211,6 +206,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("y1", function (d) { return y(d.lci); }) 
             .attr("x2", function () { return x.bandwidth() / 6; }) 
             .attr("y2", function (d) { return y(d.hci); });
+        
         //confidence indicator linecaps
         var linecapHalfWidth = 5; 
         var linecap_top = bar.append("line")
@@ -227,6 +223,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("y1", function (d) { return y(d.lci); })
             .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
             .attr("y2", function (d) { return y(d.lci); });
+        
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
         var paddingLeft = 14;         
@@ -235,7 +232,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("id", "y_axis_label")
             .text(yAxisTitle)
             .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-            .attr("text-anchor", "middle");         
+            .attr("text-anchor", "middle");   
+
         //axes
         var xAxis = chart.append("g")
             .attr("class", "axis")             
@@ -251,6 +249,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(y))
             .select(".domain").remove(); //remove y-axis line
+
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
@@ -268,28 +267,21 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 // legendItemYPosition = legendItemYPosition/2; 
                 return "translate(0, " + legendItemYPosition + ")";
             })
-            .style("fill", function (d, i) {
-                return barColors[i];
-            });
+            .style("fill", function (d, i) { return barColors[i]; });
         var label = legendEntry.append("text")
             .text(function (d) { return d; }) 
-            //.attr("height", legendColorKeyHeight)
             .attr("transform", function (d, i) {
-                let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
+                let legendItemYPosition = legendItemHeight*i + 14; 
                 let paddingLeft = legendColorKeyWidth*2; 
                 return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
         });
     }
-
+// **********************************************************************************
     function makeChartMultiBar () {
-        //clear previous chart
-        d3.selectAll("svg > *").remove(); 
+        d3.selectAll("svg > *").remove(); //clear previous chart
 
-        //instantiate chart
-        console.log('ID ', chartDivId); 
-        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); 
+        var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
         
-         //scaling
         var x0 = d3.scaleBand()
             .domain(xAxisCategoryNames)
             .rangeRound([0, width]); 
@@ -303,7 +295,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
             .rangeRound([height, 0]);
 
-        //gridlines in y axis 
         function make_y_gridlines_multi() {
             return d3.axisLeft(yMulti)
         }
@@ -317,19 +308,16 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
-                var filteredJSON = sortedJsonData.filter(function (object, index, array) {
-                    return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
-                })
+                var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
-                    console.log('obj ', object); 
                     return {
                         //keys render bars
                         key: object[xAxisColumn],
                         val: object.dv, 
                         //keys render tooltip 
-                        title: object[xAxisColumn], //shows AGE01. map to semantic english. 
-                        titleLegendColumn: object[legendColumn], //shows DISABL. map to semantic english. 
+                        title: object[xAxisColumn],  
+                        titleLegendColumn: object[legendColumn],  
                         lci: object.lci,
                         hci: object.hci,
                         wn: object.wn
@@ -343,26 +331,18 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         function createCIMatrix () {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
-                var filteredJSON = sortedJsonData.filter(function (object, index, array) {
-                    return object[xAxisColumn] === xAxisCategoryDataCodes[i]; 
-                })
+                var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
                 //create key objects
-                var keysFromFilteredJSON = filteredJSON.map(function (object) {
-                    return {
-                        lci: object.lci,
-                        hci: object.hci
-                    }
-                }); 
+                var keysFromFilteredJSON = filteredJSON.map(function (object) { return { lci: object.lci, hci: object.hci }}); 
                 ciMatrix.push(keysFromFilteredJSON); 
             }  
         }
         createCIMatrix(); 
 
         //set chart attributes
-        //chart.attr("height", "700") //refactor for compatibility with ie
         chart.attr("viewBox", function () { return "0 0 700 700"; })
             .attr("preserveAspectRatio", "xMinYMin meet");
-        
+    
         //append first grouping (container for y gridlines, response groupings, axis, legend, etc)
         chart = chart.append("g")
             
@@ -383,24 +363,24 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .enter().append("g")
                 .attr("class", "response_grouping")
                 .attr("transform", function (d) { return "translate(" + x0(d) + ", " + margin.top + ")"; }); 
-                //...bar data 
+                
+                //bar data 
                 responseGrouping
                     .data(dataMatrix) //set matrix data
                     .selectAll("rect") //container
-                    .data(function(d, i) {console.log('mat ', dataMatrix); return d;}) //process arrays
+                    .data(function(d, i) { return d; }) //process arrays
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
                         .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
                         .attr("y", function (d) { 
                             if (d.val) { return yMulti(d.val); } //checks for missing values
-                            return yMulti(''); //0 
+                            return yMulti(''); 
                         })
                         .attr("width", function (d) { return x1.bandwidth(); }) 
                         .attr("height", function (d) { 
                             if (d.val) {
                                 return height - yMulti(d.val); 
                             }
-                            console.log('rect height error: ', d); 
                             return 0; 
                         })
                         .attr("fill", function (d, i) { return barColors[i]; })
@@ -420,8 +400,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                                     wn = wn.split("").reverse().join("");
                                 }
                                 display = {
-                                    'title': d.title,
-                                    'titleLegendColumn': d.titleLegendColumn,
+                                    'title': lookup[xAxisType][d.title].name,
+                                    'titleLegendColumn': lookup[legendType][d.titleLegendColumn].name,
                                     'dv': d.val,
                                     'lci': d.lci,
                                     'hci': d.hci,
@@ -447,32 +427,31 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             .duration(500)
                             .style("opacity", 0);
                         });  
-
-            //...ci data 
-            var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //create new grouping
-                ciIntervals.selectAll("line")
-                .data(function (d, i) { return d; })                 
-                .enter().append("line")
-                .attr("class", "confidence_indicator")
-                .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
-                .attr("y1", function (d) { return yMulti(d.lci); }) 
-                .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
-                .attr("y2", function (d) { return yMulti(d.hci); }); 
-            var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-                ciIntervalCapsTop.selectAll("line") 
-                .data(function (d, i) { return d; })
-                .enter().append("line")
-                .attr("class", "linecap_top")
-                .attr("x1", function (d, i) { 
+        //...ci data 
+        var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //create new grouping
+            ciIntervals.selectAll("line")
+            .data(function (d, i) { return d; })                 
+            .enter().append("line")
+            .attr("class", "confidence_indicator")
+            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  })
+            .attr("y1", function (d) { return yMulti(d.lci); }) 
+            .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2;  }) 
+            .attr("y2", function (d) { return yMulti(d.hci); }); 
+        var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+            ciIntervalCapsTop.selectAll("line") 
+            .data(function (d, i) { return d; })
+            .enter().append("line")
+            .attr("class", "linecap_top")
+            .attr("x1", function (d, i) { 
+                if (!d.hci) { return ''; }
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
+            })
+            .attr("y1", function (d) { return yMulti(d.hci); })
+            .attr("x2", function (d, i) { 
                     if (!d.hci) { return ''; }
-                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth;   
-                })
-                .attr("y1", function (d) { return yMulti(d.hci); })
-                .attr("x2", function (d, i) { 
-                     if (!d.hci) { return ''; }
-                    return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
-                })
-                .attr("y2", function (d) { return yMulti(d.hci); });
+                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth;   
+            })
+            .attr("y2", function (d) { return yMulti(d.hci); });
         var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
         ciIntervalCapsBottom
             .selectAll("line") 
