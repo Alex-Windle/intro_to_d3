@@ -77,7 +77,7 @@ var lookup = new Promise(function (resolve, reject) {
 // }
 
 // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
-// TEST FOR HTML CHART DESCRIPTION AND TITLE
+// TEST FOR HTML CHART DESCRIPTION, TITLE, SUFFIX VALUE
 // configuration object - resp_2.json
 var chartConfigObject = {  
     "xAxisColumn":"yr",
@@ -104,7 +104,8 @@ var chartConfigObject = {
     "confidenceIntervalLabel":"95% CI",
     "chartDivId": "test123",
     "chartDesc": "This is a test chart description.",
-    "chartTitle": "This is a test chart title"
+    "chartTitle": "This is a test chart title",
+    "dataValueSuffix": "%"
  }
 
 // TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
