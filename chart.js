@@ -193,10 +193,11 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .duration(200)
                     .style("opacity", .9);
                 div.html(`
-                    <h3>${d.title}</h3> 
-                    <h3>${d.dv}${dataValueSuffix}</h3>
-                    CI (${d.lci} - ${d.hci})
-                    <br />WN = ${d.wn}
+                    <strong>${display.title}</strong>
+                    <br /><strong>${display.titleLegendColumn}</strong>
+                    <br /><strong>${display.dv}${dataValueSuffix}</strong>
+                    <br />CI (${display.lci}-${display.hci})
+                    <br />WN = ${display.wn}
                 `)                  
                     .style("left", (d3.event.pageX - 70) + "px")
                     .style("top", (d3.event.pageY - 90) + "px");
@@ -435,14 +436,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             .duration(200)
                             .style('opacity', .9);
                             tooltipDiv.html(`
-                            <h3>${display.title}</h3>
-                            <h3>${display.titleLegendColumn}</h3>
-                            <h3>${display.dv}${dataValueSuffix}</h3>
-                            CI (${display.lci} - ${display.hci})
+                            <strong>${display.title}</strong>
+                            <br /><strong>${display.titleLegendColumn}</strong>
+                            <br /><strong>${display.dv}${dataValueSuffix}</strong>
+                            <br />CI (${display.lci}-${display.hci})
                             <br />WN = ${display.wn}
                             `)
-                            .style("left", (d3.event.pageX - 70) + 'px')
-                            .style("top", (d3.event.pageY - 90) + 'px');
+                            .style("left", (d3.event.pageX + 10) + 'px')
+                            .style("top", (d3.event.pageY - 175) + 'px');
                         })
                         .on("mouseout", function (d) {
                             tooltipDiv.transition()
