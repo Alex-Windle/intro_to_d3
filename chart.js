@@ -179,6 +179,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("height", function (d) { return height - y(d); }) //height
             .attr("width", function (d, i) { return x.bandwidth() / 3; })
             .style("fill", barColors[0]) //hard-coded first color in array
+            .style("opacity", "0.8")
             .data(tooltipDisplay)
             .on("mouseover", function (d, i) {
                 div.transition()
