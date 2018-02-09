@@ -30,7 +30,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     
     //clear previous chart
     d3.selectAll("#" + chartDivId + " > *").remove(); 
-    
+
     var sortedJsonData = jsonData.sort(function (a, b) { //sort data (x-axis responses display by ascending sort number)
         let sortColA = a[xAxisColumn]; 
         let sortColB = b[xAxisColumn];
@@ -60,7 +60,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         return;
     });
 
-    //map codes to category names
+    //map codes to category names (sort order handled)
     xAxisCategoryDataCodes.forEach(function (code) {
         let lku = lookup[xAxisType]; 
         for (var key in lku) {
@@ -71,9 +71,20 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             } 
         }
     });
+    
+    //map codes to legend columns. handle sort. 
+    var legendColumnSortedJsonData = sortedJsonData.sort(function (a, b) { //sort data (legend column responses display by ascending sort number)
+        let sortColA = a[legendColumn]; 
+        let sortColB = b[legendColumn];
+        if ( lookup[legendType][sortColA].sort < lookup[legendType][sortColB].sort ) { return -1; }
+        if ( lookup[legendType][sortColB].sort < lookup[legendType][sortColA].sort ) { return 1; }
+        return 0; 
+    })
+    console.log(legendColumnSortedJsonData); 
 
-    legendCategoryDataCodes.forEach(function (code) {
+    legendColumnSortedJsonData.forEach(function (object) {
         let lku = lookup[legendType]; 
+        let code = object[legendColumn];
         for (var key in lku) {
             if (code === key) {
                 const name = lku[code].name;
@@ -82,7 +93,19 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 }
             } 
         }
-    });
+    })
+    console.log('legend names- ', legendCategoryNames); 
+    // legendCategoryDataCodes.forEach(function (code) {
+    //     let lku = lookup[legendType]; 
+    //     for (var key in lku) {
+    //         if (code === key) {
+    //             const name = lku[code].name;
+    //             if (legendCategoryNames.indexOf(name) < 0) { //check array for existing str
+    //                 legendCategoryNames.push(name);
+    //             }
+    //         } 
+    //     }
+    // });
 
     legendEntryCount = legendCategoryNames.length; 
     
@@ -201,8 +224,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     <br />CI (${display.lci}-${display.hci})
                     <br />WN = ${display.wn}
                 `)                  
-                    .style("left", (d3.event.pageX - 70) + "px")
-                    .style("top", (d3.event.pageY - 90) + "px");
+                    .style("left", (d3.event.pageX + 20) + "px")
+                    .style("top", (d3.event.pageY - 155) + "px");
             })
             .on("mouseout", function (d) {
                 div.transition()
@@ -443,8 +466,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             <br />CI (${display.lci}-${display.hci})
                             <br />WN = ${display.wn}
                             `)
-                            .style("left", (d3.event.pageX + 10) + 'px')
-                            .style("top", (d3.event.pageY - 175) + 'px');
+                            .style("left", (d3.event.pageX + 20) + 'px')
+                            .style("top", (d3.event.pageY - 155) + 'px');
                         })
                         .on("mouseout", function (d) {
                             tooltipDiv.transition()
@@ -532,7 +555,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", function () { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; })
             .text(legendTitle); 
         var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
+//****************************************************************************************** */
+        // console.log(sortedJsonData); 
         legendGrouping.data(legendCategoryNames) //count data
+//****************************************************************************************** */
             .enter() //run methods once per data count
                 .append("g") //produces new groupings
             .append("rect")
