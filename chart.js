@@ -27,7 +27,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     let legendType = chartConfigObject.legendType; 
     let legendCategoryDataCodes = [];        
     let totalBars = jsonData.length; 
-     
+    
+    //clear previous chart
+    d3.selectAll("#" + chartDivId + " > *").remove(); 
+    
     var sortedJsonData = jsonData.sort(function (a, b) { //sort data (x-axis responses display by ascending sort number)
         let sortColA = a[xAxisColumn]; 
         let sortColB = b[xAxisColumn];
@@ -154,7 +157,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     function makeChartSingleBar () {
-        d3.selectAll("svg > *").remove(); //clear previous chart
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
             chart.attr("viewBox", function () { return "0 0 700 700"; })
             .attr("preserveAspectRatio", "xMinYMin meet");
@@ -292,7 +294,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 // *****************************************
 // *****************************************
     function makeChartMultiBar () {
-        d3.selectAll("svg > *").remove(); //clear previous chart
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
         
         //508 compliance
