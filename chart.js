@@ -40,20 +40,20 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     })
 
     sortedJsonData.forEach(function (obj, i) { //process data
-        let barDataValue = obj.dv; //get data values
-        if (barDataValue) {
-            barDataValue = Number(obj.dv.toFixed(decimalPlaces));
-            barDataValues.push(barDataValue);            
-        } else {
-            barDataValue = 0;
-            barDataValues.push(barDataValue); 
-        }
+        // let barDataValue = obj.dv; //get data values
+        // if (barDataValue) {
+        //     barDataValue = Number(obj.dv.toFixed(decimalPlaces));
+        //     barDataValues.push(barDataValue);            
+        // } else {
+        //     barDataValue = 0;
+        //     barDataValues.push(barDataValue); 
+        // }
         if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {  //save data codes. then, map titles.
             xAxisCategoryDataCodes.push(obj[xAxisColumn]);
         }
-        if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
-            legendCategoryDataCodes.push(obj[legendColumn]);                  
-        }
+        // if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
+        //     legendCategoryDataCodes.push(obj[legendColumn]);                  
+        // }
         let confidenceIndicator = { lci: obj.lci, hci: obj.hci };
         confidenceIndicators.push(confidenceIndicator);
         make_tooltip_display(obj);
@@ -83,6 +83,15 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     console.log(legendColumnSortedJsonData); 
 
     legendColumnSortedJsonData.forEach(function (object) {
+        let barDataValue = object.dv; //get data values
+        if (barDataValue) {
+            barDataValue = Number(object.dv.toFixed(decimalPlaces));
+            barDataValues.push(barDataValue);            
+        } else {
+            barDataValue = 0;
+            barDataValues.push(barDataValue); 
+        }
+
         let lku = lookup[legendType]; 
         let code = object[legendColumn];
         for (var key in lku) {
@@ -94,7 +103,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             } 
         }
     })
-    console.log('legend names- ', legendCategoryNames); 
+    // console.log('legend names- ', legendCategoryNames); 
     // legendCategoryDataCodes.forEach(function (code) {
     //     let lku = lookup[legendType]; 
     //     for (var key in lku) {
@@ -214,25 +223,23 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .style("opacity", "0.8")
             .data(tooltipDisplay)
             .on("mouseover", function (d, i) {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                div.html(`
-                    <strong>${display.title}</strong>
-                    <br /><strong>${display.titleLegendColumn}</strong>
-                    <br /><strong>${display.dv}${dataValueSuffix}</strong>
-                    <br />CI (${display.lci}-${display.hci})
-                    <br />WN = ${display.wn}
+                tooltipDiv.transition()
+                .duration(200)
+                .style("opacity", .9);
+                tooltipDiv.html(`
+                <strong>${d.title}</strong>
+                <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
+                <br /><strong>CI (${d.lci} - ${d.hci})</strong>
+                <br />WN = ${d.wn}
                 `)                  
-                    .style("left", (d3.event.pageX + 20) + "px")
-                    .style("top", (d3.event.pageY - 155) + "px");
+                .style("left", (d3.event.pageX + 10) + "px")
+                .style("top", (d3.event.pageY - 160) + "px");
             })
             .on("mouseout", function (d) {
-                div.transition()
+                tooltipDiv.transition()
                     .duration(500)
                     .style("opacity", 0);
             }); 
-        
         //confidence indicator line
         var line = bar.append("line")
             .attr("class", "confidence_indicator")
@@ -241,7 +248,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("y1", function (d) { return y(d.lci); }) 
             .attr("x2", function () { return x.bandwidth() / 6; }) 
             .attr("y2", function (d) { return y(d.hci); });
-        
         //confidence indicator linecaps
         var linecapHalfWidth = 5; 
         var linecap_top = bar.append("line")
@@ -258,7 +264,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("y1", function (d) { return y(d.lci); })
             .attr("x2", function () { return x.bandwidth() / 6 + linecapHalfWidth; })
             .attr("y2", function (d) { return y(d.lci); });
-        
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
         var paddingLeft = 14;         
@@ -267,8 +272,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("id", "y_axis_label")
             .text(yAxisTitle)
             .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-            .attr("text-anchor", "middle");   
-
+            .attr("text-anchor", "middle");         
         //axes
         var xAxis = chart.append("g")
             .attr("class", "axis")             
@@ -284,38 +288,37 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(y))
             .select(".domain").remove(); //remove y-axis line
-          
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
-            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")")
-        legend.append("text")
-            .attr("class", "legend_title")
-            .attr("transform", function () { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; })
-            .text(function () { if (legend.length > 1) { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; } return ''; });  
-        var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
-        legendGrouping.data(legendCategoryNames) //count data
+            .attr("transform", "translate(" + halfTotalWidth + ", " + chartBottomBufferLegend + ")");
+        var legendEntry =  legend.selectAll("g") //groupings do not exist yet
+            .data(legendCategoryNames) //count data
             .enter() //run methods once per data count
-                .append("g") //produces new groupings
-            .append("rect")
-                .attr("width", legendColorKeyWidth)
-                .attr("height", legendColorKeyHeight)
-                .attr("transform", function (d, i) {
-                let yAlign = legendGroupingHeight*i + 15; return "translate(0, " + yAlign + ")"; })
-                .style("fill", function (d, i) { return barColors[i]; });
-        legendGrouping
-            .data(legendCategoryNames)
-            .enter()
-            .append("text")
-            .text(function (d) { return d; }) 
+            .append("g") //produces new groupings
+            .attr("height", legendColorKeyHeight); 
+        var colorKey = legendEntry.append("rect")
+            .attr("width", legendColorKeyWidth)
+            .attr("height", legendColorKeyHeight)
             .attr("transform", function (d, i) {
-                let yAlign = (legendGroupingHeight*i) + (legendColorKeyHeight*2);
+                let legendItemYPosition = legendItemHeight*i;
+                // legendItemYPosition = legendItemYPosition/2; 
+                return "translate(0, " + legendItemYPosition + ")";
+            })
+            .style("fill", function (d, i) {
+                return barColors[i];
+            });
+        var label = legendEntry.append("text")
+            .text(function (d) { return d; }) 
+            //.attr("height", legendColorKeyHeight)
+            .attr("transform", function (d, i) {
+                let legendItemYPosition = legendItemHeight*i + 14; //FIX? 
                 let paddingLeft = legendColorKeyWidth*2; 
-                return "translate(" + paddingLeft + ", " + yAlign + ")";
+                return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
         });
     }
-// *****************************************
-// *****************************************
+//************************************************************************************************ */
+
     function makeChartMultiBar () {
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
         
@@ -554,11 +557,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("class", "legend_title")
             .attr("transform", function () { let yAlign = -10; return "translate(" + 0 + "," + 0 + ")"; })
             .text(legendTitle); 
-        var legendGrouping =  legend.selectAll("g"); //groupings do not exist yet
-//****************************************************************************************** */
-        // console.log(sortedJsonData); 
+        var legendGrouping =  legend.selectAll("g") //groupings do not exist yet
         legendGrouping.data(legendCategoryNames) //count data
-//****************************************************************************************** */
             .enter() //run methods once per data count
                 .append("g") //produces new groupings
             .append("rect")
@@ -566,12 +566,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("height", legendColorKeyHeight)
                 .attr("transform", function (d, i) {
                 let yAlign = legendGroupingHeight*i + 15; return "translate(0, " + yAlign + ")"; })
-                .style("fill", function (d, i) { return barColors[i]; });
+                .style("fill", function (d, i) { return barColors[i]; }); 
         legendGrouping
             .data(legendCategoryNames)
             .enter()
             .append("text")
-            .text(function (d) { return d; }) 
+            .text(function (d) { console.log('write this name...', d); return d; }) 
             .attr("transform", function (d, i) {
                 let yAlign = (legendGroupingHeight*i) + (legendColorKeyHeight*2);
                 let paddingLeft = legendColorKeyWidth*2; 
