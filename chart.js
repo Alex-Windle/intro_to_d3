@@ -32,7 +32,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     d3.selectAll("#" + chartDivId + " > *").remove(); 
 
     //add canvas element
-    d3.select("#" + chartDivId).append("canvas").attr("width", 500).attr("height", 500);
+    d3.select("#" + chartDivId).append("canvas").attr("width", 700).attr("height", 700);
 
     var sortedJsonData = jsonData.sort(function (a, b) { //sort data (x-axis responses display by ascending sort number)
         let sortColA = a[xAxisColumn]; 
