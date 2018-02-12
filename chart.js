@@ -31,6 +31,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     //clear previous chart
     d3.selectAll("#" + chartDivId + " > *").remove(); 
 
+    //add canvas element
+    d3.select("#" + chartDivId).append("canvas").attr("width", 500).attr("height", 500);
+
     var sortedJsonData = jsonData.sort(function (a, b) { //sort data (x-axis responses display by ascending sort number)
         let sortColA = a[xAxisColumn]; 
         let sortColB = b[xAxisColumn];
@@ -226,12 +229,13 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-                tooltipDiv.html(`
-                <strong>${d.title}</strong>
-                <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
-                <br /><strong>CI (${d.lci} - ${d.hci})</strong>
-                <br />WN = ${d.wn}
-                `)                  
+                // tooltipDiv.html(`
+                // <strong>${d.title}</strong>
+                // <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
+                // <br /><strong>CI (${d.lci} - ${d.hci})</strong>
+                // <br />WN = ${d.wn}
+                // `)   
+                tooltipDiv.html("\n<strong>" + d.title + "</strong>\n<br /><strong>" + d.dv + d.dataValueSuffix + "</strong>\n<br /><strong>CI (" + d.lci + " - " + d.hci + ")</strong>\n<br />WN = " + d.wn + "\n")               
                 .style("left", (d3.event.pageX + 10) + "px")
                 .style("top", (d3.event.pageY - 160) + "px");
             })
@@ -462,13 +466,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             tooltipDiv.transition()
                             .duration(200)
                             .style('opacity', .9);
-                            tooltipDiv.html(`
-                            <strong>${display.title}</strong>
-                            <br /><strong>${display.titleLegendColumn}</strong>
-                            <br /><strong>${display.dv}${dataValueSuffix}</strong>
-                            <br />CI (${display.lci}-${display.hci})
-                            <br />WN = ${display.wn}
-                            `)
+                            // tooltipDiv.html(`
+                            // <strong>${display.title}</strong>
+                            // <br /><strong>${display.titleLegendColumn}</strong>
+                            // <br /><strong>${display.dv}${dataValueSuffix}</strong>
+                            // <br />CI (${display.lci}-${display.hci})
+                            // <br />WN = ${display.wn}
+                            // `)
+                            tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />CI (" + display.lci + "-" + display.hci + ")\n<br />WN = " + display.wn + "\n")
                             .style("left", (d3.event.pageX + 20) + 'px')
                             .style("top", (d3.event.pageY - 155) + 'px');
                         })
