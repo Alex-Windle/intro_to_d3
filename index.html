@@ -3,45 +3,70 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+        <!-- <script src="https://npmcdn.com/babel-transform-in-browser@6.4.6/dist/btib.min.js"></script>
+        <script type="text/es2015">  -->
         <style>
-            h3 {
+            #test123 {
+                width: 500px;
+                margin-left: 10px;
+                position: relative; 
+            }
+
+            div#test123 h3 {
                 /* margin: 0;
                 padding: 0; */
             }
-            .chart rect {
+
+            div#test123 .chart rect {
                 /* set inline */
             }
-            .label { 
+            
+            div#test123 canvas {
+                display: block;
+                width: 100%;
+                visibility: hidden;
+            }
+            
+            div#test123 svg {
+                height: 100%;
+                left: 0;
+                position:absolute;
+                top: 0;
+                width: 100%;
+            }
+
+            div#test123 .label { 
                 font: 17px sans-serif; 
                 /* font-weight: bold; */
             }
-            .axis text {               
+            div#test123 .axis text {               
                 font: 15px sans-serif;
             }
             /* remove y-axis ticks and main x-axis */
-            .axis path,
+            div#test123 .axis path,
             .axis line {
                 fill: none;
                 stroke: none; 
             }
-            .grid line {
+            div#test123 .grid line {
                 stroke: darkgray;
                 stroke-opacity: 0.7;
             }
-            .grid path {
+            div#test123 .grid path {
                 stroke-width: 0;
             }
-            .confidence_indicator, .linecap_top, .linecap_bottom {
+            div#test123 .confidence_indicator, .linecap_top, .linecap_bottom {
                 stroke: black;
                 stroke-width: 0.5;
             }
-            .legend_title {
+            div#test123 .legend_title {
                 font-weight: bold; 
             }
-            .legend {
+            div#test123 .legend {
                 font: 14px sans-serif;
             }
-            .tooltip {
+            div#test123 .tooltip {
                 position: absolute;
                 text-align: left;
                 width: 140px;
