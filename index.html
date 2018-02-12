@@ -7,28 +7,28 @@
         <!-- <script src="https://npmcdn.com/babel-transform-in-browser@6.4.6/dist/btib.min.js"></script>
         <script type="text/es2015">  -->
         <style>
-            #test123 {
+            #chartDiv {
                 width: 100%;
                 margin-left: 10px;
                 position: relative; 
             }
 
-            div#test123 h3 {
+            div#chartDiv h3 {
                 /* margin: 0;
                 padding: 0; */
             }
 
-            div#test123 .chart rect {
+            div#chartDiv .chart rect {
                 /* set inline */
             }
             
-            div#test123 canvas {
+            div#chartDiv canvas {
                 display: block;
                 width: 100%;
                 visibility: hidden;
             }
             
-            div#test123 svg {
+            div#chartDiv svg {
                 height: 100%;
                 left: 0;
                 position:absolute;
@@ -36,37 +36,37 @@
                 width: 100%;
             }
 
-            div#test123 .label { 
+            div#chartDiv .label { 
                 font: 17px sans-serif; 
                 /* font-weight: bold; */
             }
-            div#test123 .axis text {               
+            div#chartDiv .axis text {               
                 font: 15px sans-serif;
             }
             /* remove y-axis ticks and main x-axis */
-            div#test123 .axis path,
+            div#chartDiv .axis path,
             .axis line {
                 fill: none;
                 stroke: none; 
             }
-            div#test123 .grid line {
+            div#chartDiv .grid line {
                 stroke: darkgray;
                 stroke-opacity: 0.7;
             }
-            div#test123 .grid path {
+            div#chartDiv .grid path {
                 stroke-width: 0;
             }
-            div#test123 .confidence_indicator, .linecap_top, .linecap_bottom {
+            div#chartDiv .confidence_indicator, .linecap_top, .linecap_bottom {
                 stroke: black;
                 stroke-width: 0.5;
             }
-            div#test123 .legend_title {
+            div#chartDiv .legend_title {
                 font-weight: bold; 
             }
-            div#test123 .legend {
+            div#chartDiv .legend {
                 font: 14px sans-serif;
             }
-            div#test123 .tooltip {
+            div#chartDiv .tooltip {
                 position: absolute;
                 text-align: left;
                 width: 140px;
@@ -83,7 +83,7 @@
     </head>
     <body>
         <!-- hard coded id for testing purposes. it will match a correponding div on the main page -->
-        <div id="test123"></div> 
+        <div id="chartDiv"></div> 
         <!-- <svg class="chart"></svg> -->
         <script src="./chart.js"></script>
         <script src="./data_init.js"></script>
