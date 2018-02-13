@@ -43,20 +43,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     })
 
     sortedJsonData.forEach(function (obj, i) { //process data
-        // let barDataValue = obj.dv; //get data values
-        // if (barDataValue) {
-        //     barDataValue = Number(obj.dv.toFixed(decimalPlaces));
-        //     barDataValues.push(barDataValue);            
-        // } else {
-        //     barDataValue = 0;
-        //     barDataValues.push(barDataValue); 
-        // }
         if (xAxisCategoryDataCodes.indexOf(obj[xAxisColumn]) < 0) {  //save data codes. then, map titles.
             xAxisCategoryDataCodes.push(obj[xAxisColumn]);
         }
-        // if (legendCategoryDataCodes.indexOf(obj[legendColumn]) < 0) {
-        //     legendCategoryDataCodes.push(obj[legendColumn]);                  
-        // }
         let confidenceIndicator = { lci: obj.lci, hci: obj.hci };
         confidenceIndicators.push(confidenceIndicator);
         make_tooltip_display(obj);
@@ -106,18 +95,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             } 
         }
     })
-    // console.log('legend names- ', legendCategoryNames); 
-    // legendCategoryDataCodes.forEach(function (code) {
-    //     let lku = lookup[legendType]; 
-    //     for (var key in lku) {
-    //         if (code === key) {
-    //             const name = lku[code].name;
-    //             if (legendCategoryNames.indexOf(name) < 0) { //check array for existing str
-    //                 legendCategoryNames.push(name);
-    //             }
-    //         } 
-    //     }
-    // });
 
     legendEntryCount = legendCategoryNames.length; 
     
@@ -181,24 +158,35 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     }
 
     //commence render of single or multi-bar chart
-    if (legendEntryCount === 1) {
+    if (chartConfigObject.displayTrendChart == false && legendEntryCount === 1) {
         console.log("Display single-bar chart"); 
         makeChartSingleBar();
-    } else if (legendEntryCount >= 2) {
+    } else if (chartConfigObject.displayTrendChart == false && legendEntryCount >= 2) {
         console.log("Display multi-bar chart");
         makeChartMultiBar();
+    } else if (chartConfigObject.displayTrendChart == true) {
+        console.log("Display trend chart");
+        makeTrendChart(); 
     } else {
         console.log("Error");         
     }
 
+//*************************************************************************************************//
+    
+    function makeTrendChart () {
+
+    }
+
+//*************************************************************************************************//
+    
     function makeChartSingleBar () {
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
             chart.attr("viewBox", function () { return "0 0 700 700"; })
             .attr("preserveAspectRatio", "xMinYMin meet");
         
-         //508 compliance
-         d3.select("#" + chartDivId).append("desc").html(chartDesc); 
-         d3.select("#" + chartDivId).append("title").html(chartTitle); 
+        //508 compliance
+        d3.select("#" + chartDivId).append("desc").html(chartDesc); 
+        d3.select("#" + chartDivId).append("title").html(chartTitle); 
         
         var bar = chart.selectAll("g"); //create bar grouping
         chart.append("g")  // add the Y gridlines		
@@ -321,7 +309,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 return "translate(" + paddingLeft + ", " + legendItemYPosition + ")";
         });
     }
-//************************************************************************************************ */
+
+//*************************************************************************************************//
 
     function makeChartMultiBar () {
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
@@ -396,10 +385,8 @@ function makeChart (chartConfigObject, jsonData, lookup) {
     
         //append first grouping (container for y gridlines, response groupings, axis, legend, etc)
         chart = chart.append("g")
-            
             // resp grouping...
             var responseGrouping = chart.selectAll("g")
-            
             // y gridlines (inserted for visual layering. refactor later as a sorted element)
             chart.append("g")			
             .attr("class", "grid")
@@ -408,7 +395,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .tickFormat("")
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
-            
             //...resp grouping cont'd
             responseGrouping = responseGrouping.data(xAxisCategoryNames)
             .enter().append("g")
@@ -416,8 +402,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 .attr("transform", function (d) { 
                     return "translate(" + x0(d) + ", " + margin.top + ")"; 
                 }); 
-                
-                //bar data 
                 responseGrouping
                     .data(dataMatrix) //set matrix data
                     .selectAll("rect") //container
@@ -525,7 +509,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
             })
             .attr("y2", function (d) { return yMulti(d.lci); });
-
         //axes labels
         var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
         var paddingLeft = 14;         
@@ -535,7 +518,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .text(yAxisTitle)
             .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
             .attr("text-anchor", "middle");   
-
         //axes
         var xAxis = chart.append("g")
             .attr("class", "axis")             
@@ -543,10 +525,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .call(d3.axisBottom(x))
             .selectAll("text")
             .style("text-anchor", "end")
-//********************************************************************
+//***********************************************
             .attr("width", "50px") // NOT WORKING
-            // MASKING, WRAPPING OR BOTH? ASK JD. 
-//********************************************************************
+            // MASKING, WRAPPING OR BOTH? ASK JD.
+//***********************************************
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", "rotate(-45)");
@@ -555,7 +537,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
             .call(d3.axisLeft(yMulti))
             .select(".domain").remove(); //remove y-axis line
-        
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
@@ -567,7 +548,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         var legendGrouping =  legend.selectAll("g") //groupings do not exist yet
         legendGrouping.data(legendCategoryNames) //count data
             .enter() //run methods once per data count
-                .append("g") //produces new groupings
+            .append("g") //produces new groupings
             .append("rect")
                 .attr("width", legendColorKeyWidth)
                 .attr("height", legendColorKeyHeight)
@@ -578,7 +559,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             .data(legendCategoryNames)
             .enter()
             .append("text")
-            .text(function (d) { console.log('write this name...', d); return d; }) 
+            .text(function (d) { return d; }) 
             .attr("transform", function (d, i) {
                 let yAlign = (legendGroupingHeight*i) + (legendColorKeyHeight*2);
                 let paddingLeft = legendColorKeyWidth*2; 
