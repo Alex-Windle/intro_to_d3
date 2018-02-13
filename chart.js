@@ -474,8 +474,10 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                             // <br />WN = ${display.wn}
                             // `)
                             tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />CI (" + display.lci + "-" + display.hci + ")\n<br />WN = " + display.wn + "\n")
-                            .style("left", (d3.event.pageX + 20) + 'px')
-                            .style("top", (d3.event.pageY - 155) + 'px');
+                            .style("left", (d3.event.pageX + 10 - this.clientLeft - window.pageXOffset) + "px")
+                            .style("top", (d3.event.pageY - 150 - this.clientTop - window.pageYOffset) + "px"); 
+                            console.log(this.clientLeft); 
+                            console.log(this.clientTop); 
                         })
                         .on("mouseout", function (d) {
                             tooltipDiv.transition()
