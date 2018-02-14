@@ -47,6 +47,12 @@ let data_8 = new Promise(function (resolve, reject) {
 	})
 })
 
+let data_9 = new Promise(function (resolve, reject) {
+	d3.json("./resp_9.json", function (data) {
+		resolve(data)
+	})
+})
+
 //load lookup
 var lookup = new Promise(function (resolve, reject) {
 	d3.json("./lookup.json", function (data) {
@@ -335,9 +341,10 @@ Promise.all([data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, loo
     // var jsonData = data[2]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
     // var jsonData = data[3]; // TEST FOR GROUPED BAR CHART (2 BARS RENDER FOR 1 RESPONSE GROUPING) 
     // var jsonData = data[4]; // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 2 RESPONSE GROUPINGS)
-    var jsonData = data[5]; // TEST FOR MISSING OR NULL DATA VALUES
+    // var jsonData = data[5]; // TEST FOR MISSING OR NULL DATA VALUES
     // var jsonData = data[6]; // TEST FOR SORTING RESPONSES IN ASCENDING ORDER
     // var jsonData = data[7]; // TEST FOR SORTING LEGEND COLUMN IN ASCENDING ORDER
-    var lookup = data[8]; 
+    var jsonData = data[8]; // TEST LINE CHART
+    var lookup = data[9]; 
     makeChart(chartConfigObject, jsonData, lookup); 
 });
