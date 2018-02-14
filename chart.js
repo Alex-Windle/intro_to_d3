@@ -1,4 +1,4 @@
-function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData); 
+function makeChart (chartConfigObject, jsonData, lookup) { 
     //508 compliance
     let chartDesc = chartConfigObject.chartDesc; 
     let chartTitle = chartConfigObject.chartTitle; 
@@ -14,7 +14,7 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
     let confidenceIndicators = [];             
     let confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel; 
     let decimalPlaces = chartConfigObject.decimalPlaces; 
-    let tooltipDisplay = []; console.log('tooltip display ', tooltipDisplay);
+    let tooltipDisplay = [];
     let displayTrendChart = chartConfigObject.displayTrendChart;    
     let chartDivId = chartConfigObject.chartDivId; 
     let dataValueSuffix = chartConfigObject.dataValueSuffix;
@@ -72,7 +72,6 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
         if ( lookup[legendType][sortColB].sort < lookup[legendType][sortColA].sort ) { return 1; }
         return 0; 
     })
-    console.log(legendColumnSortedJsonData); 
 
     legendColumnSortedJsonData.forEach(function (object) {
         let barDataValue = object.dv; //get data values
@@ -99,7 +98,6 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
     legendEntryCount = legendCategoryNames.length; 
     
     function make_tooltip_display (obj, chartConfigObject) {   
-        console.log('chart config inside func: ', chartConfigObject); 
         let column = obj[xAxisColumn];
         let title = lookup[xAxisType][column].name; 
         let wn = String(obj.wn); 
@@ -116,6 +114,7 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
         tooltipDisplay.push({
             title: title,
             dv: obj.dv,
+            dataValueSuffix: chartConfigObject.dataValueSuffix,
             lci: obj.lci, 
             hci: obj.hci,
             sampleSizeLabel: chartConfigObject.sampleSizeLabel,
@@ -167,31 +166,35 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
         console.log("Display multi-bar chart");
         makeChartMultiBar();
     } else if (chartConfigObject.displayTrendChart == true) {
-        console.log("Display multi-bar chart");
-        makeChartMultiBar(); 
-        // console.log("Display trend chart");
-        // makeTrendChart(); 
+        console.log("Display trend chart");
+        makeTrendChart(); 
     } else {
         console.log("Error");         
     }
 
 //*************************************************************************************************//
     
-    function makeTrendChart () {
+    function makeTrendChart () { 
+        jsonData.forEach(function (d) { console.log(d.yr); });
+        console.log('category names ', xAxisCategoryNames); 
         var chart = d3.select("#" + chartDivId).append("svg").attr("class", "chart"); //instantiate chart
         
         //508 compliance
         d3.select("#" + chartDivId).append("desc").html(chartDesc); 
         d3.select("#" + chartDivId).append("title").html(chartTitle); 
         
-        var x0 = d3.scaleBand()
+        var x3 = d3.scaleBand()
             .domain(xAxisCategoryNames)
-            .rangeRound([0, width]); 
+            .range([0, width]);
+
+        // var x0 = d3.scaleBand()
+        //     .domain(xAxisCategoryNames)
+        //     .rangeRound([0, width]); 
  
-        var x1 = d3.scaleBand()
-            .domain(legendCategoryNames)
-            .rangeRound([0, x0.bandwidth()])
-            .paddingInner(0.5);
+        // var x1 = d3.scaleBand()
+        //     .domain(legendCategoryNames)
+        //     .rangeRound([0, x0.bandwidth()])
+        //     .paddingInner(0.5);
 
         var yMulti = d3.scaleLinear()
             .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -201,48 +204,52 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
             return d3.axisLeft(yMulti)
         }
 
+        function make_x_gridlines() {
+            return d3.axisBottom(x3)
+        }
+
         //data
-        let dataMatrix = []; //maps bar data vals
-        let ciMatrix = []; //maps CI intervals
-        const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
+        // let dataMatrix = []; //maps bar data vals
+        // let ciMatrix = []; //maps CI intervals
+        // const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
         
         // let paddingWidth = ( x1.step() - x1.bandwidth() ); //calc padding to use for centering grouped bars works best on multiple bars
-        let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars works best w/ 2 bars
-        let padding20Percent = x1.bandwidth()/5; 
+        // let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars works best w/ 2 bars
+        // let padding20Percent = x1.bandwidth()/5; 
 
-        function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
-            for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
-                //loop through each response category. filter for json data matches and return 
-                var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
-                //create key objects
-                var keysFromFilteredJSON = filteredJSON.map(function (object) {
-                    return {
-                        //keys render bars
-                        key: object[xAxisColumn],
-                        val: object.dv, 
-                        //keys render tooltip 
-                        title: object[xAxisColumn],  
-                        titleLegendColumn: object[legendColumn],  
-                        lci: object.lci,
-                        hci: object.hci,
-                        wn: object.wn
-                    }
-                }); 
-                dataMatrix.push(keysFromFilteredJSON); 
-            }
-        }
-        createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData); 
+        // function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
+        //     for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
+        //         //loop through each response category. filter for json data matches and return 
+        //         var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
+        //         //create key objects
+        //         var keysFromFilteredJSON = filteredJSON.map(function (object) {
+        //             return {
+        //                 //keys render bars
+        //                 key: object[xAxisColumn],
+        //                 val: object.dv, 
+        //                 //keys render tooltip 
+        //                 title: object[xAxisColumn],  
+        //                 titleLegendColumn: object[legendColumn],  
+        //                 lci: object.lci,
+        //                 hci: object.hci,
+        //                 wn: object.wn
+        //             }
+        //         }); 
+        //         dataMatrix.push(keysFromFilteredJSON); 
+        //     }
+        // }
+        // createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData); 
 
-        function createCIMatrix () {
-            for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
-                //loop through each response category. filter for json data matches and return 
-                var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
-                //create key objects
-                var keysFromFilteredJSON = filteredJSON.map(function (object) { return { lci: object.lci, hci: object.hci }}); 
-                ciMatrix.push(keysFromFilteredJSON); 
-            }  
-        }
-        createCIMatrix(); 
+        // function createCIMatrix () {
+        //     for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
+        //         //loop through each response category. filter for json data matches and return 
+        //         var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
+        //         //create key objects
+        //         var keysFromFilteredJSON = filteredJSON.map(function (object) { return { lci: object.lci, hci: object.hci }}); 
+        //         ciMatrix.push(keysFromFilteredJSON); 
+        //     }  
+        // }
+        // createCIMatrix(); 
 
         //set chart attributes
         chart.attr("viewBox", function () { return "0 0 700 700"; })
@@ -257,151 +264,164 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
             .attr("class", "grid")
             .call(make_y_gridlines_multi() 
                 .tickSize(-width) //full graph width
-                .tickFormat("")
             )
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+            //x gridlines 
+            chart.append("g")
+            .attr("class", "grid")
+            .call(make_x_gridlines()
+                .tickSize(-height)
+            )
+            .attr("transform", function () { let xAxisHeight = height + margin.top; return "translate(0," + xAxisHeight + ")";  });
             //...resp grouping cont'd
-            responseGrouping = responseGrouping.data(xAxisCategoryNames)
-            .enter().append("g")
-                .attr("class", "response_grouping")
-                .attr("transform", function (d) { 
-                    return "translate(" + x0(d) + ", " + margin.top + ")"; 
-                }); 
-                responseGrouping
-                    .data(dataMatrix) //set matrix data
-                    .selectAll("rect") //container
-                    .data(function(d, i) { return d; }) //process arrays
-                        .enter().append("rect") //render matrix into grouped bars
-                        .attr("class", "bar") 
-                        .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
-                        .attr("y", function (d) { 
-                            if (d.val) { return yMulti(d.val); } //checks for missing values
-                            return yMulti(''); 
-                        })
-                        .attr("width", function (d) { return x1.bandwidth() - padding20Percent; }) //bar width with 20% padding
-                        .attr("height", function (d) { 
-                            if (d.val) {
-                                return height - yMulti(d.val); 
-                            }
-                            return 0; 
-                        })
-                        .attr("fill", function (d, i) { return barColors[i]; })
-                        .style("opacity", "0.8")
-                        .on("mouseover", function (d, i) {
-                            let display, title; 
-                            function make_tooltip_display(d, xAxisColumn){
-                                let column = d.key; 
-                                let title = lookup[xAxisType][column].name; 
-                                let wn = String(d.wn); 
-                                if (wn.length > 3 && wn.length < 7) {
-                                    wn = wn.split("").reverse().join("");
-                                    wn = wn.substring(0,3) + "," + wn.substring(3);
-                                    wn = wn.split("").reverse().join("");
-                                } else if (wn.length > 6 && wn.length < 10) {
-                                    wn = wn.split("").reverse().join("");
-                                    wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
-                                    wn = wn.split("").reverse().join("");
-                                }
-                                display = {
-                                    'title': lookup[xAxisType][d.title].name,
-                                    'titleLegendColumn': lookup[legendType][d.titleLegendColumn].name,
-                                    'dv': d.val,
-                                    'lci': d.lci,
-                                    'hci': d.hci,
-                                    'wn': wn
-                                }
-                            }
-                            make_tooltip_display(d, xAxisColumn); 
-                            tooltipDiv.transition()
-                            .duration(200)
-                            .style('opacity', .9);
-                            // tooltipDiv.html(`
-                            // <strong>${display.title}</strong>
-                            // <br /><strong>${display.titleLegendColumn}</strong>
-                            // <br /><strong>${display.dv}${dataValueSuffix}</strong>
-                            // <br />CI (${display.lci}-${display.hci})
-                            // <br />WN = ${display.wn}
-                            // `)
-                            tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />CI (" + display.lci + "-" + display.hci + ")\n<br />WN = " + display.wn + "\n")
-                            .style("left", (d3.event.pageX + 10 - this.clientLeft - window.pageXOffset) + "px")
-                            .style("top", (d3.event.pageY - 150 - this.clientTop - window.pageYOffset) + "px"); 
-                            console.log(this.clientLeft); 
-                            console.log(this.clientTop); 
-                        })
-                        .on("mouseout", function (d) {
-                            tooltipDiv.transition()
-                            .duration(500)
-                            .style("opacity", 0);
-                        });  
+            // responseGrouping = responseGrouping.data(xAxisCategoryNames)
+            // .enter().append("g")
+            //     .attr("class", "response_grouping")
+            //     .attr("transform", function (d) {
+            //         console.log('data ', d);  
+            //         return "translate(" + x(d) + ", " + margin.top + ")"; 
+            //     }); 
+                // responseGrouping
+                //     .data(dataMatrix) //set matrix data
+                    //Render responses flush to the start and end of graph
+                    
+                    //Add vertical gridlines
+                    //Render lines
+                    //Render data points
+                    //Render tool tips
+
+                    // .selectAll("rect") //container
+                    // .data(function(d, i) { return d; }) //process arrays
+                    //     .enter().append("rect") //render matrix into grouped bars
+                    //     .attr("class", "bar") 
+                    //     .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
+                    //     .attr("y", function (d) { 
+                    //         if (d.val) { return yMulti(d.val); } //checks for missing values
+                    //         return yMulti(''); 
+                    //     })
+                    //     .attr("width", function (d) { return x1.bandwidth() - padding20Percent; }) //bar width with 20% padding
+                    //     .attr("height", function (d) { 
+                    //         if (d.val) {
+                    //             return height - yMulti(d.val); 
+                    //         }
+                    //         return 0; 
+                    //     })
+                    //     .attr("fill", function (d, i) { return barColors[i]; })
+                    //     .style("opacity", "0.8");
+                        // .on("mouseover", function (d, i) {
+                        //     let display, title; 
+                        //     function make_tooltip_display(d, xAxisColumn){
+                        //         let column = d.key; 
+                        //         let title = lookup[xAxisType][column].name; 
+                        //         let wn = String(d.wn); 
+                        //         if (wn.length > 3 && wn.length < 7) {
+                        //             wn = wn.split("").reverse().join("");
+                        //             wn = wn.substring(0,3) + "," + wn.substring(3);
+                        //             wn = wn.split("").reverse().join("");
+                        //         } else if (wn.length > 6 && wn.length < 10) {
+                        //             wn = wn.split("").reverse().join("");
+                        //             wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
+                        //             wn = wn.split("").reverse().join("");
+                        //         }
+                        //         display = {
+                        //             'title': lookup[xAxisType][d.title].name,
+                        //             'titleLegendColumn': lookup[legendType][d.titleLegendColumn].name,
+                        //             'dv': d.val,
+                        //             'lci': d.lci,
+                        //             'hci': d.hci,
+                        //             'wn': wn
+                        //         }
+                        //     }
+                        //     make_tooltip_display(d, xAxisColumn); 
+                        //     tooltipDiv.transition()
+                        //     .duration(200)
+                        //     .style('opacity', .9);
+                        //     // tooltipDiv.html(`
+                        //     // <strong>${display.title}</strong>
+                        //     // <br /><strong>${display.titleLegendColumn}</strong>
+                        //     // <br /><strong>${display.dv}${dataValueSuffix}</strong>
+                        //     // <br />CI (${display.lci}-${display.hci})
+                        //     // <br />WN = ${display.wn}
+                        //     // `)
+                        //     tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />CI (" + display.lci + "-" + display.hci + ")\n<br />WN = " + display.wn + "\n")
+                        //     .style("left", (d3.event.pageX + 10 - this.clientLeft - window.pageXOffset) + "px")
+                        //     .style("top", (d3.event.pageY - 150 - this.clientTop - window.pageYOffset) + "px"); 
+                        // })
+                        // .on("mouseout", function (d) {
+                        //     tooltipDiv.transition()
+                        //     .duration(500)
+                        //     .style("opacity", 0);
+                        // });  
         //...ci data 
-        var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //create new grouping
-            ciIntervals.selectAll("line")
-            .data(function (d, i) { return d; })                 
-            .enter().append("line")
-            .attr("class", "confidence_indicator")
-            .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  })
-            .attr("y1", function (d) { return yMulti(d.lci); }) 
-            .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  }) 
-            .attr("y2", function (d) { return yMulti(d.hci); }); 
-        var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
-            ciIntervalCapsTop.selectAll("line") 
-            .data(function (d, i) { return d; })
-            .enter().append("line")
-            .attr("class", "linecap_top")
-            .attr("x1", function (d, i) { 
-                if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
-            })
-            .attr("y1", function (d) { return yMulti(d.hci); })
-            .attr("x2", function (d, i) { 
-                    if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
-            })
-            .attr("y2", function (d) { return yMulti(d.hci); });
-        var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
-        ciIntervalCapsBottom
-            .selectAll("line") 
-            .data(function (d, i) { return d; })
-            .enter().append("line")
-            .attr("class", "linecap_bottom")
-            .attr("x1", function (d, i) { 
-                if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
-            })
-            .attr("y1", function (d) { return yMulti(d.lci); })
-            .attr("x2", function (d, i) { 
-                if (!d.hci) { return ''; }
-                return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
-            })
-            .attr("y2", function (d) { return yMulti(d.lci); });
+        // var ciIntervals = responseGrouping.data(ciMatrix).append("g"); //create new grouping
+        //     ciIntervals.selectAll("line")
+        //     .data(function (d, i) { return d; })                 
+        //     .enter().append("line")
+        //     .attr("class", "confidence_indicator")
+        //     .attr("x1", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  })
+        //     .attr("y1", function (d) { return yMulti(d.lci); }) 
+        //     .attr("x2", function (d, i) {  return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - padding20Percent/2;  }) 
+        //     .attr("y2", function (d) { return yMulti(d.hci); }); 
+        // var ciIntervalCapsTop = ciIntervals.data(ciMatrix).append("g"); 
+        //     ciIntervalCapsTop.selectAll("line") 
+        //     .data(function (d, i) { return d; })
+        //     .enter().append("line")
+        //     .attr("class", "linecap_top")
+        //     .attr("x1", function (d, i) { 
+        //         if (!d.hci) { return ''; }
+        //         return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
+        //     })
+        //     .attr("y1", function (d) { return yMulti(d.hci); })
+        //     .attr("x2", function (d, i) { 
+        //             if (!d.hci) { return ''; }
+        //         return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
+        //     })
+        //     .attr("y2", function (d) { return yMulti(d.hci); });
+        // var ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append("g"); 
+        // ciIntervalCapsBottom
+        //     .selectAll("line") 
+        //     .data(function (d, i) { return d; })
+        //     .enter().append("line")
+        //     .attr("class", "linecap_bottom")
+        //     .attr("x1", function (d, i) { 
+        //         if (!d.hci) { return ''; }
+        //         return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 - linecapHalfWidth - padding20Percent/2;   
+        //     })
+        //     .attr("y1", function (d) { return yMulti(d.lci); })
+        //     .attr("x2", function (d, i) { 
+        //         if (!d.hci) { return ''; }
+        //         return paddingWidth + margin.left + x1.bandwidth()*i + x1.bandwidth()/2 + linecapHalfWidth - padding20Percent/2;   
+        //     })
+        //     .attr("y2", function (d) { return yMulti(d.lci); });
         //axes labels
-        var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
-        var paddingLeft = 14;         
-        var yAxisLabel = chart.append("text")
-            .attr("class", "label")
-            .attr("id", "y_axis_label")
-            .text(yAxisTitle)
-            .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
-            .attr("text-anchor", "middle");   
+        // var yAxisMidpoint = (height + margin.top)/2 + margin.top;    
+        // var paddingLeft = 14;         
+        // var yAxisLabel = chart.append("text")
+        //     .attr("class", "label")
+        //     .attr("id", "y_axis_label")
+        //     .text(yAxisTitle)
+        //     .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")                
+        //     .attr("text-anchor", "middle");   
         //axes
-        var xAxis = chart.append("g")
-            .attr("class", "axis")             
-            .attr("transform", "translate(" + margin.left + ", " + spaceFromTop + ")")
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .style("text-anchor", "end")
+        // console.log('names ', xAxisCategoryDataCodes);
+        // var xAxis = chart.append("g")
+        //     .attr("class", "axis")            
+        //     .attr("transform", "translate(0, " + spaceFromTop + ")")
+        //     .call(d3.axisBottom(x3)); 
+            // .selectAll("text")
+            // .style("text-anchor", "end");
 //***********************************************
-            .attr("width", "50px") // NOT WORKING
+            // .attr("width", "50px") // NOT WORKING
             // MASKING, WRAPPING OR BOTH? ASK JD.
 //***********************************************
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-45)");
-        var yAxis = chart.append("g")
-            .attr("class", "axis")
-            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-            .call(d3.axisLeft(yMulti))
-            .select(".domain").remove(); //remove y-axis line
+            // .attr("dx", "-.8em")
+            // .attr("dy", ".15em")
+            // .attr("transform", "rotate(-45)");
+        // var yAxis = chart.append("g")
+        //     .attr("class", "axis")
+        //     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+        //     .call(d3.axisLeft(yMulti))
+        //     .select(".domain").remove(); //remove y-axis line
         //legend 
         var legend = chart.append("g") //create & position legend area
             .attr("class", "legend")
@@ -472,16 +492,18 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
                 tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
+                console.log(chartConfigObject);
                 // tooltipDiv.html(`
                 // <strong>${d.title}</strong>
                 // <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
                 // <br /><strong>CI (${d.lci} - ${d.hci})</strong>
                 // <br />WN = ${d.wn}
                 // `)   
-                console.log('label ', d.sampleSizeLabel); 
                 tooltipDiv.html("\n<strong>" + d.title + "</strong>\n<br /><strong>" + d.dv + d.dataValueSuffix + "</strong>\n<br /><strong>95% CI (" + d.lci + " - " + d.hci + ")</strong>\n<br />" + d.sampleSizeLabel + ":" + d.wn + "\n")               
-                .style("left", (d3.event.pageX + 10) + "px")
-                .style("top", (d3.event.pageY - 160) + "px");
+                // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
+                // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
+                .style("left", (d3.event.pageX - 75 - this.clientLeft - window.pageXOffset) + "px") //compromise chrm/ie
+                .style("top", (d3.event.pageY - 350 - this.clientTop - window.pageYOffset) + "px"); 
             })
             .on("mouseout", function (d) {
                 tooltipDiv.transition()
@@ -715,10 +737,10 @@ function makeChart (chartConfigObject, jsonData, lookup) { console.log(jsonData)
                             // <br />WN = ${display.wn}
                             // `)
                             tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />95% CI (" + display.lci + "-" + display.hci + ")\n<br />" + display.sampleSizeLabel + ":" + display.wn + "\n")
-                            .style("left", (d3.event.pageX + 10 - this.clientLeft - window.pageXOffset) + "px")
-                            .style("top", (d3.event.pageY - 150 - this.clientTop - window.pageYOffset) + "px"); 
-                            console.log(this.clientLeft); 
-                            console.log(this.clientTop); 
+                            // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
+                            // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
+                            .style("left", (d3.event.pageX - 75 - this.clientLeft - window.pageXOffset) + "px") //compromise chrm/ie
+                            .style("top", (d3.event.pageY - 350 - this.clientTop - window.pageYOffset) + "px"); 
                         })
                         .on("mouseout", function (d) {
                             tooltipDiv.transition()
