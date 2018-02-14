@@ -334,7 +334,7 @@ var chartConfigObject = {
     "chartDesc508":"chart 508 desc goes here"
  }
 
-Promise.all([data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, lookup]).then(function (data) {
+Promise.all([data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, data_9, lookup]).then(function (data) {
     // *only turn on 1 jsonData at a time*
     // var jsonData = data[0]; // TEST FOR SINGLE BAR CHART (1 BAR RENDERS PER EACH OF MULTIPLE RESPONSE GROUPINGS)
     // var jsonData = data[1]; // TEST FOR GROUPED BAR CHART (3 BARS RENDER PER EACH OF 3 RESPONSE GROUPINGS)
