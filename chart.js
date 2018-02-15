@@ -73,11 +73,20 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         return 0; 
     })
 
-    legendColumnSortedJsonData.forEach(function (object) {
+    legendColumnSortedJsonData.forEach(function (object) { //UPDATED BAR DATA VALUES. DOES THIS POPULATE THE HOVER? 
         let barDataValue = object.dv; //get data values
         if (barDataValue) {
-            barDataValue = Number(object.dv.toFixed(decimalPlaces));
-            barDataValues.push(barDataValue);            
+            var arr = barDataValue.toString().split(''); 
+            if (arr.indexOf('.') >= 0) { //check if num has a decimal 
+                barDataValue = Number(object.dv.toFixed(decimalPlaces));
+                barDataValues.push(barDataValue);  
+            } else { //add decimal 
+                arr.push('.0'); 
+                arr = arr.join('');
+                barDataValue = Number(arr); 
+                barDataValues.push(barDataValue);
+            }
+                      
         } else {
             barDataValue = 0;
             barDataValues.push(barDataValue); 
@@ -111,17 +120,61 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
             wn = wn.split("").reverse().join("");
         }
+         //handle decimals 
+         var hciArr = obj.hci.toString().split('');
+         var lciArr = obj.lci.toString().split('');
+         var valArr = obj.dv.toString().split('');
+         var hciNum, lciNum, valNum; 
+         switch (hciArr.indexOf('.') >= 0) { //hci
+             case true: 
+                 hciArr = hciArr.join(''); 
+                 hciNum = Number(hciArr); 
+                 break;
+             case false: 
+                 hciArr = hciArr.join(''); 
+                 hciArr = Number(hciArr); 
+                 hciNum = hciArr.toFixed(decimalPlaces); 
+                 break;  
+             default:  
+                 break; 
+         }
+         switch (lciArr.indexOf('.') >= 0) { //lci
+             case true: 
+                 lciArr = lciArr.join(''); 
+                 lciNum = Number(lciArr); 
+                 break;
+             case false: 
+                 lciArr = lciArr.join(''); 
+                 lciArr = Number(lciArr); 
+                 lciNum = lciArr.toFixed(decimalPlaces); 
+                 break;  
+             default:  
+                 break; 
+         }
+         switch (valArr.indexOf('.') >= 0) { //val 
+             case true: 
+                 valArr = valArr.join(''); 
+                 valNum = Number(valArr); 
+                 break;
+             case false: 
+                 valArr = valArr.join(''); 
+                 valArr = Number(valArr); 
+                 valNum = valArr.toFixed(decimalPlaces); 
+                 break;  
+             default:  
+                 break; 
+         }
+         /////////////////////////////////////////////////
         tooltipDisplay.push({
             title: title,
-            dv: obj.dv,
+            dv: valNum,
             dataValueSuffix: chartConfigObject.dataValueSuffix,
-            lci: obj.lci, 
-            hci: obj.hci,
+            lci: lciNum, 
+            hci: hciNum,
             sampleSizeLabel: chartConfigObject.sampleSizeLabel,
             wn: wn
         });
     }
-
     //svg chart variables
     const margin = {top: 30, right: 0, bottom: 220, left: 60};
     const width = 700 - margin.left - margin.right;
@@ -479,7 +532,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var bandwidth = x.bandwidth(); 
                 var spaceLeft = x.bandwidth() + x(d);
                 return "translate(" + spaceLeft + ", " + margin.top + ")";  
-            }); 
+            });   
         bar.append("rect")
             .data(barDataValues)
             .attr("y", function (d) { return y(d); }) //y coordinate
@@ -492,13 +545,12 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-                console.log(chartConfigObject);
                 // tooltipDiv.html(`
                 // <strong>${d.title}</strong>
                 // <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
                 // <br /><strong>CI (${d.lci} - ${d.hci})</strong>
                 // <br />WN = ${d.wn}
-                // `)   
+                // `) 
                 tooltipDiv.html("\n<strong>" + d.title + "</strong>\n<br /><strong>" + d.dv + d.dataValueSuffix + "</strong>\n<br /><strong>95% CI (" + d.lci + " - " + d.hci + ")</strong>\n<br />" + d.sampleSizeLabel + ":" + d.wn + "\n")               
                 // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
                 // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
@@ -629,18 +681,64 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                 var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
+                    //handle decimals 
+                    var hciArr = object.hci.toString().split('');
+                    var lciArr = object.lci.toString().split('');
+                    var valArr = object.dv.toString().split('');
+                    var hciNum, lciNum, valNum; 
+                    switch (hciArr.indexOf('.') >= 0) { //hci
+                        case true: 
+                            hciArr = hciArr.join(''); 
+                            hciNum = Number(hciArr); 
+                            break;
+                        case false: 
+                            hciArr = hciArr.join(''); 
+                            hciArr = Number(hciArr); 
+                            hciNum = hciArr.toFixed(decimalPlaces); 
+                            break;  
+                        default:  
+                            break; 
+                    }
+                    switch (lciArr.indexOf('.') >= 0) { //lci
+                        case true: 
+                            lciArr = lciArr.join(''); 
+                            lciNum = Number(lciArr); 
+                            break;
+                        case false: 
+                            lciArr = lciArr.join(''); 
+                            lciArr = Number(lciArr); 
+                            lciNum = lciArr.toFixed(decimalPlaces); 
+                            break;  
+                        default:  
+                            break; 
+                    }
+                    switch (valArr.indexOf('.') >= 0) { //val 
+                        case true: 
+                            valArr = valArr.join(''); 
+                            valNum = Number(valArr); 
+                            break;
+                        case false: 
+                            valArr = valArr.join(''); 
+                            valArr = Number(valArr); 
+                            valNum = valArr.toFixed(decimalPlaces); 
+                            break;  
+                        default:  
+                            break; 
+                    }
+                    /////////////////////////////////////////////////
                     return {
                         //keys render bars
                         key: object[xAxisColumn],
-                        val: object.dv, 
+                        val: valNum, 
                         //keys render tooltip 
                         title: object[xAxisColumn],  
                         titleLegendColumn: object[legendColumn],  
-                        lci: object.lci,
-                        hci: object.hci,
+                        lci: lciNum,
+                        hci: hciNum,
                         wn: object.wn
                     }
                 }); 
+                console.log(keysFromFilteredJSON); 
                 dataMatrix.push(keysFromFilteredJSON); 
             }
         }
@@ -701,6 +799,9 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .style("opacity", "0.8")
                         .on("mouseover", function (d, i) {
+
+                            console.log(dataMatrix);
+
                             let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
                                 let column = d.key; 
