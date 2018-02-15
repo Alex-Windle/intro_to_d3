@@ -106,7 +106,7 @@ function makeChart (chartConfigObject, jsonData, lookup) {
 
     legendEntryCount = legendCategoryNames.length; 
     
-    function make_tooltip_display (obj, chartConfigObject) {   
+    function make_tooltip_display (obj, chartConfigObject) {  
         let column = obj[xAxisColumn];
         let title = lookup[xAxisType][column].name; 
         let wn = String(obj.wn); 
@@ -120,57 +120,65 @@ function makeChart (chartConfigObject, jsonData, lookup) {
             wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
             wn = wn.split("").reverse().join("");
         }
-         //handle decimals 
-         var hciArr = obj.hci.toString().split('');
-         var lciArr = obj.lci.toString().split('');
-         var valArr = obj.dv.toString().split('');
-         var hciNum, lciNum, valNum; 
-         switch (hciArr.indexOf('.') >= 0) { //hci
-             case true: 
-                 hciArr = hciArr.join(''); 
-                 hciNum = Number(hciArr); 
-                 break;
-             case false: 
-                 hciArr = hciArr.join(''); 
-                 hciArr = Number(hciArr); 
-                 hciNum = hciArr.toFixed(decimalPlaces); 
-                 break;  
-             default:  
-                 break; 
-         }
-         switch (lciArr.indexOf('.') >= 0) { //lci
-             case true: 
-                 lciArr = lciArr.join(''); 
-                 lciNum = Number(lciArr); 
-                 break;
-             case false: 
-                 lciArr = lciArr.join(''); 
-                 lciArr = Number(lciArr); 
-                 lciNum = lciArr.toFixed(decimalPlaces); 
-                 break;  
-             default:  
-                 break; 
-         }
-         switch (valArr.indexOf('.') >= 0) { //val 
-             case true: 
-                 valArr = valArr.join(''); 
-                 valNum = Number(valArr); 
-                 break;
-             case false: 
-                 valArr = valArr.join(''); 
-                 valArr = Number(valArr); 
-                 valNum = valArr.toFixed(decimalPlaces); 
-                 break;  
-             default:  
-                 break; 
-         }
-         /////////////////////////////////////////////////
+        //handle decimals 
+        if (obj.hci >= 0) {
+            var hciArr = obj.hci.toString().split('');
+            var hciNum;
+            switch (hciArr.indexOf('.') >= 0) { //hci
+                case true: 
+                    hciArr = hciArr.join(''); 
+                    hciNum = Number(hciArr); 
+                    break;
+                case false: 
+                    hciArr = hciArr.join(''); 
+                    hciArr = Number(hciArr); 
+                    hciNum = hciArr.toFixed(decimalPlaces); 
+                    break;  
+                default:  
+                    break; 
+            }
+        }
+        if (obj.lci >=0) {
+            var lciArr = obj.lci.toString().split('');
+            var  lciNum;
+            switch (lciArr.indexOf('.') >= 0) { //lci
+                case true: 
+                    lciArr = lciArr.join(''); 
+                    lciNum = Number(lciArr); 
+                    break;
+                case false: 
+                    lciArr = lciArr.join(''); 
+                    lciArr = Number(lciArr); 
+                    lciNum = lciArr.toFixed(decimalPlaces); 
+                    break;  
+                default:  
+                    break; 
+            }
+        }
+        if (obj.dv >= 0) {
+            var valArr = obj.dv.toString().split('');
+            var valNum;    
+            switch (valArr.indexOf('.') >= 0) { //val 
+                case true: 
+                    valArr = valArr.join(''); 
+                    valNum = Number(valArr); 
+                    break;
+                case false: 
+                    valArr = valArr.join(''); 
+                    valArr = Number(valArr); 
+                    valNum = valArr.toFixed(decimalPlaces); 
+                    break;  
+                default:  
+                    break; 
+            }       
+        }
+        /////////////////////////////////////////////////
         tooltipDisplay.push({
             title: title,
-            dv: valNum,
+            dv: valNum || obj.dv,
             dataValueSuffix: chartConfigObject.dataValueSuffix,
-            lci: lciNum, 
-            hci: hciNum,
+            lci: lciNum || obj.lci, 
+            hci: hciNum || obj.hci,
             sampleSizeLabel: chartConfigObject.sampleSizeLabel,
             wn: wn
         });
@@ -651,12 +659,18 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         
         var x0 = d3.scaleBand()
             .domain(xAxisCategoryNames)
-            .rangeRound([0, width]); 
+            .rangeRound([0, width])
+            .paddingInner(0.1)
+            .paddingOuter(0.1);
  
         var x1 = d3.scaleBand()
             .domain(legendCategoryNames)
-            .rangeRound([0, x0.bandwidth()])
-            .paddingInner(0.5);
+            .range([0, x0.bandwidth()])
+            // .rangeRound([0, x0.bandwidth()])
+            .paddingOuter(0)
+            .paddingInner(0);
+            // .align();
+            // .paddingInner(0.5);
 
         var yMulti = d3.scaleLinear()
             .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -670,75 +684,80 @@ function makeChart (chartConfigObject, jsonData, lookup) {
         let dataMatrix = []; //maps bar data vals
         let ciMatrix = []; //maps CI intervals
         const linecapHalfWidth = x1.bandwidth()/8; //calc ci line caps
-        
         // let paddingWidth = ( x1.step() - x1.bandwidth() ); //calc padding to use for centering grouped bars works best on multiple bars
         let paddingWidth = ( x1.step() - x1.bandwidth() ) / 2; //calc padding to use for centering grouped bars works best w/ 2 bars
-        let padding20Percent = x1.bandwidth()/5; 
-
+        let padding20Percent = x1.bandwidth()/5;  
         function createDataMatrix (xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
             for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
                 //loop through each response category. filter for json data matches and return 
                 var filteredJSON = sortedJsonData.filter(function (object, index, array) { return object[xAxisColumn] === xAxisCategoryDataCodes[i]; })
                 //create key objects
                 var keysFromFilteredJSON = filteredJSON.map(function (object) {
-                    //handle decimals 
-                    var hciArr = object.hci.toString().split('');
-                    var lciArr = object.lci.toString().split('');
-                    var valArr = object.dv.toString().split('');
-                    var hciNum, lciNum, valNum; 
-                    switch (hciArr.indexOf('.') >= 0) { //hci
-                        case true: 
-                            hciArr = hciArr.join(''); 
-                            hciNum = Number(hciArr); 
-                            break;
-                        case false: 
-                            hciArr = hciArr.join(''); 
-                            hciArr = Number(hciArr); 
-                            hciNum = hciArr.toFixed(decimalPlaces); 
-                            break;  
-                        default:  
-                            break; 
+                   //handle decimals 
+                    if (object.hci >= 0) {
+                        var hciArr = object.hci.toString().split('');
+                        var hciNum;
+                        switch (hciArr.indexOf('.') >= 0) { //hci
+                            case true: 
+                                hciArr = hciArr.join(''); 
+                                hciNum = Number(hciArr); 
+                                break;
+                            case false: 
+                                hciArr = hciArr.join(''); 
+                                hciArr = Number(hciArr); 
+                                hciNum = hciArr.toFixed(decimalPlaces); 
+                                break;  
+                            default:  
+                                break; 
+                        }
                     }
-                    switch (lciArr.indexOf('.') >= 0) { //lci
-                        case true: 
-                            lciArr = lciArr.join(''); 
-                            lciNum = Number(lciArr); 
-                            break;
-                        case false: 
-                            lciArr = lciArr.join(''); 
-                            lciArr = Number(lciArr); 
-                            lciNum = lciArr.toFixed(decimalPlaces); 
-                            break;  
-                        default:  
-                            break; 
+                    if (object.lci >=0) {
+                        var lciArr = object.lci.toString().split('');
+                        var  lciNum;
+                        switch (lciArr.indexOf('.') >= 0) { //lci
+                            case true: 
+                                lciArr = lciArr.join(''); 
+                                lciNum = Number(lciArr); 
+                                break;
+                            case false: 
+                                lciArr = lciArr.join(''); 
+                                lciArr = Number(lciArr); 
+                                lciNum = lciArr.toFixed(decimalPlaces); 
+                                break;  
+                            default:  
+                                break; 
+                        }
                     }
-                    switch (valArr.indexOf('.') >= 0) { //val 
-                        case true: 
-                            valArr = valArr.join(''); 
-                            valNum = Number(valArr); 
-                            break;
-                        case false: 
-                            valArr = valArr.join(''); 
-                            valArr = Number(valArr); 
-                            valNum = valArr.toFixed(decimalPlaces); 
-                            break;  
-                        default:  
-                            break; 
+                    if (object.dv >= 0) {
+                        var valArr = object.dv.toString().split('');
+                        var valNum;    
+                        switch (valArr.indexOf('.') >= 0) { //val 
+                            case true: 
+                                valArr = valArr.join(''); 
+                                valNum = Number(valArr); 
+                                break;
+                            case false: 
+                                valArr = valArr.join(''); 
+                                valArr = Number(valArr); 
+                                valNum = valArr.toFixed(decimalPlaces); 
+                                break;  
+                            default:  
+                                break; 
+                        }       
                     }
                     /////////////////////////////////////////////////
                     return {
                         //keys render bars
                         key: object[xAxisColumn],
-                        val: valNum, 
+                        val: valNum || object.dv, 
                         //keys render tooltip 
                         title: object[xAxisColumn],  
                         titleLegendColumn: object[legendColumn],  
-                        lci: lciNum,
-                        hci: hciNum,
+                        lci: lciNum || object.lci,
+                        hci: hciNum || object.hci,
                         wn: object.wn
                     }
-                }); 
-                console.log(keysFromFilteredJSON); 
+                });  
                 dataMatrix.push(keysFromFilteredJSON); 
             }
         }
@@ -784,12 +803,14 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                     .data(function(d, i) { return d; }) //process arrays
                         .enter().append("rect") //render matrix into grouped bars
                         .attr("class", "bar") 
-                        .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
+                        .attr("x", function (d, i) { return margin.left + x1.bandwidth()*i; })
+                        // .attr("x", function (d, i) { return paddingWidth + margin.left + x1.bandwidth()*i; })
                         .attr("y", function (d) { 
                             if (d.val) { return yMulti(d.val); } //checks for missing values
                             return yMulti(''); 
                         })
                         .attr("width", function (d) { return x1.bandwidth() - padding20Percent; }) //bar width with 20% padding
+                        // .attr("width", function (d) { return x1.bandwidth() - padding20Percent; }) //bar width with 20% padding
                         .attr("height", function (d) { 
                             if (d.val) {
                                 return height - yMulti(d.val); 
@@ -799,9 +820,6 @@ function makeChart (chartConfigObject, jsonData, lookup) {
                         .attr("fill", function (d, i) { return barColors[i]; })
                         .style("opacity", "0.8")
                         .on("mouseover", function (d, i) {
-
-                            console.log(dataMatrix);
-
                             let display, title; 
                             function make_tooltip_display(d, xAxisColumn){
                                 let column = d.key; 
