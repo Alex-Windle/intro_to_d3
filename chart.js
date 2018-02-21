@@ -268,7 +268,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     })
     .y(function(d, i) { 
       console.log('y coordinate: ', d.dv); 
-      return yMulti(d.dv); 
+      return margin.top + yMulti(d.dv); 
     });
 //////////////////////////////
 
@@ -312,7 +312,8 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         console.log("call line function with: ", d.values); 
         return makeLines(d.values); 
       })
-      .style("stroke", "green");
+      .style("stroke", function (d) { return colors(d.key) })
+      .style("fill", "none");
 
 //////////////////////////////////////
     
