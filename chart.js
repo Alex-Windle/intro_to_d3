@@ -231,8 +231,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
   //* ************************************************************************************************//
 
   function makeTrendChart() {
-    // jsonData.forEach((d) => { console.log(d); });
-    // console.log('category names ', xAxisCategoryNames);
+
     let chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
 
     // 508 compliance
@@ -243,10 +242,11 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     var dataGroup = d3.nest()
       .key(function (d) { return d[legendColumn]; })
       .entries(jsonData);
+    console.log('data group: ', dataGroup);
 
     const x3 = d3.scaleBand() //FIX SCALING
       .domain(xAxisCategoryNames)
-      .range([- margin.left/2, totalWidth + margin.left*1.5]);
+      .range([-margin.left/2, totalWidth + margin.left*1.5]);
 
     const yMulti = d3.scaleLinear()
       .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
@@ -258,13 +258,16 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       }));
 
 /////////////////////////////
-    var line = d3.line()
-    .x(function(d) { 
-      console.log('x coord: ', d.yr); 
-      return x3(d.yr); 
+    var makeLines = d3.line()
+    //THE X COORDINATE IS not a number...it is "yr2"
+    .x(function(d, i) { 
+      var column = d[xAxisColumn]; 
+      var value = Number(lookup[xAxisType][column].name);
+      console.log('x coordinate: ', value); 
+      return (margin.left/2 + margin.left/5 + margin.left + x3(value));
     })
-    .y(function(d) { 
-      console.log('y coord: ', d.dv); 
+    .y(function(d, i) { 
+      console.log('y coordinate: ', d.dv); 
       return yMulti(d.dv); 
     });
 //////////////////////////////
@@ -300,15 +303,17 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       .attr("class", "response"); 
 
 //////////////////////////////////////
+    
     response.append("path")
       .data(dataGroup)
       .attr("class", "line")
       .attr("d", function(d) {
-        //pass in values
-        console.log("path/line value: ", d.values); 
-        return line(d.values); 
+        //the problem is passing in the correctly formatted data
+        console.log("call line function with: ", d.values); 
+        return makeLines(d.values); 
       })
-      .style("stroke", "black");
+      .style("stroke", "green");
+
 //////////////////////////////////////
     
     //circles
