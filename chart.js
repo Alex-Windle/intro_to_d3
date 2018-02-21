@@ -238,40 +238,35 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     d3.select(`#${chartDivId}`).append('desc').html(chartDesc);
     d3.select(`#${chartDivId}`).append('title').html(chartTitle);
 
-     //data
+    //data
+    var sortedJsonDataByAscendYrs = sortedJsonData.sort(function (a, b) {
+      if (a.yr < b.yr) { return -1; }
+      if (a.yr > b.yr) { return 1; }
+      return 0; 
+    });
+
     var dataGroup = d3.nest()
       .key(function (d) { return d[legendColumn]; })
-      .entries(jsonData);
-    console.log('data group: ', dataGroup);
+      .entries(sortedJsonDataByAscendYrs);
 
-    const x3 = d3.scaleBand() //FIX SCALING
+    //scaling
+    const x3 = d3.scaleBand()
       .domain(xAxisCategoryNames)
       .range([-margin.left/2, totalWidth + margin.left*1.5]);
-
     const yMulti = d3.scaleLinear()
       .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
       .rangeRound([height, 0]);
-
     const colors = d3.scaleOrdinal(barColors)
       .domain(dataGroup.map(function (d) {
         return d.key; 
       }));
-
-/////////////////////////////
     var makeLines = d3.line()
-    //THE X COORDINATE IS not a number...it is "yr2"
     .x(function(d, i) { 
       var column = d[xAxisColumn]; 
       var value = Number(lookup[xAxisType][column].name);
-      console.log('x coordinate: ', value); 
       return (margin.left/2 + margin.left/5 + margin.left + x3(value));
     })
-    .y(function(d, i) { 
-      console.log('y coordinate: ', d.dv); 
-      return margin.top + yMulti(d.dv); 
-    });
-//////////////////////////////
-
+    .y(function(d, i) { return margin.top + yMulti(d.dv) });
     function make_y_gridlines_multi() { return d3.axisLeft(yMulti); }
     function make_x_gridlines() { return d3.axisBottom(x3);}
 
@@ -289,125 +284,39 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         .tickSize(-width), // full graph width
       )
       .attr('transform', `translate(${margin.left},${margin.top})`);
-    
     // x gridlines
     chart.append('g')
       .attr('class', 'grid')
       .call(make_x_gridlines()
         .tickSize(-height))
       .attr('transform', () => { const xAxisHeight = height + margin.top; return `translate(0,${xAxisHeight})`; });
-
+    // 
     var response = chart.selectAll(".response")
       .data(dataGroup)
       .enter().append("g")
       .attr("class", "response"); 
-
-//////////////////////////////////////
     
+    // lines
     response.append("path")
       .data(dataGroup)
-      .attr("class", "line")
-      .attr("d", function(d) {
-        //the problem is passing in the correctly formatted data
-        console.log("call line function with: ", d.values); 
-        return makeLines(d.values); 
+      .attr("class", "pathline")
+      .attr("d", function(d) { return makeLines(d.values); })
+      .style("stroke", function (d) { return colors(d.key) });
+    
+    // circles
+    response.selectAll("circle")
+      .data(function (d) { return d.values })
+      .enter().append("circle")
+      .attr("r", 4)
+      .attr("cx", function (d) {
+        var column = d[xAxisColumn]; 
+        var value = Number(lookup[xAxisType][column].name);
+        return (margin.left/2 + margin.left/5 + margin.left + x3(value)); //FIX SCALING
       })
-      .style("stroke", function (d) { return colors(d.key) })
-      .style("fill", "none");
-
-//////////////////////////////////////
-    
-    //circles
-    // response.selectAll("circle")
-    //   .data(function (d) { return d.values })
-    //   .enter().append("circle")
-    //   .attr("r", 5)
-    //   .attr("cx", function (d) {
-    //     var column = d[xAxisColumn]; 
-    //     var value = Number(lookup[xAxisType][column].name);
-    //     return (margin.left/2 + margin.left/5 + margin.left + x3(value)); //FIX SCALING
-    //   })
-    //   .attr("cy", function (d) { return margin.top + yMulti(d.dv); }); 
-    // response.data(dataGroup)
-    //   .style("fill", function (d) {
-    //     return colors(d.key); 
-    //   });
-   
-    // .on("mouseover", function (d, i) {
-    //     let display, title;
-    //     function make_tooltip_display(d, xAxisColumn){
-    //         let column = d.key;
-    //         let title = lookup[xAxisType][column].name;
-    //         let wn = String(d.wn);
-    //         if (wn.length > 3 && wn.length < 7) {
-    //             wn = wn.split("").reverse().join("");
-    //             wn = wn.substring(0,3) + "," + wn.substring(3);
-    //             wn = wn.split("").reverse().join("");
-    //         } else if (wn.length > 6 && wn.length < 10) {
-    //             wn = wn.split("").reverse().join("");
-    //             wn = wn.substring(0,3) + "," + wn.substring(3,6) + "," + wn.substring(6);
-    //             wn = wn.split("").reverse().join("");
-    //         }
-    //         display = {
-    //             'title': lookup[xAxisType][d.title].name,
-    //             'titleLegendColumn': lookup[legendType][d.titleLegendColumn].name,
-    //             'dv': d.val,
-    //             'lci': d.lci,
-    //             'hci': d.hci,
-    //             'wn': wn
-    //         }
-    //     }
-    //     make_tooltip_display(d, xAxisColumn);
-    //     tooltipDiv.transition()
-    //     .duration(200)
-    //     .style('opacity', .9);
-    //     // tooltipDiv.html(`
-    //     // <strong>${display.title}</strong>
-    //     // <br /><strong>${display.titleLegendColumn}</strong>
-    //     // <br /><strong>${display.dv}${dataValueSuffix}</strong>
-    //     // <br />CI (${display.lci}-${display.hci})
-    //     // <br />WN = ${display.wn}
-    //     // `)
-    //     tooltipDiv.html("\n<strong>" + display.title + "</strong>\n<br /><strong>" + display.titleLegendColumn + "</strong>\n<br /><strong>" + display.dv + dataValueSuffix + "</strong>\n<br />CI (" + display.lci + "-" + display.hci + ")\n<br />WN = " + display.wn + "\n")
-    //     .style("left", (d3.event.pageX + 10 - this.clientLeft - window.pageXOffset) + "px")
-    //     .style("top", (d3.event.pageY - 150 - this.clientTop - window.pageYOffset) + "px");
-    // })
-    // .on("mouseout", function (d) {
-    //     tooltipDiv.transition()
-    //     .duration(500)
-    //     .style("opacity", 0);
-    // });
- 
-    // axes labels
-    // var yAxisMidpoint = (height + margin.top)/2 + margin.top;
-    // var paddingLeft = 14;
-    // var yAxisLabel = chart.append("text")
-    //     .attr("class", "label")
-    //     .attr("id", "y_axis_label")
-    //     .text(yAxisTitle)
-    //     .attr("transform", "translate(" + paddingLeft + ", " + yAxisMidpoint + ")rotate(-90)")
-    //     .attr("text-anchor", "middle");
-    // axes
-    // console.log('names ', xAxisCategoryDataCodes);
-    // var xAxis = chart.append("g")
-    //     .attr("class", "axis")
-    //     .attr("transform", "translate(0, " + spaceFromTop + ")")
-    //     .call(d3.axisBottom(x3));
-    // .selectAll("text")
-    // .style("text-anchor", "end");
-    //* **********************************************
-    // .attr("width", "50px") // NOT WORKING
-    // MASKING, WRAPPING OR BOTH? ASK JD.
-    //* **********************************************
-    // .attr("dx", "-.8em")
-    // .attr("dy", ".15em")
-    // .attr("transform", "rotate(-45)");
-    // var yAxis = chart.append("g")
-    //     .attr("class", "axis")
-    //     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
-    //     .call(d3.axisLeft(yMulti))
-    //     .select(".domain").remove(); //remove y-axis line
-    
+      .attr("cy", function (d) { return margin.top + yMulti(d.dv); }); 
+    response.data(dataGroup)
+      .style("fill", function (d) { return colors(d.key) });
+  
     // legend
     const legend = chart.append('g') // create & position legend area
       .attr('class', 'legend')
@@ -439,7 +348,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       });
   }
 
-  //* ************************************************************************************************//
+  //************************************************************************************************
 
   function makeChartSingleBar() {
     const chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
@@ -457,18 +366,14 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         .tickSize(-width) // full graph width
         .tickFormat(''))
       .attr('transform', `translate(${margin.left},${margin.top})`);
-    // ///////////////////////////////////////////////////////
     bar = bar.data(xAxisCategoryNames)
       .enter()
       .append('g')
       .attr('transform', (d, i) => {
-        // const bandwidth = x.bandwidth();
-        // const spaceLeft = x.bandwidth() + x(d);
         const padding30Percent = x.bandwidth() / 3;
         const spaceLeft = margin.left + x.bandwidth() * i + padding30Percent / 2;
         return `translate(${spaceLeft}, ${margin.top})`;
       });
-    // ////////////////////////////////////////////////////////
     bar.append('rect')
       .data(barDataValues)
       .attr('y', d => y(d)) // y coordinate
@@ -477,10 +382,8 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         const padding30Percent = x.bandwidth() / 3;
         return x.bandwidth() - padding30Percent;
       })
-    //   .attr('width', (d, i) => x.bandwidth() / 3)
       .style('fill', barColors[0]) // hard-coded first color in array
       .style('opacity', '0.8')
-    // ////////////////////////////////////////////////////////
       .data(tooltipDisplay)
       .on('mouseover', function (d, i) {
         tooltipDiv.transition()
@@ -585,7 +488,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       });
   }
 
-  //* ************************************************************************************************//
+  //************************************************************************************************
 
   function makeChartMultiBar() {
     let chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
@@ -603,11 +506,8 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     const x1 = d3.scaleBand()
       .domain(legendCategoryNames)
       .range([0, x0.bandwidth()])
-      // .rangeRound([0, x0.bandwidth()])
       .paddingOuter(0)
       .paddingInner(0);
-    // .align();
-    // .paddingInner(0.5);
     const hciArray = confidenceIndicators.map(ind => ind.hci);
     const yMulti = d3.scaleLinear()
       .domain([0, d3.max(hciArray) + chartTopBufferDataValue])
@@ -682,7 +582,6 @@ function makeChart(chartConfigObject, jsonData, lookup) {
                 break;
             }
           }
-          // ///////////////////////////////////////////////
           return {
             // keys render bars
             key: object[xAxisColumn],
