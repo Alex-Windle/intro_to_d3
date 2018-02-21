@@ -316,7 +316,15 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       .attr("cy", function (d) { return margin.top + yMulti(d.dv); }); 
     response.data(dataGroup)
       .style("fill", function (d) { return colors(d.key) });
-  
+    // axes labels
+    const yAxisMidpoint = (height + margin.top) / 2 + margin.top;
+    const paddingLeft = 14;
+    const yAxisLabel = chart.append('text')
+      .attr('class', 'label')
+      .attr('id', 'y_axis_label')
+      .text(yAxisTitle)
+      .attr('transform', `translate(${paddingLeft}, ${yAxisMidpoint})rotate(-90)`)
+      .attr('text-anchor', 'middle');
     // legend
     const legend = chart.append('g') // create & position legend area
       .attr('class', 'legend')
