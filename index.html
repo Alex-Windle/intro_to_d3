@@ -3,7 +3,7 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script> 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script> -->
         <!-- <script src="https://npmcdn.com/babel-transform-in-browser@6.4.6/dist/btib.min.js"></script>
         <script type="text/es2015">  -->
         <style>
@@ -84,15 +84,13 @@
                 box-shadow: 2px 2px 1px gray; 
                 z-index: 5;
             }
+            div#chartDiv .pathline {
+                stroke-width: 1.5;
+                fill: none;
+            }
         </style>
     </head>
     <body>
-        <h1>Lorem ipsum dolor sit amet</h1>
-        <p>Per soluta scaevola verterem ut, suavitate qualisque no cum. Unum ubique interesset ne ius, sed commune adolescens in. Suavitate imperdiet usu et, vix ea tibique appareat consequuntur. Mea an convenire philosophia, ea sed soluta repudiare euripidis.</p>
-        <p>Per soluta scaevola verterem ut, suavitate qualisque no cum. Unum ubique interesset ne ius, sed commune adolescens in. Suavitate imperdiet usu et, vix ea tibique appareat consequuntur. Mea an convenire philosophia, ea sed soluta repudiare euripidis.</p>
-        <p>Per soluta scaevola verterem ut, suavitate qualisque no cum. Unum ubique interesset ne ius, sed commune adolescens in. Suavitate imperdiet usu et, vix ea tibique appareat consequuntur. Mea an convenire philosophia, ea sed soluta repudiare euripidis.</p>
-        <p>Per soluta scaevola verterem ut, suavitate qualisque no cum. Unum ubique interesset ne ius, sed commune adolescens in. Suavitate imperdiet usu et, vix ea tibique appareat consequuntur. Mea an convenire philosophia, ea sed soluta repudiare euripidis.</p>
-        <p>Per soluta scaevola verterem ut, suavitate qualisque no cum. Unum ubique interesset ne ius, sed commune adolescens in. Suavitate imperdiet usu et, vix ea tibique appareat consequuntur. Mea an convenire philosophia, ea sed soluta repudiare euripidis.</p>
         <!-- hard coded id for testing purposes. it will match a correponding div on the main page -->
         <div id="chartDiv"></div> 
         <!-- <svg class="chart"></svg> -->
