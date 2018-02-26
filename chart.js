@@ -1,32 +1,28 @@
 function makeChart(chartConfigObject, jsonData, lookup) {
   // 508 compliance
-  const chartDesc = chartConfigObject.chartDesc;
-  const chartTitle = chartConfigObject.chartTitle;
+  const { chartDesc } = chartConfigObject;
+  const { chartTitle } = chartConfigObject;
 
   // chart variables
   const barColors = chartConfigObject.colorsArrStr;
   const barDataValues = []; // ordered by json order
   const xAxisCategoryNames = [];
-  const yAxisTitle = chartConfigObject.yAxisTitle;
+  const { yAxisTitle } = chartConfigObject;
   const legendTitle = chartConfigObject.legendTitleStr;
   const legendCategoryNames = [];
   let legendEntryCount = [];
   const confidenceIndicators = [];
-  const confidenceIntervalLabel = chartConfigObject.confidenceIntervalLabel;
-  const decimalPlaces = chartConfigObject.decimalPlaces;
+  const { decimalPlaces } = chartConfigObject;
   const tooltipDisplay = [];
-  const displayTrendChart = chartConfigObject.displayTrendChart;
-  const chartDivId = chartConfigObject.chartDivId;
-  const dataValueSuffix = chartConfigObject.dataValueSuffix;
+  const { chartDivId } = chartConfigObject;
+  const { dataValueSuffix } = chartConfigObject;
 
   // data used to process chart variables
-  const xAxisColumn = chartConfigObject.xAxisColumn;
-  const xAxisType = chartConfigObject.xAxisType;
+  const { xAxisColumn } = chartConfigObject;
+  const { xAxisType } = chartConfigObject;
   const xAxisCategoryDataCodes = [];
-  const legendColumn = chartConfigObject.legendColumn;
-  const legendType = chartConfigObject.legendType;
-  const legendCategoryDataCodes = [];
-  const totalBars = jsonData.length;
+  const { legendColumn } = chartConfigObject;
+  const { legendType } = chartConfigObject;
 
   // clear previous chart
   d3.selectAll(`#${chartDivId} > *`).remove();
@@ -168,7 +164,6 @@ function makeChart(chartConfigObject, jsonData, lookup) {
           break;
       }
     }
-    // ///////////////////////////////////////////////
     tooltipDisplay.push({
       title,
       dv: valNum || obj.dv,
@@ -209,66 +204,51 @@ function makeChart(chartConfigObject, jsonData, lookup) {
   const y = d3.scaleLinear()
     .domain([0, d3.max(hciArray) + chartTopBufferDataValue]) // set value scaling with buffer
     .range([height, 0]);
-    // gridlines in y axis
+  // gridlines in y axis
   function make_y_gridlines() {
     return d3.axisLeft(y);
   }
 
-  // commence render of single or multi-bar chart
-  if (chartConfigObject.displayTrendChart == false && legendEntryCount === 1) {
-    console.log('Display single-bar chart');
-    makeChartSingleBar();
-  } else if (chartConfigObject.displayTrendChart == false && legendEntryCount >= 2) {
-    console.log('Display multi-bar chart');
-    makeChartMultiBar();
-  } else if (chartConfigObject.displayTrendChart == true) {
-    console.log('Display trend chart');
-    makeTrendChart();
-  } else {
-    console.log('Error');
-  }
-
-  //* ************************************************************************************************//
+  //*************************************************************************************************//
 
   function makeTrendChart() {
-
     let chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
-
     // 508 compliance
     d3.select(`#${chartDivId}`).append('desc').html(chartDesc);
     d3.select(`#${chartDivId}`).append('title').html(chartTitle);
 
-    //data
-    var sortedJsonDataByAscendYrs = sortedJsonData.sort(function (a, b) {
-      if (a.yr < b.yr) { return -1; }
-      if (a.yr > b.yr) { return 1; }
-      return 0; 
-    });
+    // data
+    const dataGroup = d3.nest()
+      .key(d => d[legendColumn])
+      .entries(sortedJsonData); //sorts values by response
 
-    var dataGroup = d3.nest()
-      .key(function (d) { return d[legendColumn]; })
-      .entries(sortedJsonDataByAscendYrs);
+    for (var i = 0; i<dataGroup.length; i++) {
+      dataGroup[i].values.sort(function (a,b) {
+        if (a.yr < b.yr) { return -1; }
+        if (a.yr > b.yr) { return 1; }
+        return 0;
+      })
+    } //sorts values by year
 
-    //scaling
+    // scaling
     const x3 = d3.scaleBand()
       .domain(xAxisCategoryNames)
-      .range([-margin.left/2, totalWidth + margin.left*1.5]);
+      .range([-margin.left / 2, totalWidth + margin.left * 1.5]);
     const yMulti = d3.scaleLinear()
       .domain([0, d3.max(barDataValues) + chartTopBufferDataValue])
       .rangeRound([height, 0]);
     const colors = d3.scaleOrdinal(barColors)
-      .domain(dataGroup.map(function (d) {
-        return d.key; 
-      }));
-    var makeLines = d3.line()
-    .x(function(d, i) { 
-      var column = d[xAxisColumn]; 
-      var value = Number(lookup[xAxisType][column].name);
-      return (margin.left/2 + margin.left/5 + margin.left + x3(value));
-    })
-    .y(function(d, i) { return margin.top + yMulti(d.dv) });
+      .domain(dataGroup.map(d => d.key));
+    const makeLines = d3.line()
+      .x((d, i) => {
+        const column = d[xAxisColumn];
+        const value = Number(lookup[xAxisType][column].name);
+        if (xAxisCategoryNames.length == 4) { return (margin.left / 2 + margin.left / 5 + margin.left + x3(value)); }
+        if (xAxisCategoryNames.length == 3) { return (margin.left / 2 + margin.left * 0.77 + margin.left + x3(value)); }
+      })
+      .y((d, i) => margin.top + yMulti(d.dv));
     function make_y_gridlines_multi() { return d3.axisLeft(yMulti); }
-    function make_x_gridlines() { return d3.axisBottom(x3);}
+    function make_x_gridlines() { return d3.axisBottom(x3); }
 
     // set chart attributes
     chart.attr('viewBox', () => '0 0 700 780')
@@ -289,33 +269,135 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       .attr('class', 'grid')
       .call(make_x_gridlines()
         .tickSize(-height))
-      .attr('transform', () => { const xAxisHeight = height + margin.top; return `translate(0,${xAxisHeight})`; });
-    // 
-    var response = chart.selectAll(".response")
+      .attr('transform', () => { const xAxisHeight = height + margin.top; return `translate(0,${xAxisHeight + 15})`; });
+
+    const response = chart.selectAll('.response')
       .data(dataGroup)
-      .enter().append("g")
-      .attr("class", "response"); 
-    
+      .enter().append('g')
+      .attr('class', 'response');
+
     // lines
-    response.append("path")
+    response.append('path')
+      // .data(dataGroupByYr)
       .data(dataGroup)
-      .attr("class", "pathline")
-      .attr("d", function(d) { return makeLines(d.values); })
-      .style("stroke", function (d) { return colors(d.key) });
-    
+      .attr('class', 'pathline')
+      .attr('d', d => makeLines(d.values))
+      .style('stroke', d => colors(d.key))
+      .style('stroke-width', 2.3)
+      .style('fill', 'none');;
     // circles
-    response.selectAll("circle")
-      .data(function (d) { return d.values })
-      .enter().append("circle")
-      .attr("r", 4)
-      .attr("cx", function (d) {
-        var column = d[xAxisColumn]; 
-        var value = Number(lookup[xAxisType][column].name);
-        return (margin.left/2 + margin.left/5 + margin.left + x3(value)); //FIX SCALING
+    response.selectAll('circle')
+      .data(d => d.values)
+      .enter().append('circle')
+      .attr('r', 4.9)
+      .attr('cx', (d) => {
+        const column = d[xAxisColumn];
+        const value = Number(lookup[xAxisType][column].name);
+        if (xAxisCategoryNames.length == 4) { return (margin.left / 2 + margin.left / 5 + margin.left + x3(value)); } // FIX SCALING
+        if (xAxisCategoryNames.length == 3) { return (margin.left / 2 + margin.left * 0.77 + margin.left + x3(value)); } // FIX SCALING
       })
-      .attr("cy", function (d) { return margin.top + yMulti(d.dv); }); 
+      .attr('cy', d => margin.top + yMulti(d.dv))
+      .on('mouseover', function (d,i) {
+        let display;
+        let title;
+        function make_tooltip_display(d, xAxisColumn) {
+          let hciNum,
+          lciNum,
+          valNum;
+          const column = d[xAxisColumn];
+          const title = lookup[xAxisType][column].name;
+          let wn = String(d.wn);
+          if (wn.length > 3 && wn.length < 7) {
+            wn = wn.split('').reverse().join('');
+            wn = `${wn.substring(0, 3)},${wn.substring(3)}`;
+            wn = wn.split('').reverse().join('');
+          } else if (wn.length > 6 && wn.length < 10) {
+            wn = wn.split('').reverse().join('');
+            wn = `${wn.substring(0, 3)},${wn.substring(3, 6)},${wn.substring(6)}`;
+            wn = wn.split('').reverse().join('');
+          }
+          // handle decimals
+          if (d.hci >= 0) {
+            let hciArr = d.hci.toString().split('');
+            switch (hciArr.indexOf('.') >= 0) { // hci
+              case true:
+                hciArr = hciArr.join('');
+                hciArr = Number(hciArr);
+                hciNum = hciArr.toFixed(decimalPlaces);
+                break;
+              case false:
+                hciArr = hciArr.join('');
+                hciArr = Number(hciArr);
+                hciNum = hciArr.toFixed(decimalPlaces);
+                break;
+              default:
+                break;
+            }
+          }
+          if (d.lci >= 0) {
+            let lciArr = d.lci.toString().split('');
+            switch (lciArr.indexOf('.') >= 0) { // lci
+              case true:
+                lciArr = lciArr.join('');
+                lciArr = Number(lciArr);
+                lciNum = lciArr.toFixed(decimalPlaces);
+                break;
+              case false:
+                lciArr = lciArr.join('');
+                lciArr = Number(lciArr);
+                lciNum = lciArr.toFixed(decimalPlaces);
+                break;
+              default:
+                break;
+            }
+          }
+          if (d.dv >= 0) {
+            let valArr = d.dv.toString().split('');
+            switch (valArr.indexOf('.') >= 0) { // val
+              case true:
+                valArr = valArr.join('');
+                valArr = Number(valArr);
+                valNum = valArr.toFixed(decimalPlaces); 
+                break;
+              case false:
+                valArr = valArr.join('');
+                valArr = Number(valArr);
+                valNum = valArr.toFixed(decimalPlaces);
+                break;
+              default:
+                break;
+            }
+          }
+          display = {
+            title: lookup[xAxisType][column].name,
+            titleLegendColumn: lookup[legendType][d[legendColumn]].name,
+            dv: valNum || d.dv,
+            lci: lciNum || d.lci,
+            hci: hciNum || d.hci,
+            sampleSizeLabel: chartConfigObject.sampleSizeLabel,
+            wn,
+          };
+        }
+        make_tooltip_display(d, xAxisColumn);
+        tooltipDiv.transition()
+          .duration(200)
+          .style('opacity', 0.9);
+        tooltipDiv.html(`\n<strong>${display.title}</strong>\n<br /><strong>${display.titleLegendColumn}</strong>\n<br /><strong>${display.dv}${dataValueSuffix}</strong>\n<br />95% CI (${display.lci}-${display.hci})\n<br />${display.sampleSizeLabel}:${display.wn}\n`)
+        // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
+        // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
+          .style('left', `${d3.event.pageX - 75 - this.clientLeft - window.pageXOffset}px`) // compromise chrm/ie
+          .style('top', `${d3.event.pageY - this.clientTop - window.pageYOffset}px`);
+          // .style('top', `${d3.event.pageY - 350 - this.clientTop - window.pageYOffset}px`);
+
+      })
+      .on('mouseout', (d) => {
+        tooltipDiv.transition()
+          .duration(500)
+          .style('opacity', 0);
+      });
     response.data(dataGroup)
-      .style("fill", function (d) { return colors(d.key) });
+      .style('fill', d => colors(d.key)); 
+      
     // axes labels
     const yAxisMidpoint = (height + margin.top) / 2 + margin.top;
     const paddingLeft = 14;
@@ -325,6 +407,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       .text(yAxisTitle)
       .attr('transform', `translate(${paddingLeft}, ${yAxisMidpoint})rotate(-90)`)
       .attr('text-anchor', 'middle');
+
     // legend
     const legend = chart.append('g') // create & position legend area
       .attr('class', 'legend')
@@ -337,11 +420,26 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     legendGrouping.data(legendCategoryNames) // count data
       .enter() // run methods once per data count
       .append('g') // produces new groupings
-      .append('rect')
-      .attr('width', legendColorKeyWidth)
-      .attr('height', legendColorKeyHeight)
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', function (d, i) {
+        const yAlign = legendGroupingHeight * i + 15;
+        return `${yAlign + 7}`;
+      })
+      .attr('x2', 20)
+      .attr('y2', function (d, i) {
+        const yAlign = legendGroupingHeight * i + 15;
+        return `${yAlign + 7}`;
+      })
+      .attr('stroke-width', 2.8)
+      .attr('stroke', (d, i) => barColors[i]);
+    legendGrouping.data(legendCategoryNames)
+      .enter()
+      .append('g')
+      .append('circle')
+      .attr('r', 4.9)
       .attr('transform', (d, i) => {
-        const yAlign = legendGroupingHeight * i + 15; return `translate(0, ${yAlign})`;
+        const yAlign = legendGroupingHeight * i + 15; return `translate(10, ${yAlign + 7})`;
       })
       .style('fill', (d, i) => barColors[i]);
     legendGrouping
@@ -356,7 +454,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       });
   }
 
-  //************************************************************************************************
+  //*************************************************************************************************//
 
   function makeChartSingleBar() {
     const chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
@@ -397,12 +495,6 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         tooltipDiv.transition()
           .duration(200)
           .style('opacity', 0.9);
-        // tooltipDiv.html(`
-        // <strong>${d.title}</strong>
-        // <br /><strong>${d.dv}${d.dataValueSuffix}</strong>
-        // <br /><strong>CI (${d.lci} - ${d.hci})</strong>
-        // <br />WN = ${d.wn}
-        // `)
         tooltipDiv.html(`\n<strong>${d.title}</strong>\n<br /><strong>${d.dv}${d.dataValueSuffix}</strong>\n<br /><strong>95% CI (${d.lci} - ${d.hci})</strong>\n<br />${d.sampleSizeLabel}:${d.wn}\n`)
         // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
         // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
@@ -422,10 +514,8 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         const padding30Percent = x.bandwidth() / 3;
         return padding30Percent;
       })
-      //   .attr('x1', () => x.bandwidth() / 6)
       .attr('y1', d => y(d.lci))
       .attr('x2', (d, i) => x.bandwidth() / 3)
-      //   .attr('x2', () => x.bandwidth() / 6)
       .attr('y2', d => y(d.hci));
     // confidence indicator linecaps
     const linecapHalfWidth = 5;
@@ -496,7 +586,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       });
   }
 
-  //************************************************************************************************
+  //*************************************************************************************************//
 
   function makeChartMultiBar() {
     let chart = d3.select(`#${chartDivId}`).append('svg').attr('class', 'chart'); // instantiate chart
@@ -514,8 +604,11 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     const x1 = d3.scaleBand()
       .domain(legendCategoryNames)
       .range([0, x0.bandwidth()])
+      // .rangeRound([0, x0.bandwidth()])
       .paddingOuter(0)
       .paddingInner(0);
+    // .align();
+    // .paddingInner(0.5);
     const hciArray = confidenceIndicators.map(ind => ind.hci);
     const yMulti = d3.scaleLinear()
       .domain([0, d3.max(hciArray) + chartTopBufferDataValue])
@@ -532,7 +625,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     // let paddingWidth = ( x1.step() - x1.bandwidth() ); //calc padding to use for centering grouped bars works best on multiple bars
     const paddingWidth = (x1.step() - x1.bandwidth()) / 2; // calc padding to use for centering grouped bars works best w/ 2 bars
     const padding20Percent = x1.bandwidth() / 5;
-    function createDataMatrix(xAxisCategoryNames, xAxisCategoryDataCodes, xAxisColumn, xAxisType, sortedJsonData) {
+    function createDataMatrix() {
       for (var i = 0; i < xAxisCategoryDataCodes.length; i++) {
         // loop through each response category. filter for json data matches and return
         const filteredJSON = sortedJsonData.filter((object, index, array) => object[xAxisColumn] === xAxisCategoryDataCodes[i]);
@@ -691,13 +784,6 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         tooltipDiv.transition()
           .duration(200)
           .style('opacity', 0.9);
-        // tooltipDiv.html(`
-        // <strong>${display.title}</strong>
-        // <br /><strong>${display.titleLegendColumn}</strong>
-        // <br /><strong>${display.dv}${dataValueSuffix}</strong>
-        // <br />CI (${display.lci}-${display.hci})
-        // <br />WN = ${display.wn}
-        // `)
         tooltipDiv.html(`\n<strong>${display.title}</strong>\n<br /><strong>${display.titleLegendColumn}</strong>\n<br /><strong>${display.dv}${dataValueSuffix}</strong>\n<br />95% CI (${display.lci}-${display.hci})\n<br />${display.sampleSizeLabel}:${display.wn}\n`)
         // .style("left", (d3.event.pageX - 50 - this.clientLeft - window.pageXOffset) + "px") //chrome positioning
         // .style("left", (d3.event.pageX - 200 - this.clientLeft - window.pageXOffset) + "px") //ie positioning
@@ -737,43 +823,40 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     const ciIntervalCapsBottom = ciIntervals.data(ciMatrix).append('g');
     ciIntervalCapsBottom
       .selectAll('line')
-      .data((d, i) => d)
+      .data(d => d)
       .enter().append('line')
       .attr('class', 'linecap_bottom')
       .attr('x1', (d, i) => {
         if (!d.hci) { return ''; }
-        return paddingWidth + margin.left + x1.bandwidth() * i + x1.bandwidth() / 2 - linecapHalfWidth - padding20Percent / 2;
+        return paddingWidth + margin.left + (x1.bandwidth() * i) + (x1.bandwidth() / 2) - linecapHalfWidth - (padding20Percent / 2);
       })
       .attr('y1', d => yMulti(d.lci))
       .attr('x2', (d, i) => {
         if (!d.hci) { return ''; }
-        return paddingWidth + margin.left + x1.bandwidth() * i + x1.bandwidth() / 2 + linecapHalfWidth - padding20Percent / 2;
+        return paddingWidth + margin.left + (x1.bandwidth() * i) + (x1.bandwidth() / 2) + linecapHalfWidth - (padding20Percent / 2);
       })
       .attr('y2', d => yMulti(d.lci));
     // axes labels
     const yAxisMidpoint = (height + margin.top) / 2 + margin.top;
     const paddingLeft = 14;
-    const yAxisLabel = chart.append('text')
+    chart.append('text')
       .attr('class', 'label')
       .attr('id', 'y_axis_label')
       .text(yAxisTitle)
       .attr('transform', `translate(${paddingLeft}, ${yAxisMidpoint})rotate(-90)`)
       .attr('text-anchor', 'middle');
     // axes
-    const xAxis = chart.append('g')
+    chart.append('g')
       .attr('class', 'axis')
       .attr('transform', `translate(${margin.left}, ${spaceFromTop})`)
       .call(d3.axisBottom(x))
       .selectAll('text')
       .style('text-anchor', 'end')
-      //* **********************************************
-      .attr('width', '50px') // NOT WORKING
-      // MASKING, WRAPPING OR BOTH? ASK JD.
-      //* **********************************************
+      .attr('width', '50px')
       .attr('dx', '-.8em')
       .attr('dy', '.15em')
       .attr('transform', 'rotate(-45)');
-    const yAxis = chart.append('g')
+    chart.append('g')
       .attr('class', 'axis')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
       .call(d3.axisLeft(yMulti))
@@ -785,7 +868,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       .attr('transform', `translate(${halfTotalWidth}, ${chartBottomBufferLegend})`);
     legend.append('text')
       .attr('class', 'legend_title')
-      .attr('transform', () => { const yAlign = -10; return `translate(${0},${0})`; })
+      .attr('transform', () => `translate(${0},${0})`)
       .text(legendTitle);
     const legendGrouping = legend.selectAll('g'); // groupings do not exist yet
     legendGrouping.data(legendCategoryNames) // count data
@@ -809,6 +892,12 @@ function makeChart(chartConfigObject, jsonData, lookup) {
         return `translate(${paddingLeft}, ${yAlign})`;
       });
   }
-}
 
-// open -n -a /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/someFolderName" --disable-web-security
+  if (chartConfigObject.displayTrendChart === false && legendEntryCount === 1) {
+    makeChartSingleBar();
+  } else if (chartConfigObject.displayTrendChart === false && legendEntryCount >= 2) {
+    makeChartMultiBar();
+  } else if (chartConfigObject.displayTrendChart === true) {
+    makeTrendChart();
+  }
+}
