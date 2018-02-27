@@ -12,22 +12,15 @@
                 margin-left: 10px;
                 position: relative; 
             }
-
-            div#chartDiv h3 {
-                /* margin: 0;
-                padding: 0; */
+            div#chartDiv > * {
+                font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif; 
+                font-size: 14px; 
             }
-
-            div#chartDiv .chart rect {
-                /* set inline */
-            }
-            
             div#chartDiv canvas {
                 display: block;
                 width: 100%;
                 visibility: hidden;
             }
-            
             div#chartDiv svg {
                 height: 100%;
                 left: 0;
@@ -35,17 +28,6 @@
                 top: 0;
                 width: 100%;
             }
-
-            div#chartDiv .label { 
-                font: 17px sans-serif; 
-                /* font-weight: bold; */
-            }
-
-            div#chartDiv .axis text {               
-                font: 11px sans-serif;
-            }
-
-            /* remove y-axis ticks and main x-axis */
             div#chartDiv .axis path,
             .axis line {
                 fill: none;
@@ -65,9 +47,6 @@
             div#chartDiv .legend_title {
                 font-weight: bold; 
             }
-            div#chartDiv .legend {
-                font: 14px sans-serif;
-            }
             div#chartDiv .tooltip {
                 position: absolute;
                 top: 0; 
@@ -75,7 +54,7 @@
                 text-align: left;
                 width: 140px;
                 padding: 11px 7px 7px 11px;
-                font: 16px sans-serif;
+                font: 16px;
                 line-height: 1.4em; 
                 background:#ededed;
                 border: 1px solid #333333 ;
