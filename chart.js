@@ -28,7 +28,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
   d3.selectAll(`#${chartDivId} > *`).remove();
 
   // add canvas element
-  d3.select(`#${chartDivId}`).append('canvas').attr('width', 700).attr('height', 700);
+  // d3.select(`#${chartDivId}`).append('canvas').attr('width', 700).attr('height', 700);
 
   const sortedJsonData = jsonData.sort((a, b) => { // sort data (x-axis responses display by ascending sort number)
     const sortColA = a[xAxisColumn];
@@ -231,6 +231,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     } //sorts values by year
 
     // scaling
+    const radius = 4.9;
     const x3 = d3.scaleBand()
       .domain(xAxisCategoryNames)
       .range([-margin.left / 2, totalWidth + margin.left * 1.5]);
@@ -251,8 +252,12 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     function make_x_gridlines() { return d3.axisBottom(x3); }
 
     // set chart attributes
-    chart.attr('viewBox', () => '0 0 700 780')
-      .attr('preserveAspectRatio', 'xMinYMin meet');
+    chart
+      .attr('height', 780);
+      // .attr('width', 500);
+      //.attr('viewBox', () => '0 0 700 780');
+      //.attr('preserveAspectRatio', 'xMinYMin meet');
+
     // append first grouping (container for y gridlines, response groupings, axis, legend, etc)
     chart = chart.append('g');
     // resp grouping...
@@ -289,7 +294,7 @@ function makeChart(chartConfigObject, jsonData, lookup) {
     response.selectAll('circle')
       .data(d => d.values)
       .enter().append('circle')
-      .attr('r', 4.9)
+      .attr('r', radius)
       .attr('cx', (d) => {
         const column = d[xAxisColumn];
         const value = Number(lookup[xAxisType][column].name);
@@ -298,6 +303,10 @@ function makeChart(chartConfigObject, jsonData, lookup) {
       })
       .attr('cy', d => margin.top + yMulti(d.dv))
       .on('mouseover', function (d,i) {
+        //circle effects
+        d3.select(this)
+          .attr('r', radius * 1.5);
+        //tooltip 
         let display;
         let title;
         function make_tooltip_display(d, xAxisColumn) {
@@ -391,6 +400,10 @@ function makeChart(chartConfigObject, jsonData, lookup) {
 
       })
       .on('mouseout', (d) => {
+        //circle effects
+        d3.selectAll('circle')
+          .attr('r', radius);
+        //tooltip 
         tooltipDiv.transition()
           .duration(500)
           .style('opacity', 0);
